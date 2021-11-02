@@ -11,6 +11,7 @@ knitr::opts_chunk$set(
   fig.path = "man/figures/README-",
   out.width = "100%"
 )
+Sys.setenv(LANGUAGE='en')
 ```
 
 # stenR
@@ -18,43 +19,126 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of stenR is to ...
+`stenR` is a package tailored mainly for creators of psychological questionnaires,
+though other social science researchers and survey authors can benefit greatly
+from it.
+
+It normalize and standardize results to standard scale of your choosing. It
+works on basis of source data: creates frequency table and computes Z score
+corresponding to particular raw score. After that you can get the score for
+all observations in the sourced data, chosen individuals or external data not
+used for calculating the norms.
 
 ## Installation
 
-You can install the released version of stenR from [CRAN](https://CRAN.R-project.org) with:
-
-``` r
-install.packages("stenR")
-```
-
-And the development version from [GitHub](https://github.com/) with:
+You can install the development version from [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
 devtools::install_github("StatisMike/stenR")
 ```
-## Example
+## Recommended workflow for using stenR functionality
 
-This is a basic example which shows you how to solve a common problem:
+`stenR` currently is based entirely on one `R6 class`: computed frequency table,
+or `stenR.comp_freqtable`. This document will shortly document the available
+methods and functions.
 
-```{r example}
+### Creating `stenR.comp_freqtable`
+
+Firstly you need to initialize new computed frequency table. It is recommended
+to do it using `gen_freqtable()` function.
+
+```{r initialize object}
 library(stenR)
-## basic example code
+
+# We will use data provided in the package
+
+freqtable <- gen_freqtable(
+  data = HEXACO_60,
+  vars = c("HEX_H", "HEX_E", "HEX_X", "HEX_A", "HEX_C", "HEX_O"),
+  id = "user_id"
+)
+```
+After initialization of the object, you can get some warnings. They indicate that there are some
+values of raw score that weren't represented in the data. The more possible values the scales
+can get and the smaller your data, the bigger possibility for it to happen. If you feel that your
+sample were representative, you can ignore it. It is recommended though to get more
+varied, greater number of observations when getting this warning.
+
+### Computing scores in standard scale
+
+After creation of your `stenR.comp_freqtable` object, you then need to calculate scores
+in scoring scale of your choice (or multiple of them). You can do it with `compute_scores(scale)` method:
+
+```{r compute_scores method}
+# one of most commonly used scales is a STEN scale
+freqtable$compute_scores("sten")
+# though we can also use tanines
+freqtable$compute_scores("tanine")
 ```
 
-What is special about using `README.Rmd` instead of just `README.md`? You can include R chunks like so:
+Now `freqtable` object holds scores computed in both *STEN* and *tanine* scales.
+We can check the state using `get_status()` method. It returns a list object,
+and `standardized scores` character vector holds the names of computed
+scores.
 
-```{r cars}
-summary(cars)
+```{r get_status method}
+freqtable$get_status()$`standardized scores`
+```
+### Getting computed scores for observations
+
+When results are available, you can get them using `get_computed_scores()` method:
+
+```{r get_computed_scores all}
+# we will print only few first rows of results
+head(
+  freqtable$get_computed_scores("sten")
+  )
+```
+You can also get only scores for specific observations and variables:
+
+```{r get_computed_scores_individual}
+freqtable$get_computed_scores(
+  "tanine",
+  vars = c("HEX_H", "HEX_C"),
+  ids = c("decrepit_norwayrat", "trapeziform_zebradove")
+)
+```
+If you need to get scores for some other observations, not present in the source data, 
+you can get it with use of `get_computed_scores_ext()` method:
+
+```{r get_computed_scores_ext()}
+external_data <- data.frame(
+  # names of the variables don't need to be the same as in computed freqtable
+  Extraversion = c(25, 42),
+  # and can also be supplied as characters. Just make sure it can be coerced to numerical
+  Openness = c("40", "23")
+)
+
+freqtable$get_computed_scores_ext(
+  data = external_data,
+  scale = "tanine",
+    # if the names are different, you need to provide named character vector
+  vars = c(HEX_X = "Extraversion", HEX_O = "Openness")
+)
 ```
 
-You'll still need to render `README.Rmd` regularly, to keep `README.md` up-to-date. `devtools::build_readme()` is handy for this. You could also use GitHub Actions to re-render `README.Rmd` every time you push. An example workflow can be found here: <https://github.com/r-lib/actions/tree/master/examples>.
+## Available methods and their functionality
 
-You can also embed plots, for example:
+Besides the basic methods shared by all `R6 class` objects, 
+`stenR.comp_freqtable` supports currently following methods:
 
-```{r pressure, echo = FALSE}
-plot(pressure)
-```
+- `get_status()` - returns list with details of current status of the object,
+- `get_data_info()` - returns list with information of the basic source data structure,
+- `get_freqtables()` - returns frequency tables for each variable
+- `compute_scores()` - compute score in one of the built-in standard scales of custom one. Currently, there are built-in definitions of following:
+  - *sten* (M = 5.5, SD = 2, min = 1, max = 10),
+  - *stanine* (M = 5, SD = 2, min = 1, max = 9),
+  - *tanine* (M = 50, SD = 10, min = 1, max = 100),
+  - *tetronic* (M = 10, SD = 4, min = 0, max = 20),
+  - *wechsler-iq* (M = 100, SD = 15, min = 40, max = 160)
+- `get_scoretables()` - returns scoring tables in specified computed scale,
+- `get_computed_scores()` - returns scores of source data for specified computed scale,
+- `get_computed_scores_ext()` - returns scores of external data for specified computed scale.
 
-In that case, don't forget to commit and push the resulting figure files, so they display on GitHub and CRAN.
+
