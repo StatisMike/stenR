@@ -267,11 +267,19 @@ comp_freqtable <- R6::R6Class("stenR.comp_freqtable",
       if(is.null(scale) || !is.character(scale) || length(scale) > 1 || !scale %in% names(private$computed_scores)) {
         stop(.warnings$valid_scale_required, call. = F)
       }
-      if((!is.character(vars) || (!all(vars %in% names(private$computed_scores[[scale]]$tables)) && !all(names(vars) %in% names(private$computed_scores[[scale]]$tables))))){
+      if(!is.character(vars)){ 
         stop(.warnings$bad_var_name, call. = F)
       }
+      
       if(!is.null(names(vars))){
         source_names <- names(data)
+        if(!all(names(vars) %in% names(private$computed_scores[[scale]]$tables))){
+          stop(.warnings$bad_var_name, call. = F)
+        }
+      } else {
+        if(!all(vars %in% names(private$computed_scores[[scale]]$tables))){
+          stop(.warnings$bad_var_name, call. = F)
+        }
       }
 
     # loop over all variables
@@ -317,6 +325,8 @@ gen_freqtable <- function(data,
                           id = NULL,
                           keep_data = T
                           ) {
+  
+  
 
   comp_freqtable$new(data = data,
                      vars = vars,
