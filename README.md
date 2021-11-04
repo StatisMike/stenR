@@ -10,11 +10,11 @@
 questionnaires, though other social science researchers and survey
 authors can benefit greatly from it.
 
-It normalize and standardize results to standard scale of your choosing.
-It works on basis of source data: creates frequency table and computes Z
-score corresponding to particular raw score. After that you can get the
-score for all observations in the sourced data, chosen individuals or
-external data not used for calculating the norms.
+It normalizes and standardizes results to standard scale of your
+choosing. It works on basis of source data: creates frequency table and
+computes Z score corresponding to particular raw score. After that you
+can get the score for all observations in the sourced data, chosen
+individuals or external data not used for calculating the norms.
 
 ## Installation
 
@@ -66,11 +66,12 @@ freqtable <- gen_freqtable(
 
 After initialization of the object, you can get some warnings. They
 indicate that there are some values of raw score that weren’t
-represented in the data. The more possible values the scales can get and
-the smaller your data, the bigger possibility for it to happen. If you
-feel that your sample were representative, you can ignore it. It is
-recommended though to get more varied, greater number of observations
-when getting this warning.
+represented in the data. By the rule of thumb: the more possible values
+the raw scores can get and the smaller your data, the bigger possibility
+for it to happen. If you feel that your sample was representative, you
+can ignore it. It is recommended though to get more varied, greater
+number of observations when getting this warning - or clean your data
+more thoroughly.
 
 ### Computing scores in standard scale
 
