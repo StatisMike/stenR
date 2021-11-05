@@ -162,7 +162,7 @@ Besides the basic methods shared by all `R6 class` objects,
     source data structure,
 -   `get_freqtables()` - returns frequency tables for each variable
 -   `compute_scores()` - compute score in one of the built-in standard
-    scales of custom one. Currently, there are built-in definitions of
+    scales or a custom one. Currently, there are built-in definitions of
     following:
     -   *sten* (M = 5.5, SD = 2, min = 1, max = 10),
     -   *stanine* (M = 5, SD = 2, min = 1, max = 9),
