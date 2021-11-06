@@ -96,14 +96,13 @@
 
 .get_comp_score <- function(raw_score, comp_table){
 
-  score <- as.numeric(comp_table[comp_table[["score"]] == as.character(raw_score), 2])
-
-  if (is.na(score)){
-    if (as.numeric(raw_score) > max(as.numeric(comp_table[["score"]]))){
-      score <- as.numeric(comp_table[nrow(comp_table), 2])
-    } else {
-      score <- as.numeric(comp_table[1, 2])
-    }
+  if (as.numeric(raw_score) > max(as.numeric(comp_table[["score"]]))){
+    score <- as.numeric(comp_table[nrow(comp_table), 2])
+  } else if (as.numeric(raw_score) < min(as.numeric(comp_table[["score"]]))){
+    score <- as.numeric(comp_table[1, 2])
+  } else {
+    score <- as.numeric(comp_table[comp_table[["score"]] == as.character(raw_score), 2])
   }
+  
   return(score)
 }
