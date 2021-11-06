@@ -72,13 +72,11 @@ test_that(".get_comp_score works correcty on raw scores available in scoring tab
 
 test_that(".get_comp_score works correctly on raw scores lower or higher", {
   for (raw_score in list(1, "1", 55, "55")) {
-    expect_failure(
-      expect_error(
-        stenR:::.get_comp_score(
-          raw_score = raw_score,
-          comp_table = score_table
-        )
-      )
+    expect_type(
+      stenR:::.get_comp_score(
+        raw_score = raw_score,
+        comp_table = score_table
+      ), "double"
     )
   }
 })
