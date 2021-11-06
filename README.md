@@ -4,6 +4,9 @@
 # stenR
 
 <!-- badges: start -->
+
+[![Codecov test
+coverage](https://codecov.io/gh/StatisMike/stenR/branch/master/graph/badge.svg)](https://codecov.io/gh/StatisMike/stenR?branch=master)
 <!-- badges: end -->
 
 `stenR` is a package tailored mainly for creators of psychological
