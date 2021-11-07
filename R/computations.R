@@ -30,8 +30,8 @@
 
   table <- data.frame(
     score = comp$score,
-    freq = as.numeric(round(comp$h, 4)*100),
-    quan = as.numeric(round(comp$props, 4)*100),
+    freq = as.numeric(comp$h * 100),
+    quan = as.numeric(comp$props * 100),
     Z = as.numeric(comp$Z_val)
   )
 

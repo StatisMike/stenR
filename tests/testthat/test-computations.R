@@ -32,6 +32,7 @@ test_that("table object is correct", {
   expect_s3_class(freq_table$table, "data.frame")
   expect_equal(min(as.numeric(freq_table$table$score)), min(HEXACO_60$HEX_C))
   expect_equal(max(as.numeric(freq_table$table$score)), max(HEXACO_60$HEX_C))
+  expect_equal(sum(freq_table$table$freq) , 100)
 })
 
 # .calc_score get object for further test ####

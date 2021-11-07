@@ -80,17 +80,17 @@ comp_freqtable <- R6::R6Class("stenR.comp_freqtable",
 
     initialize = function(data, vars, id, keep_data = T) {
 
+      if (!is.data.frame(data)) {
+        stop(.warnings$data.frame_required, call. = F)
+      }
       if (is.null(id) & keep_data) {
         stop(.warnings$missing_id_for_keep, call. = F)
       }
       if (keep_data && !id %in% names(data)) {
         stop(.warnings$bad_id_name)
       }
-      if (!is.data.frame(data)) {
-        stop(.warning$data.frame_required, call. = F)
-      }
       if (!all(vars %in% names(data))) {
-        stop(.warning$bad_var_name)
+        stop(.warnings$bad_var_name)
       }
 
 
