@@ -19,7 +19,7 @@
 
   # stop message for bad scale specification
   bad_scale_specification = "Currently, the 'scale' argument needs to be either character value: one of 'sten', 'stanine', 'tanine',
-               'tetronic', 'weschler-iq' or list containing objects 'M' (mean), 'SD' (standard deviation), 'min'
+               'tetronic', 'wechsler-iq' or list containing objects 'M' (mean), 'SD' (standard deviation), 'min'
                (minimal score) and 'max' (maximal score) of other scoring scale.",
 
   # stop message if there is not kept data and it is needed

@@ -135,7 +135,7 @@ comp_freqtable <- R6::R6Class("stenR.comp_freqtable",
     #' @description Compute scores in scale of your choice. After computation, you can get them with 'get_scoretables' method.
     #' @param scale Either a character string indicating one of built-in scale, or list specifying the parameters of scale of your choice
     #' \itemize{
-    #'   \item built-in scales: 'sten', 'stanine', 'tanine', 'tetronic', 'weschler-iq'
+    #'   \item built-in scales: 'sten', 'stanine', 'tanine', 'tetronic', 'wechsler-iq'
     #'   \item custom scales: specify parameters within list: 'M', 'SD', 'min', 'max' and 'name' of the scale for storage within object
     #' }
     compute_scores = function(scale) {

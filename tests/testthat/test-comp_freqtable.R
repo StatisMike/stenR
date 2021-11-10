@@ -87,3 +87,101 @@ test_that("There is an error trying to get_scoretables() without computing", {
   expect_error(freqtable_l$get_scoretables("sten"))
 })
 
+#### comp_freqtable score computation
+
+test_that("Score computation checks works", {
+  
+  expect_error(freqtable$compute_scores("non-existent scale"))
+  expect_error(freqtable$compute_scores(
+    list(name = "Incomplete custom scale",
+         M = 5,
+         SD = 3))) })
+
+test_that("Score computation works for default scales", {
+  
+  for (scale in c("sten", "stanine", "tanine", "tetronic", "wechsler-iq")){
+    
+    # regular freqtable
+      expect_silent(
+        freqtable$compute_scores(scale)
+      )
+    
+    # freqtable-light
+
+      expect_silent(
+        freqtable_l$compute_scores(scale)
+      )
+  }
+})
+
+test_that("Score computation works for custom scales", {
+  
+  custom_scales <- list(
+    list(name = "Low-score scale",
+         M = 2, SD = 0.5, min = 0, max = 4),
+    list(name = "High-score scale",
+         M = 1000, SD = 200, min = 0,max = 2000),
+    list(name = "Medium-score scale",
+         M = 20, SD = 5, min = 0, max = 40),
+    list(name = "Negative-score scale",
+         M = 0, SD = 5, min = -10, max = 10)
+  )
+  
+  for (scale in custom_scales){
+    # regular freqtable
+    expect_silent(
+      freqtable$compute_scores(scale)
+    )
+    
+    # freqtable-light
+    
+    expect_silent(
+      freqtable_l$compute_scores(scale)
+    )
+  }
+})
+
+#### get scoretables from regular comp_freqtable test
+
+test_that("You can get computed scoretables from comp_freqtable", {
+  
+  for (scale in freqtable$get_status()$`standardized scores`){
+    
+    expect_silent(
+      computed_score <- freqtable$get_scoretables(scale)
+    )
+    
+    expect_equal(length(computed_score), 2)
+    expect_equal(length(computed_score$tables), length(vars))
+    
+    for (var in vars){
+      
+      expect_equal(nrow(computed_score$tables[[var]]),
+                   nrow(freqtable$get_freqtables()[[var]]))
+      
+    }
+  }
+})
+
+#### get scoretables from light comp_freqtable test
+
+test_that("You can get computed scoretables from comp_freqtable light", {
+  
+  for (scale in freqtable_l$get_status()$`standardized scores`){
+    
+    expect_silent(
+      computed_score <- freqtable_l$get_scoretables(scale)
+    )
+    
+    expect_equal(length(computed_score), 2)
+    expect_equal(length(computed_score$tables), length(vars))
+    
+    for (var in vars){
+      
+      expect_equal(nrow(computed_score$tables[[var]]),
+                   nrow(freqtable_l$get_freqtables()[[var]]))
+      
+    }
+  }
+})
+
