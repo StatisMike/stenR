@@ -95,7 +95,10 @@ test_that("Score computation checks works", {
   expect_error(freqtable$compute_scores(
     list(name = "Incomplete custom scale",
          M = 5,
-         SD = 3))) })
+         SD = 3))) 
+  expect_error(freqtable$compute_scores(scale = 3))
+  
+  })
 
 test_that("Score computation works for default scales", {
   
@@ -185,3 +188,121 @@ test_that("You can get computed scoretables from comp_freqtable light", {
   }
 })
 
+#### get computed scores checks tests ####
+
+test_that("You cannot get internal computed_scores from light freqtable", {
+  
+  expect_error(freqtable_l$get_computed_scores())
+  
+})
+
+test_that("Prints error messages for invalid arguments are provided", {
+  
+  expect_error(freqtable$get_computed_scores(scale = "non-computed scale"))
+  expect_error(freqtable$get_computed_scores(scale = c("multiple", "strings")))
+  expect_error(freqtable$get_computed_scores(id = c("non-existing", "identifications")))
+  expect_error(freqtable$get_computed_scores(vars = c("non-existing", "variables")))
+  
+})
+
+#### get computed scores works as it should
+
+test_that("Gets computed scores for all scales that are computed", {
+  
+  for (scale in freqtable$get_status()$`standardized scores`){
+    
+    test_scores <- freqtable$get_computed_scores(scale = scale)
+    
+    expect_equal(nrow(test_scores), nrow(HEXACO_60))
+    expect_equal(ncol(test_scores), length(vars) + 1)
+  }
+})
+
+test_that("Gets computed scores for all scales that are computed and only for specified ids and vars", {
+  
+  random_ids <- sample(HEXACO_60$user_id, 5)
+  random_vars <- sample(vars, 3)
+  
+  for (scale in freqtable$get_status()$`standardized scores`){
+      
+      test_scores <- freqtable$get_computed_scores(scale = scale,
+                                                   ids = random_ids,
+                                                   vars = random_vars)
+      
+      expect_equal(nrow(test_scores), length(random_ids))
+      expect_equal(ncol(test_scores), length(random_vars) + 1)
+      
+  }
+  
+})
+
+#### get_computed_scores_ext checks
+
+# external data
+
+external_data_same_names <- data.frame(
+  HEX_C = c(32, 49), HEX_E = c("40", "23")
+)
+
+external_data_differing_names <- data.frame(
+  Extraversion = c(25, 42), Openness = c("40", "23")
+)
+
+
+test_that("Prints error messages for invalid arguments are provided", {
+    
+  expect_error(freqtable$get_computed_scores_ext(scale = "non-computed scale",
+                                                 data = external_data_same_names))
+  expect_error(freqtable$get_computed_scores_ext(scale = c("multiple", "strings"),
+                                                 data = external_data_same_names))
+  expect_error(freqtable$get_computed_scores_ext(vars = c("non-existing", "variables"),
+                                                 scale = "sten",
+                                                 data = external_data_same_names))
+})
+
+test_that("Correctly gets computed scores from external data", {
+  
+  test_scores <- list()
+  
+  # for regular freqtable
+  for (scale in freqtable$get_status()$`standardized scores`){
+    # same names
+    expect_silent(test_scores[["reg_same"]] <- freqtable$get_computed_scores_ext(
+      scale = scale,
+      vars = c("HEX_C", "HEX_E"),
+      data = external_data_same_names))
+    expect_equal(nrow(test_scores$reg_same), nrow(external_data_same_names))
+    expect_equal(ncol(test_scores$reg_same), ncol(external_data_same_names))
+    # different names
+    expect_silent(test_scores[["reg_diff"]] <- freqtable$get_computed_scores_ext(
+      scale = scale,
+      vars = c("HEX_O" = "Openness", 
+               "HEX_X" = "Extraversion"),
+      data = external_data_differing_names))
+    expect_equal(nrow(test_scores$reg_diff), nrow(external_data_differing_names))
+    expect_equal(ncol(test_scores$reg_diff), ncol(external_data_differing_names))
+  }
+  
+  # for light freqtable
+  for (scale in freqtable$get_status()$`standardized scores`){
+    # same names
+    expect_silent(test_scores[["l_same"]] <- freqtable_l$get_computed_scores_ext(
+      scale = scale,
+      vars = c("HEX_C", "HEX_E"),
+      data = external_data_same_names))
+    expect_equal(nrow(test_scores$l_same), nrow(external_data_same_names))
+    expect_equal(ncol(test_scores$l_same), ncol(external_data_same_names))
+    # different names
+    expect_silent(test_scores[["l_diff"]] <- freqtable_l$get_computed_scores_ext(
+      scale = scale,
+      vars = c("HEX_O" = "Openness", 
+               "HEX_X" = "Extraversion"),
+      data = external_data_differing_names))
+    expect_equal(nrow(test_scores$l_diff), nrow(external_data_differing_names))
+    expect_equal(ncol(test_scores$l_diff), ncol(external_data_differing_names))
+  }
+  
+  expect_identical(test_scores[["reg_diff"]], test_scores[["l_diff"]])
+  expect_identical(test_scores[["reg_same"]], test_scores[["l_same"]])
+  
+})
