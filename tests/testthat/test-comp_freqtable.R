@@ -200,8 +200,12 @@ test_that("Prints error messages for invalid arguments are provided", {
   
   expect_error(freqtable$get_computed_scores(scale = "non-computed scale"))
   expect_error(freqtable$get_computed_scores(scale = c("multiple", "strings")))
-  expect_error(freqtable$get_computed_scores(id = c("non-existing", "identifications")))
-  expect_error(freqtable$get_computed_scores(vars = c("non-existing", "variables")))
+  expect_error(freqtable$get_computed_scores(scale = "sten",
+                                             ids = 1))
+  expect_error(freqtable$get_computed_scores(ids = c("non-existing", "identifications"),
+                                             scale = "sten"))
+  expect_error(freqtable$get_computed_scores(vars = c("non-existing", "variables"),
+                                             scale = "sten"))
   
 })
 
