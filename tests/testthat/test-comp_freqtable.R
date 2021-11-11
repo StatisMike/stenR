@@ -262,6 +262,12 @@ test_that("Prints error messages for invalid arguments are provided", {
   expect_error(freqtable$get_computed_scores_ext(vars = c("non-existing", "variables"),
                                                  scale = "sten",
                                                  data = external_data_same_names))
+  expect_error(freqtable$get_computed_scores_ext(vars = 1,
+                                                 scale = "sten",
+                                                 data = external_data_same_names))
+  expect_error(freqtable$get_computed_scores_ext(vars = c("HEX_NONE" = "non-existing"),
+                                                 scale = "sten",
+                                                 data = external_data_same_names))
 })
 
 test_that("Correctly gets computed scores from external data", {
