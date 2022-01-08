@@ -13,7 +13,7 @@ Description: stenR creates an user-friendly R6 class to standardize raw discrete
              scoring tables. It provides support for few standard scales often
              used in psychological questionnaires, though also allows using
              custom scales not provided out of the box.
-License: GPL (>= 3)
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
