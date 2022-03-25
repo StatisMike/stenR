@@ -34,10 +34,10 @@ devtools::install_github("StatisMike/stenR")
 ## Recommended workflow for using stenR functionality
 
 `stenR` currently is based entirely on one `R6 class`: computed
-frequency table, or `stenR.comp_freqtable`. This document will shortly
-document the available methods and functions.
+frequency table, or `CompFreqtable`. This document will shortly document
+the available methods and functions.
 
-### Creating `stenR.comp_freqtable`
+### Creating `CompFreqtable`
 
 Firstly you need to initialize new computed frequency table. It is
 recommended to do it using `gen_freqtable()` function.
@@ -80,7 +80,7 @@ more thoroughly.
 
 ### Computing scores in standard scale
 
-After creation of your `stenR.comp_freqtable` object, you then need to
+After creation of your `CompFreqtable` object, you then need to
 calculate scores in scoring scale of your choice (or multiple of them).
 You can do it with `compute_scores(scale)` method:
 
@@ -97,8 +97,31 @@ list object, and `standardized scores` character vector holds the names
 of computed scores.
 
 ``` r
-freqtable$get_status()$`standardized scores`
+freqtable$get_status()$standardized_scores
 #> [1] "sten"   "tanine"
+```
+
+You can also get complete summary on current state of your object in a
+human-readable way with `summary()`
+
+``` r
+summary(freqtable)
+#> Frequency tables have been computed on: 204 observations.
+#> 
+#> Source data is kept within.
+#> Computed frequency tables for: 6 scales.
+#> 
+#> Frequency table status:
+#> HEX_H : incomplete 
+#> HEX_E : incomplete 
+#> HEX_X : incomplete 
+#> HEX_A : incomplete 
+#> HEX_C : complete 
+#> HEX_O : incomplete 
+#> 
+#> Computed standardized scores for scales:
+#> sten 
+#> tanine
 ```
 
 ### Getting computed scores for observations
@@ -159,7 +182,7 @@ freqtable$get_computed_scores_ext(
 ## Available methods and their functionality
 
 Besides the basic methods shared by all `R6 class` objects,
-`stenR.comp_freqtable` supports currently following methods:
+`CompFreqtable` supports currently following methods:
 
 -   `get_status()` - returns list with details of current status of the
     object,

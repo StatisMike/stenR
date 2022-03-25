@@ -8,7 +8,7 @@
 #' @export
 #' @import R6
 
-comp_freqtable <- R6::R6Class("stenR.comp_freqtable",
+CompFreqtable <- R6::R6Class("CompFreqtable",
 
   private = list(
 
@@ -31,32 +31,28 @@ comp_freqtable <- R6::R6Class("stenR.comp_freqtable",
   public = list(
 
     #' @description Current information about object
+    #' 
     #' @return List of metrics
     #' \itemize{
     #'   \item n: Number of observations for frequency table generation
-    #'   \item kept data: Is the data kept in the object?
-    #'   \item frequency tables: Are the frequency table complete or incomplete?
-    #'   \item standardized scores: Are the standardized scores computed - and if yes, then: for which scales?
+    #'   \item kept_data: Is the data kept in the object?
+    #'   \item frequency_tables: Are the frequency table complete or incomplete?
+    #'   \item standardized_scores: Are the standardized scores computed - and if yes, then: for which scales?
     #' }
 
     get_status = function() {
-
+      
       status <- list(
         n = private$n,
-        `data kept` = !is.null(private$source_data),
-        `frequency tables` = private$freq_tables_status,
-        `standardized scores` = NULL
-        )
-
-      if (is.null(private$computed_scores)) {
-        status$`standardized scores` <- "not computed yet"
-      } else {
-        status$`standardized scores` <- names(private$computed_scores)
-      }
-
+        data_kept = !is.null(private$source_data),
+        frequency_tables = private$freq_tables_status,
+        standardized_scores = if (is.null(private$computed_scores)) "not computed yet"
+        else names(private$computed_scores)
+      )
+      
       return(status)
-
-      },
+        
+    },
 
     #' @description Information about kept data
     #'
@@ -326,12 +322,36 @@ gen_freqtable <- function(data,
                           keep_data = T
                           ) {
   
-  
-
-  comp_freqtable$new(data = data,
+  CompFreqtable$new(data = data,
                      vars = vars,
                      id = id,
                      keep_data = keep_data)
 
+}
+
+
+#' Summary method for CompFreqtable object
+#' @export
+
+summary.CompFreqtable <- function(object) {
+  
+  status <- object$get_status()
+  
+  cat("Frequency tables have been computed on:", status$n, "observations.\n")
+  cat("\nSource data is", if(status$data_kept) "kept within." else "not kept within.\n")
+  cat("\nComputed frequency tables for:", 
+      length(status$frequency_tables), "scales.\n")
+  cat("\nFrequency table status:\n")
+  for (i in seq_along(status$frequency_tables)) {
+    cat(names(status$frequency_tables)[i], ":", status$frequency_tables[[i]], "\n")
+  }
+  cat("\nComputed standardized scores for scales:\n")
+  if (status$standardized_scores[1] == "not computed yet") cat("None yet!")
+  else { 
+    for (scale in status$standardized_scores) {
+      cat(scale, "\n")
+    }
+  }
+  
 }
 
