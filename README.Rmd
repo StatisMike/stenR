@@ -19,6 +19,8 @@ Sys.setenv(LANGUAGE='en')
 <!-- badges: start -->
 [![Codecov test coverage](https://codecov.io/gh/StatisMike/stenR/branch/master/graph/badge.svg)](https://codecov.io/gh/StatisMike/stenR?branch=master)
 [![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://www.tidyverse.org/lifecycle/#stable)
+[![Codecov test coverage](https://codecov.io/gh/StatisMike/stenR/branch/master/graph/badge.svg)](https://app.codecov.io/gh/StatisMike/stenR?branch=master)
+[![R-CMD-check](https://github.com/StatisMike/stenR/workflows/R-CMD-check/badge.svg)](https://github.com/StatisMike/stenR/actions)
 <!-- badges: end -->
 
 `stenR` is a package tailored mainly for creators of psychological questionnaires,

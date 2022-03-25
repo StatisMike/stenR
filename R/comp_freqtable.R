@@ -25,7 +25,10 @@ CompFreqtable <- R6::R6Class("CompFreqtable",
     freq_tables_status = NULL,
 
     # computed_scores Computed scores for all raw score values present in the source data. Computed in format of scale specified by argument 'score'
-    computed_scores = NULL
+    computed_scores = NULL,
+    
+    # scale_params Params for created scales
+    scale_params = NULL
   ),
 
   public = list(
@@ -46,8 +49,8 @@ CompFreqtable <- R6::R6Class("CompFreqtable",
         n = private$n,
         data_kept = !is.null(private$source_data),
         frequency_tables = private$freq_tables_status,
-        standardized_scores = if (is.null(private$computed_scores)) "not computed yet"
-        else names(private$computed_scores)
+        standardized_scores = if (is.null(private$scale_params)) "not computed yet"
+        else private$scale_params
       )
       
       return(status)
@@ -171,8 +174,8 @@ CompFreqtable <- R6::R6Class("CompFreqtable",
                                      params$max)
       }
 
-      private$computed_scores[[scale]] <- list(tables = output,
-                                               params = params)
+      private$computed_scores[[scale]] <- output
+      private$scale_params[[scale]] <- params
 
     },
 
@@ -214,7 +217,7 @@ CompFreqtable <- R6::R6Class("CompFreqtable",
       if(!is.null(ids) & (!is.character(ids) || !all(ids %in% private$source_data[[1]]))){
         stop(.warnings$valid_id_required, call. = F)
       }
-      if(!is.null(vars) & (!is.character(vars) || !all(vars %in% names(private$computed_scores[[scale]]$tables)))){
+      if(!is.null(vars) & (!is.character(vars) || !all(vars %in% names(private$computed_scores[[scale]])))){
         stop(.warnings$bad_var_name, call. = F)
       }
 
@@ -227,7 +230,7 @@ CompFreqtable <- R6::R6Class("CompFreqtable",
 
       # if vars not provided, get all vars
       if(is.null(vars)){
-        variables <- names(private$computed_scores[[scale]]$tables)
+        variables <- names(private$computed_scores[[scale]])
       } else {
         variables <- vars
       }
@@ -244,7 +247,7 @@ CompFreqtable <- R6::R6Class("CompFreqtable",
               # get value from computed scores table and into the correct results row
               results[results_index, variable] <- .get_comp_score(
                 raw_score = private$source_data[source_index, variable],
-                comp_table = private$computed_scores[[scale]]$tables[[variable]]
+                comp_table = private$computed_scores[[scale]][[variable]]
               )
             }
         }
@@ -269,11 +272,11 @@ CompFreqtable <- R6::R6Class("CompFreqtable",
       
       if(!is.null(names(vars))){
         source_names <- names(data)
-        if(!all(names(vars) %in% names(private$computed_scores[[scale]]$tables))){
+        if(!all(names(vars) %in% names(private$computed_scores[[scale]]))){
           stop(.warnings$bad_var_name, call. = F)
         }
       } else {
-        if(!all(vars %in% names(private$computed_scores[[scale]]$tables))){
+        if(!all(vars %in% names(private$computed_scores[[scale]]))){
           stop(.warnings$bad_var_name, call. = F)
         }
       }
@@ -291,7 +294,7 @@ CompFreqtable <- R6::R6Class("CompFreqtable",
         for (row in 1:nrow(data)) {
           data[row, variable] <- .get_comp_score(
             raw_score = as.character(data[row, variable]),
-            comp_table = private$computed_scores[[scale]]$tables[[variable]]
+            comp_table = private$computed_scores[[scale]][[variable]]
           )
         }
       }
@@ -348,8 +351,13 @@ summary.CompFreqtable <- function(object) {
   cat("\nComputed standardized scores for scales:\n")
   if (status$standardized_scores[1] == "not computed yet") cat("None yet!")
   else { 
-    for (scale in status$standardized_scores) {
-      cat(scale, "\n")
+    for (i in seq_along(status$standardized_scores)) {
+      cat(names(status$standardized_scores)[i], ":\t( ", sep = "")
+      for (i_p in seq_along(status$standardized_scores[[i]])) {
+        cat(names(status$standardized_scores[[i]])[i_p], ": ", sep = "")
+        cat(status$standardized_scores[[i]][[i_p]]); cat(" ")
+      }
+      cat(")\n")
     }
   }
   
