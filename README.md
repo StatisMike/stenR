@@ -9,6 +9,9 @@
 coverage](https://codecov.io/gh/StatisMike/stenR/branch/master/graph/badge.svg)](https://codecov.io/gh/StatisMike/stenR?branch=master)
 [![Lifecycle:
 stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://www.tidyverse.org/lifecycle/#stable)
+[![Codecov test
+coverage](https://codecov.io/gh/StatisMike/stenR/branch/master/graph/badge.svg)](https://app.codecov.io/gh/StatisMike/stenR?branch=master)
+[![R-CMD-check](https://github.com/StatisMike/stenR/workflows/R-CMD-check/badge.svg)](https://github.com/StatisMike/stenR/actions)
 <!-- badges: end -->
 
 `stenR` is a package tailored mainly for creators of psychological
@@ -44,6 +47,7 @@ recommended to do it using `gen_freqtable()` function.
 
 ``` r
 library(stenR)
+#> Loading required package: R6
 
 # We will use data provided in the package
 
@@ -98,7 +102,32 @@ of computed scores.
 
 ``` r
 freqtable$get_status()$standardized_scores
-#> [1] "sten"   "tanine"
+#> $sten
+#> $sten$M
+#> [1] 5.5
+#> 
+#> $sten$SD
+#> [1] 2
+#> 
+#> $sten$min
+#> [1] 1
+#> 
+#> $sten$max
+#> [1] 10
+#> 
+#> 
+#> $tanine
+#> $tanine$M
+#> [1] 50
+#> 
+#> $tanine$SD
+#> [1] 10
+#> 
+#> $tanine$min
+#> [1] 1
+#> 
+#> $tanine$max
+#> [1] 100
 ```
 
 You can also get complete summary on current state of your object in a
@@ -120,8 +149,8 @@ summary(freqtable)
 #> HEX_O : incomplete 
 #> 
 #> Computed standardized scores for scales:
-#> sten 
-#> tanine
+#> sten:    ( M: 5.5 SD: 2 min: 1 max: 10 )
+#> tanine:  ( M: 50 SD: 10 min: 1 max: 100 )
 ```
 
 ### Getting computed scores for observations
