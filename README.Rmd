@@ -19,6 +19,8 @@ Sys.setenv(LANGUAGE='en')
 <!-- badges: start -->
 [![Codecov test coverage](https://codecov.io/gh/StatisMike/stenR/branch/master/graph/badge.svg)](https://codecov.io/gh/StatisMike/stenR?branch=master)
 [![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://www.tidyverse.org/lifecycle/#stable)
+[![Codecov test coverage](https://codecov.io/gh/StatisMike/stenR/branch/master/graph/badge.svg)](https://app.codecov.io/gh/StatisMike/stenR?branch=master)
+[![R-CMD-check](https://github.com/StatisMike/stenR/workflows/R-CMD-check/badge.svg)](https://github.com/StatisMike/stenR/actions)
 <!-- badges: end -->
 
 `stenR` is a package tailored mainly for creators of psychological questionnaires,
@@ -42,10 +44,10 @@ devtools::install_github("StatisMike/stenR")
 ## Recommended workflow for using stenR functionality
 
 `stenR` currently is based entirely on one `R6 class`: computed frequency table,
-or `stenR.comp_freqtable`. This document will shortly document the available
+or `CompFreqtable`. This document will shortly document the available
 methods and functions.
 
-### Creating `stenR.comp_freqtable`
+### Creating `CompFreqtable`
 
 Firstly you need to initialize new computed frequency table. It is recommended
 to do it using `gen_freqtable()` function.
@@ -71,7 +73,7 @@ clean your data more thoroughly.
 
 ### Computing scores in standard scale
 
-After creation of your `stenR.comp_freqtable` object, you then need to calculate scores
+After creation of your `CompFreqtable` object, you then need to calculate scores
 in scoring scale of your choice (or multiple of them). You can do it with `compute_scores(scale)` method:
 
 ```{r compute_scores method}
@@ -87,8 +89,16 @@ and `standardized scores` character vector holds the names of computed
 scores.
 
 ```{r get_status method}
-freqtable$get_status()$`standardized scores`
+freqtable$get_status()$standardized_scores
 ```
+
+You can also get complete summary on current state of your object in 
+a human-readable way with `summary()`
+
+```{r summary_method}
+summary(freqtable)
+```
+
 ### Getting computed scores for observations
 
 When results are available, you can get them using `get_computed_scores()` method:
@@ -130,7 +140,7 @@ freqtable$get_computed_scores_ext(
 ## Available methods and their functionality
 
 Besides the basic methods shared by all `R6 class` objects, 
-`stenR.comp_freqtable` supports currently following methods:
+`CompFreqtable` supports currently following methods:
 
 - `get_status()` - returns list with details of current status of the object,
 - `get_data_info()` - returns list with information of the basic source data structure,

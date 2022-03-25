@@ -78,8 +78,8 @@ test_that("There is no kept data with `keep_data` = F", {
 #### comp_freqtable without computed scores
 
 test_that("There is good output with get_status() method (not computed scores)", {
-  expect_match(freqtable$get_status()$`standardized scores`, regexp = "not computed yet")
-  expect_match(freqtable_l$get_status()$`standardized scores`, regexp = "not computed yet")
+  expect_match(freqtable$get_status()$standardized_scores, regexp = "not computed yet")
+  expect_match(freqtable_l$get_status()$standardized_scores, regexp = "not computed yet")
 })
 
 test_that("There is an error trying to get_scoretables() without computing", {
@@ -148,18 +148,17 @@ test_that("Score computation works for custom scales", {
 
 test_that("You can get computed scoretables from comp_freqtable", {
   
-  for (scale in freqtable$get_status()$`standardized scores`){
+  for (scale in names(freqtable$get_status()$standardized_scores)){
     
     expect_silent(
       computed_score <- freqtable$get_scoretables(scale)
     )
-    
-    expect_equal(length(computed_score), 2)
-    expect_equal(length(computed_score$tables), length(vars))
+
+    expect_equal(length(computed_score), length(vars))
     
     for (var in vars){
       
-      expect_equal(nrow(computed_score$tables[[var]]),
+      expect_equal(nrow(computed_score[[var]]),
                    nrow(freqtable$get_freqtables()[[var]]))
       
     }
@@ -170,18 +169,17 @@ test_that("You can get computed scoretables from comp_freqtable", {
 
 test_that("You can get computed scoretables from comp_freqtable light", {
   
-  for (scale in freqtable_l$get_status()$`standardized scores`){
+  for (scale in names(freqtable_l$get_status()$standardized_scores)){
     
     expect_silent(
       computed_score <- freqtable_l$get_scoretables(scale)
     )
     
-    expect_equal(length(computed_score), 2)
-    expect_equal(length(computed_score$tables), length(vars))
+    expect_equal(length(computed_score), length(vars))
     
     for (var in vars){
       
-      expect_equal(nrow(computed_score$tables[[var]]),
+      expect_equal(nrow(computed_score[[var]]),
                    nrow(freqtable_l$get_freqtables()[[var]]))
       
     }
@@ -213,7 +211,7 @@ test_that("Prints error messages for invalid arguments are provided", {
 
 test_that("Gets computed scores for all scales that are computed", {
   
-  for (scale in freqtable$get_status()$`standardized scores`){
+  for (scale in names(freqtable$get_status()$standardized_scores)){
     
     test_scores <- freqtable$get_computed_scores(scale = scale)
     
@@ -227,7 +225,7 @@ test_that("Gets computed scores for all scales that are computed and only for sp
   random_ids <- sample(HEXACO_60$user_id, 5)
   random_vars <- sample(vars, 3)
   
-  for (scale in freqtable$get_status()$`standardized scores`){
+  for (scale in names(freqtable$get_status()$standardized_scores)){
       
       test_scores <- freqtable$get_computed_scores(scale = scale,
                                                    ids = random_ids,
@@ -275,7 +273,7 @@ test_that("Correctly gets computed scores from external data", {
   test_scores <- list()
   
   # for regular freqtable
-  for (scale in freqtable$get_status()$`standardized scores`){
+  for (scale in names(freqtable$get_status()$standardized_scores)){
     # same names
     expect_silent(test_scores[["reg_same"]] <- freqtable$get_computed_scores_ext(
       scale = scale,
@@ -294,7 +292,7 @@ test_that("Correctly gets computed scores from external data", {
   }
   
   # for light freqtable
-  for (scale in freqtable$get_status()$`standardized scores`){
+  for (scale in names(freqtable$get_status()$standardized_scores)){
     # same names
     expect_silent(test_scores[["l_same"]] <- freqtable_l$get_computed_scores_ext(
       scale = scale,
