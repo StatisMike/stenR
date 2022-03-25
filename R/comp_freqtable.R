@@ -334,9 +334,11 @@ gen_freqtable <- function(data,
 
 
 #' Summary method for CompFreqtable object
+#' @param object an object for which a summary is desired.
+#' @param ... additional arguments affecting the summary produced.
 #' @export
 
-summary.CompFreqtable <- function(object) {
+summary.CompFreqtable <- function(object, ...) {
   
   status <- object$get_status()
   

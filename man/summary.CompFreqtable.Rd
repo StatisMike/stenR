@@ -4,7 +4,12 @@
 \alias{summary.CompFreqtable}
 \title{Summary method for CompFreqtable object}
 \usage{
-\method{summary}{CompFreqtable}(object)
+\method{summary}{CompFreqtable}(object, ...)
+}
+\arguments{
+\item{object}{an object for which a summary is desired.}
+
+\item{...}{additional arguments affecting the summary produced.}
 }
 \description{
 Summary method for CompFreqtable object
