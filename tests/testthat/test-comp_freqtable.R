@@ -120,13 +120,13 @@ test_that("Score computation works for default scales", {
 test_that("Score computation works for custom scales", {
   
   custom_scales <- list(
-    list(name = "Low-score scale",
+    FreqtableScale(name = "Low-score scale",
          M = 2, SD = 0.5, min = 0, max = 4),
-    list(name = "High-score scale",
+    FreqtableScale(name = "High-score scale",
          M = 1000, SD = 200, min = 0,max = 2000),
-    list(name = "Medium-score scale",
+    FreqtableScale(name = "Medium-score scale",
          M = 20, SD = 5, min = 0, max = 40),
-    list(name = "Negative-score scale",
+    FreqtableScale(name = "Negative-score scale",
          M = 0, SD = 5, min = -10, max = 10)
   )
   

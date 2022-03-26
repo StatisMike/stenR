@@ -5,10 +5,8 @@
 
 <!-- badges: start -->
 
-[![Codecov test
-coverage](https://codecov.io/gh/StatisMike/stenR/branch/master/graph/badge.svg)](https://codecov.io/gh/StatisMike/stenR?branch=master)
 [![Lifecycle:
-stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://www.tidyverse.org/lifecycle/#stable)
+experimental](https://img.shields.io/badge/lifecycle-experimental-blue.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![Codecov test
 coverage](https://codecov.io/gh/StatisMike/stenR/branch/master/graph/badge.svg)](https://app.codecov.io/gh/StatisMike/stenR?branch=master)
 [![R-CMD-check](https://github.com/StatisMike/stenR/workflows/R-CMD-check/badge.svg)](https://github.com/StatisMike/stenR/actions)
@@ -135,22 +133,32 @@ human-readable way with `summary()`
 
 ``` r
 summary(freqtable)
-#> Frequency tables have been computed on: 204 observations.
-#> 
 #> Source data is kept within.
 #> Computed frequency tables for: 6 scales.
 #> 
-#> Frequency table status:
-#> HEX_H : incomplete 
-#> HEX_E : incomplete 
-#> HEX_X : incomplete 
-#> HEX_A : incomplete 
-#> HEX_C : complete 
-#> HEX_O : incomplete 
+#> Frequency tables status:
+#> HEX_H:
+#>  range: incomplete
+#>  no obs: 204
+#> HEX_E:
+#>  range: incomplete
+#>  no obs: 204
+#> HEX_X:
+#>  range: incomplete
+#>  no obs: 204
+#> HEX_A:
+#>  range: incomplete
+#>  no obs: 204
+#> HEX_C:
+#>  range: complete
+#>  no obs: 204
+#> HEX_O:
+#>  range: incomplete
+#>  no obs: 204
 #> 
 #> Computed standardized scores for scales:
-#> sten:    ( M: 5.5 SD: 2 min: 1 max: 10 )
-#> tanine:  ( M: 50 SD: 10 min: 1 max: 100 )
+#> sten:    ( M: 5.5; SD: 2; min: 1; max: 10 )
+#> tanine:  ( M: 50; SD: 10; min: 1; max: 100 )
 ```
 
 ### Getting computed scores for observations
