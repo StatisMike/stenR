@@ -12,8 +12,6 @@ CompFreqtable <- R6::R6Class("CompFreqtable",
 
   private = list(
 
-    # how many observation were used to create frequency tables
-    n = NULL,
 
     # source data, if the argument 'keep_data' during initialization is TRUE (default)
     source_data = NULL,
@@ -28,7 +26,11 @@ CompFreqtable <- R6::R6Class("CompFreqtable",
     computed_scores = NULL,
     
     # scale_params Params for created scales
-    scale_params = NULL
+    scale_params = NULL,
+    
+    # scales list of attached scales
+    scales = NULL
+    
   ),
 
   public = list(
@@ -46,11 +48,10 @@ CompFreqtable <- R6::R6Class("CompFreqtable",
     get_status = function() {
       
       status <- list(
-        n = private$n,
         data_kept = !is.null(private$source_data),
         frequency_tables = private$freq_tables_status,
-        standardized_scores = if (is.null(private$scale_params)) "not computed yet"
-        else private$scale_params
+        standardized_scores = if (is.null(names(private$computed_scores))) "not computed yet"
+        else private$scales[names(private$scales) %in% names(private$computed_scores)]
       )
       
       return(status)
@@ -92,13 +93,12 @@ CompFreqtable <- R6::R6Class("CompFreqtable",
         stop(.warnings$bad_var_name)
       }
 
-
-      private$n <- nrow(data)
-
       if (keep_data) {
         private$source_data <- data[, c(id, vars)]
       }
+      
       tables <- list()
+      
       for (var in vars) {
         tables[[var]] <- .calc_freq_Z_table(data, var)
       }
@@ -112,9 +112,12 @@ CompFreqtable <- R6::R6Class("CompFreqtable",
         statuses[[names(tables)[n_freq]]] <- tables[[n_freq]]$status
 
       }
+      
+      lapply(.default_scales, \(x) self$attach_scale(x))
 
       private$freq_tables <- freqtables
       private$freq_tables_status <- statuses
+
 
     },
 
@@ -130,52 +133,61 @@ CompFreqtable <- R6::R6Class("CompFreqtable",
       return(private$freq_tables)
 
     },
+    
+    #' @description Attach new scale to the object
+    #' @param scale `FreqtableScale` object defining a scale
+    #' 
+    
+    attach_scale = function(scale) {
+      
+      if (class(scale) != "FreqtableScale")
+        stop("Scale definition should be provided in form of the `FreqtableScale` object")
+      
+      if (!is.null(private$scales[[scale$name]]))
+        warning(paste0("Definition of scale '", scale$name, 
+                       "' was already attached. It is being overwritten."))
+      
+      private$scales[[scale$name]] <- 
+        list(M = scale$M, SD = scale$SD, min = scale$min, max = scale$max)
+      
+    },
 
-    #' @description Compute scores in scale of your choice. After computation, you can get them with 'get_scoretables' method.
-    #' @param scale Either a character string indicating one of built-in scale, or list specifying the parameters of scale of your choice
-    #' \itemize{
-    #'   \item built-in scales: 'sten', 'stanine', 'tanine', 'tetronic', 'wechsler-iq'
-    #'   \item custom scales: specify parameters within list: 'M', 'SD', 'min', 'max' and 'name' of the scale for storage within object
-    #' }
+    #' @description Compute scores in scale of your choice. After computation, 
+    #' you can get them with 'get_scoretables' method.
+    #' @param scale Either a character string indicating one of built-in scale, 
+    #' or `FreqtableScale` object describing new scale.
+    #' If new scale is declared, it will be automatically attached
+    #' 
     compute_scores = function(scale) {
-
-      if (class(scale) == "character" & length(scale) == 1) { # default scoring scales
-        if (scale == "sten") {
-          params <- list(M = 5.5, SD = 2, min = 1, max = 10)
-        } else if (scale == "stanine") {
-          params <- list(M = 5, SD = 2, min = 1, max = 9)
-        } else if (scale == "tanine") {
-          params <- list(M = 50, SD = 10, min = 1, max = 100)
-        } else if (scale == "tetronic") {
-          params <- list(M = 10, SD = 4, min = 0, max = 20)
-        } else if (scale == "wechsler-iq") {
-          params <- list(M = 100, SD = 15, min = 40, max = 160)
-        } else {
-          stop(.warnings$bad_scale_specification)
+      
+      if (class(scale) == "FreqtableScale") {
+        
+        self$attach_scale(scale)
+        scale <- scale$name
+        
+      } else if (class(scale) == "character" & length(scale) == 1) {
+        
+        if (!scale %in% names(private$scales)) {
+          stop(paste0("Scale of name '", scale, " were not attached before."))
         }
-      } else if (class(scale) == "list") {
-        if (all(c("M", "SD", "min", "max", "name") %in% names(scale))) {
-          params <- list(M = scale$M, SD = scale$SD, min = scale$min, max = scale$max)
-          scale <- scale$name
-        } else {
-          stop(.warnings$bad_scale_specification)
-        }
+        
       } else {
-        stop(.warnings$bad_scale_specification)
+        
+        stop("'scale' argument should contain eiter character poining to attached scale or new `FreqtableScale` object with definition")
+        
       }
 
       output <- list()
       for(var in names(private$freq_tables)){
         output[[var]] <- .calc_score(name = var,
                                      table = private$freq_tables[[var]],
-                                     params$M,
-                                     params$SD,
-                                     params$min,
-                                     params$max)
+                                     private$scales[[scale]]$M,
+                                     private$scales[[scale]]$SD,
+                                     private$scales[[scale]]$min,
+                                     private$scales[[scale]]$max)
       }
 
       private$computed_scores[[scale]] <- output
-      private$scale_params[[scale]] <- params
 
     },
 
@@ -342,13 +354,14 @@ summary.CompFreqtable <- function(object, ...) {
   
   status <- object$get_status()
   
-  cat("Frequency tables have been computed on:", status$n, "observations.\n")
-  cat("\nSource data is", if(status$data_kept) "kept within." else "not kept within.\n")
+  cat("Source data is", if(status$data_kept) "kept within." else "not kept within.\n")
   cat("\nComputed frequency tables for:", 
       length(status$frequency_tables), "scales.\n")
-  cat("\nFrequency table status:\n")
+  cat("\nFrequency tables status:\n")
   for (i in seq_along(status$frequency_tables)) {
-    cat(names(status$frequency_tables)[i], ":", status$frequency_tables[[i]], "\n")
+    cat(sep = "", names(status$frequency_tables)[i], ":\n", 
+        "\trange: ", status$frequency_tables[[i]]$range, "\n",
+        "\tno obs: ", status$frequency_tables[[i]]$n, "\n")
   }
   cat("\nComputed standardized scores for scales:\n")
   if (status$standardized_scores[1] == "not computed yet") cat("None yet!")
@@ -357,7 +370,8 @@ summary.CompFreqtable <- function(object, ...) {
       cat(names(status$standardized_scores)[i], ":\t( ", sep = "")
       for (i_p in seq_along(status$standardized_scores[[i]])) {
         cat(names(status$standardized_scores[[i]])[i_p], ": ", sep = "")
-        cat(status$standardized_scores[[i]][[i_p]]); cat(" ")
+        cat(status$standardized_scores[[i]][[i_p]])
+        if (i_p == 4) cat(" ") else cat("; ")
       }
       cat(")\n")
     }

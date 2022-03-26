@@ -17,11 +17,6 @@
       "]: There are missing score values between minimum and maximum scores. They have been filled automatically, though have in mind that you should get more representative sample.")
   },
 
-  # stop message for bad scale specification
-  bad_scale_specification = "Currently, the 'scale' argument needs to be either character value: one of 'sten', 'stanine', 'tanine',
-               'tetronic', 'wechsler-iq' or list containing objects 'M' (mean), 'SD' (standard deviation), 'min'
-               (minimal score) and 'max' (maximal score) of other scoring scale.",
-
   # stop message if there is not kept data and it is needed
   need_source_data = "You tried to do something that requires your class to have kept the data.",
 
@@ -34,3 +29,4 @@
   # stop message if provided id name is not valid
   bad_id_name = "Please provide valid column name containing ids."
 )
+

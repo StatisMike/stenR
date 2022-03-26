@@ -24,11 +24,11 @@ freq_table <- stenR:::.calc_freq_Z_table(
 # .calc_freq_Z output object is correct ####
 
 test_that("status object is correct", {
-  expect_equal(freq_table$status, "complete")
+  expect_equal(freq_table$status$range, "complete")
 })
 
 test_that("table object is correct", {
-  expect_equal(names(freq_table$table), c("score", "freq", "quan", "Z"))
+  expect_equal(names(freq_table$table), c("n", "score", "freq", "quan", "Z"))
   expect_s3_class(freq_table$table, "data.frame")
   expect_equal(min(as.numeric(freq_table$table$score)), min(HEXACO_60$HEX_C))
   expect_equal(max(as.numeric(freq_table$table$score)), max(HEXACO_60$HEX_C))

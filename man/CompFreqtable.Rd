@@ -16,6 +16,7 @@ is recommended.
 \item \href{#method-get_data_info}{\code{CompFreqtable$get_data_info()}}
 \item \href{#method-new}{\code{CompFreqtable$new()}}
 \item \href{#method-get_freqtables}{\code{CompFreqtable$get_freqtables()}}
+\item \href{#method-attach_scale}{\code{CompFreqtable$attach_scale()}}
 \item \href{#method-compute_scores}{\code{CompFreqtable$compute_scores()}}
 \item \href{#method-get_scoretables}{\code{CompFreqtable$get_scoretables()}}
 \item \href{#method-get_computed_scores}{\code{CompFreqtable$get_computed_scores()}}
@@ -93,10 +94,28 @@ Two lists, containing actual cumulated frequency tables and their statuses
 }
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-attach_scale"></a>}}
+\if{latex}{\out{\hypertarget{method-attach_scale}{}}}
+\subsection{Method \code{attach_scale()}}{
+Attach new scale to the object
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CompFreqtable$attach_scale(scale)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{scale}}{\code{FreqtableScale} object defining a scale}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-compute_scores"></a>}}
 \if{latex}{\out{\hypertarget{method-compute_scores}{}}}
 \subsection{Method \code{compute_scores()}}{
-Compute scores in scale of your choice. After computation, you can get them with 'get_scoretables' method.
+Compute scores in scale of your choice. After computation,
+you can get them with 'get_scoretables' method.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{CompFreqtable$compute_scores(scale)}\if{html}{\out{</div>}}
 }
@@ -104,11 +123,9 @@ Compute scores in scale of your choice. After computation, you can get them with
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{scale}}{Either a character string indicating one of built-in scale, or list specifying the parameters of scale of your choice
-\itemize{
-\item built-in scales: 'sten', 'stanine', 'tanine', 'tetronic', 'wechsler-iq'
-\item custom scales: specify parameters within list: 'M', 'SD', 'min', 'max' and 'name' of the scale for storage within object
-}}
+\item{\code{scale}}{Either a character string indicating one of built-in scale,
+or \code{FreqtableScale} object describing new scale.
+If new scale is declared, it will be automatically attached}
 }
 \if{html}{\out{</div>}}
 }
