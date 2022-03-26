@@ -108,7 +108,9 @@
 
 .get_comp_score <- function(raw_score, comp_table){
 
-  if (as.numeric(raw_score) > max(as.numeric(comp_table[["score"]]))){
+  if (is.na(as.numeric(raw_score))) {
+    score <- raw_score
+  } else if (as.numeric(raw_score) > max(as.numeric(comp_table[["score"]]))){
     score <- as.numeric(comp_table[nrow(comp_table), 2])
   } else if (as.numeric(raw_score) < min(as.numeric(comp_table[["score"]]))){
     score <- as.numeric(comp_table[1, 2])

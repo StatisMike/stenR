@@ -113,7 +113,7 @@ CompFreqtable <- R6::R6Class("CompFreqtable",
 
       }
       
-      lapply(.default_scales, \(x) self$attach_scale(x))
+      lapply(.default_scales, function(x) self$attach_scale(x))
 
       private$freq_tables <- freqtables
       private$freq_tables_status <- statuses
