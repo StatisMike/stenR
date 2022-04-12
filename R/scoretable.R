@@ -47,6 +47,9 @@ print.ScoreTable <- function(st, max = NULL) {
   invisible(st)
 }
 
+#' @param st a `ScoreTable` object
+#' @rdname ScoreTable
+#' @export
 plot.ScoreTable <- function(st) {
 
   sum_of_n <- sum(st$table$n)

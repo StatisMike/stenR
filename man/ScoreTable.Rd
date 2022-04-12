@@ -3,18 +3,21 @@
 \name{ScoreTable}
 \alias{ScoreTable}
 \alias{print.ScoreTable}
+\alias{plot.ScoreTable}
 \title{Create a ScoreTable using \code{FrequencyTable} and \code{StandardScale} objects}
 \usage{
 ScoreTable(ft, scale)
 
 \method{print}{ScoreTable}(st, max = NULL)
+
+\method{plot}{ScoreTable}(st)
 }
 \arguments{
 \item{ft}{\code{FrequencyTable} object}
 
 \item{scale}{\code{StandardScale} object}
 
-\item{st}{A \code{ScoreTable} object}
+\item{st}{a \code{ScoreTable} object}
 
 \item{max}{numeric or NULL, specifying the maximal number of entries to be
 printed. By default, when NULL, \code{\link{getOption}("max.print")} used.}
