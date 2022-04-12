@@ -84,10 +84,11 @@
 #' @param SD sd of output scale
 #' @param min min of output scale
 #' @param max max of output scale
+#' @param scale_name name of the standardized scale
 #' @return tibble with normalized values for each raw score
 #' @noRd
 
-.calc_score <- function (name, table, M, SD, min, max) {
+.calc_score <- function (name, table, M, SD, min, max, scale_name) {
 
   Z_val <- table$Z
   val <- round(Z_val * SD + M)
@@ -95,7 +96,7 @@
                     ifelse(val > max, max, val))
   output <- data.frame(score = table$score,
                        val = val_mut)
-  names(output)[2] <- name
+  names(output)[2] <- scale_name
 
   return(output)
 

@@ -1,6 +1,6 @@
 Package: stenR
 Title: R6-based Standardization of Raw Discrete Scores 
-Version: 0.1.4
+Version: 0.1.5
 Authors@R: 
     person(given = "Michal",
            family = "Kosinski",
@@ -21,6 +21,7 @@ RoxygenNote: 7.1.2
 Depends:
     R6
 Imports:
+    data.table,
     dplyr,
     stats
 Suggests: 
