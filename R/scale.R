@@ -1,10 +1,10 @@
-#' An object with specification for some standard scale
+#' Specify standard scale
 #' 
-#' @details `StandardScale` objects are used with \code{\link{ScoreTable}}
+#' @description `StandardScale` objects are used with \code{\link{ScoreTable}}
 #' objects to recalculate \code{\link{FrequencyTable}} into some standardized
 #' scale score. 
 #' 
-#' There are some StandardScale defaults available out of the box. Check out the
+#' There are some `StandardScale` defaults available. Check out the
 #' \code{\link{default_scales}} help page for more information.
 #' 
 #' Plot method requires `ggplot2` package to be installed.
@@ -15,6 +15,7 @@
 #' @param min Minimal value the scale takes
 #' @param max Maximal value the scale takes
 #' @return StandardScale object
+#' 
 #' @export
 #' 
 StandardScale <- function(
@@ -54,8 +55,9 @@ StandardScale <- function(
 #' @export
 print.StandardScale <- function(object) {
   
-  cat("<StandardScale> object: '", object$name, "' scale definition\n", sep = "")
+  cat("<StandardScale>: '", object$name, "'\n", sep = "")
   cat("( M: ", object$M, "; SD: ", object$SD, "; min: ", object$min, "; max: ", object$max, " )", sep = "")
+  cat("\n")
   
 }
 
@@ -87,7 +89,7 @@ TANINE <- StandardScale(name = "tanine", M = 50, SD = 10, min = 1, max = 100)
 TETRONIC <- StandardScale(name = "tetronic", M = 10, SD = 4, min = 0, max = 20)
 
 #' @export
-WECHSLER_IQ <- StandardScale(name = "wechsler-iq", M = 100, SD = 15, min = 40, max = 160)
+WECHSLER_IQ <- StandardScale(name = "wechslerIQ", M = 100, SD = 15, min = 40, max = 160)
 
 #' @param scale StandardScale object
 #' @param n Number of points the plot generates. The higher the number, the more
@@ -129,7 +131,9 @@ plot.StandardScale <- function(scale, n = 1000) {
     ggplot2::scale_x_continuous(breaks = c(scale$min, SD2[1], SD1[1], scale$M, SD1[2], SD2[2], scale$max)) +
     ggplot2::geom_vline(xintercept = scale$M) +
     ggplot2::geom_vline(xintercept = SD1, color = "green") +
-    ggplot2::geom_vline(xintercept = SD2, color = "blue")
+    ggplot2::geom_vline(xintercept = SD2, color = "blue") +
+    ggplot2::theme_bw() +
+    ggplot2::scale_y_continuous(name = NULL)
   
 }
   

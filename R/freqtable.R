@@ -73,6 +73,9 @@ FrequencyTable <- function(data) {
                    n = sum(table$n))
   }
   
+  table$score <- as.numeric(table$score)
+  table <- table[, c("score", "n", "freq", "quan", "Z")]
+  
   output <- list(table = table,
                  status = status)
   
@@ -90,7 +93,7 @@ FrequencyTable <- function(data) {
 print.FrequencyTable <- function(ft, max = NULL) {
   
   cat(sep = "", "<FrequencyTable> computed on: ", ft$status$n, " observations\n")
-  cat(ft$status$range, "range", if(ft$status$range != "complete") "(missing raw score values between <min> and <max>)\n\n")
+  cat("range:", ft$status$range, if(ft$status$range != "complete") "(missing raw score values between <min> and <max>)", "\n\n")
   
   print(ft$table, max = max, row.names = F)
   
@@ -114,10 +117,13 @@ plot.FrequencyTable <- function(ft) {
   Z_label <- paste("Z =", round(ft$table$Z[i], 2))
   
   ggplot2::ggplot(data = ft$table, ggplot2::aes(x = score, y = n)) + 
-    ggplot2::geom_col(ggplot2::aes(fill = sds)) +
-    ggplot2::scale_fill_discrete("Normalized\ndistribution") +
+    ggplot2::geom_col(ggplot2::aes(fill = sds), color = "black", alpha = 0.3) +
+    ggplot2::scale_fill_manual("Normalized\ndistribution",
+                                 values = c("green", "blue", "red")) +
     ggplot2::geom_vline(ggplot2::aes(xintercept = ft$table$score[i],
-                                     color = Z_label)) +
-    ggplot2::scale_color_manual("Closest to\ncenter", values = "#000000")
+                                     color = Z_label), size = 0.5) +
+    ggplot2::scale_color_manual("Closest to\ncenter", values = "#000000") +
+    ggplot2::theme_bw() +
+    ggplot2::scale_y_continuous(name = "Number of observations")
 
 }

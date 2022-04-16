@@ -2,29 +2,70 @@
 % Please edit documentation in R/scoretable.R
 \name{ScoreTable}
 \alias{ScoreTable}
+\alias{attach_scales}
 \alias{print.ScoreTable}
 \alias{plot.ScoreTable}
-\title{Create a ScoreTable using \code{FrequencyTable} and \code{StandardScale} objects}
+\title{Create a ScoreTable}
 \usage{
 ScoreTable(ft, scale)
 
+attach_scales(st, scale)
+
 \method{print}{ScoreTable}(st, max = NULL)
 
-\method{plot}{ScoreTable}(st)
+\method{plot}{ScoreTable}(st, scale_name = NULL)
 }
 \arguments{
-\item{ft}{\code{FrequencyTable} object}
+\item{ft}{a \code{FrequencyTable} object}
 
-\item{scale}{\code{StandardScale} object}
+\item{scale}{a \code{StandardScale} object or list of multiple \code{StandardScale} objects}
 
 \item{st}{a \code{ScoreTable} object}
 
 \item{max}{numeric or NULL, specifying the maximal number of entries to be
 printed. By default, when NULL, \code{\link{getOption}("max.print")} used.}
+
+\item{scale_name}{if scores for multiple scales available, provide the name
+of the scale for plotting.}
+}
+\value{
+object of class \code{StandardScale}. Consists of:
+\itemize{
+\item table: data.frame containing for each point in the raw score:
+\itemize{
+\item number of observations (\code{n}),
+\item frequency in sample (\code{freq}),
+\item quantile (\code{quan}),
+\item normalized Z-score (\code{Z}),
+\item score transformed to every of provided \code{StandardScales}
+}
+\item status: list with status description of the table
+\itemize{
+\item range: either 'complete' or 'incomplete', if there were any missing
+raw scores between minimum and maximum
+\item n: complete number or observations for which the \code{ScoreTable} is computed
+}
+\item scale: named list of all attached \code{StandardScale} objects
+}
 }
 \description{
-Creates a table to recalculate raw scores into specified
-standardized scale. Uses normalization provided by \code{FrequencyTable}.
+Creates a table to calculate scores in specified standardized
+scale for each discrete raw score. Uses normalization provided by
+\code{\link{FrequencyTable}} and scale definition created with
+\code{\link{StandardScale}}.
+
+After creation it can be used to normalize and standardize raw scores with
+\code{\link{normalize_score}}.
 
 \code{plot.ScoreTable} method requires \code{ggplot2} package to be installed.
+}
+\examples{
+# firstly compute FrequencyTable for a variable
+ft <- FrequencyTable(HEXACO_60$HEX_A)
+
+# then create a ScoreTable
+st <- ScoreTable(ft, STEN)
+
+# possibly attach more scales to ScoreTable
+st <- attach_scales(st, list(STANINE, WECHSLER_IQ))
 }

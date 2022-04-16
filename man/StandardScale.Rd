@@ -4,7 +4,7 @@
 \alias{StandardScale}
 \alias{print.StandardScale}
 \alias{plot.StandardScale}
-\title{An object with specification for some standard scale}
+\title{Specify standard scale}
 \usage{
 StandardScale(name, M, SD, min, max)
 
@@ -34,14 +34,11 @@ detailed are the plots. Default to 1000 for nicely detailed plot.}
 StandardScale object
 }
 \description{
-An object with specification for some standard scale
-}
-\details{
 \code{StandardScale} objects are used with \code{\link{ScoreTable}}
 objects to recalculate \code{\link{FrequencyTable}} into some standardized
 scale score.
 
-There are some StandardScale defaults available out of the box. Check out the
+There are some \code{StandardScale} defaults available. Check out the
 \code{\link{default_scales}} help page for more information.
 
 Plot method requires \code{ggplot2} package to be installed.
