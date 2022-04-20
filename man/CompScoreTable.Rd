@@ -14,19 +14,51 @@ for provided raw scores and integrate them into stored tables.
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-attach_scale}{\code{CompScoreTable$attach_scale()}}
+\item \href{#method-new}{\code{CompScoreTable$new()}}
+\item \href{#method-attach_StandardScale}{\code{CompScoreTable$attach_StandardScale()}}
 \item \href{#method-attach_FrequencyTable}{\code{CompScoreTable$attach_FrequencyTable()}}
+\item \href{#method-get_ScoreTable}{\code{CompScoreTable$get_ScoreTable()}}
+\item \href{#method-standardize}{\code{CompScoreTable$standardize()}}
 \item \href{#method-clone}{\code{CompScoreTable$clone()}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-attach_scale"></a>}}
-\if{latex}{\out{\hypertarget{method-attach_scale}{}}}
-\subsection{Method \code{attach_scale()}}{
+\if{html}{\out{<a id="method-new"></a>}}
+\if{latex}{\out{\hypertarget{method-new}{}}}
+\subsection{Method \code{new()}}{
+Initialize a CompScoreTable object. You can attach one or many
+StandardScale and FrequencyTable objects
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CompScoreTable$new(tables = NULL, scales = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{tables}}{Named list of FrequencyTable objects to be attached. Names
+will indicate the name of variable for which the table is calculated.
+Defaults to NULL, so no tables will be available at the beginning.}
+
+\item{\code{scales}}{StandardScale object or list of such objects to be attached.
+They will be used for calculation of ScoreTables. Default to NULL, so no
+scales wil be attached.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+Both \code{FrequencyTable} and \code{StandardScale} objects can be attached
+with appropriate methods after object initialization.
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-attach_StandardScale"></a>}}
+\if{latex}{\out{\hypertarget{method-attach_StandardScale}{}}}
+\subsection{Method \code{attach_StandardScale()}}{
 Attach new scale to the object. If there are any ScoreTables
 already computed, score for newly-attached scale will be computed automatically.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{CompScoreTable$attach_scale(scale, overwrite = FALSE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{CompScoreTable$attach_StandardScale(scale, overwrite = FALSE)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -48,15 +80,15 @@ Attach previously generated \code{FrequencyTable} for a given
 variable. \code{ScoreTable} containing every attached scale will be calulcated
 automatically based on every new \code{FrequencyTable}.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{CompScoreTable$attach_FrequencyTable(var, ft, if_exists = "append")}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{CompScoreTable$attach_FrequencyTable(ft, var, if_exists = "append")}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{var}}{String with the name of the variable}
-
 \item{\code{ft}}{FrequencyTable to be attached}
+
+\item{\code{var}}{String with the name of the variable}
 
 \item{\code{if_exists}}{Action that should be taken if \code{FrequencyTable} for
 given variable already exists in the object.
@@ -66,6 +98,58 @@ given variable already exists in the object.
 }}
 }
 \if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-get_ScoreTable"></a>}}
+\if{latex}{\out{\hypertarget{method-get_ScoreTable}{}}}
+\subsection{Method \code{get_ScoreTable()}}{
+Extract list of ScoreTables from the object
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CompScoreTable$get_ScoreTable(vars = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{vars}}{Names of the variables for which to get the ScoreTables.
+If left at \code{NULL} default - get all ScoreTables}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-standardize"></a>}}
+\if{latex}{\out{\hypertarget{method-standardize}{}}}
+\subsection{Method \code{standardize()}}{
+Compute standardize scores for data.frame of raw scores.
+Additionally, the raw scores can be used to recalculate ScoreTables
+before computing.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CompScoreTable$standardize(data, vars = names(data), what, calc = TRUE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{data}}{data.frame containing raw scores.}
+
+\item{\code{vars}}{vector of variable names which will taken into account}
+
+\item{\code{what}}{the values to get. One of either:
+\itemize{
+\item \code{quan} - the quantile of raw score in the distribution
+\item \code{Z} - normalized Z score for the raw scores
+\item name of the scale attached to the \code{CompScoreTable} object
+}}
+
+\item{\code{calc}}{should the ScoreTables be computed (or recalculated, if
+some are already provided?)}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+data.frame with values recalculated
 }
 }
 \if{html}{\out{<hr>}}
