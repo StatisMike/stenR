@@ -21,10 +21,12 @@ Depends:
 Imports:
     data.table,
     dplyr,
+    moments,
     stats
 Suggests: 
     knitr,
     rmarkdown,
+    SimMultiCorrData,
     testthat (>= 3.0.0),
     covr
 VignetteBuilder: knitr

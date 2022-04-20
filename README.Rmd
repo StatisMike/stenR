@@ -18,8 +18,6 @@ Sys.setenv(LANGUAGE='en')
 
 <!-- badges: start -->
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-blue.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
-[![Codecov test coverage](https://codecov.io/gh/StatisMike/stenR/branch/master/graph/badge.svg)](https://app.codecov.io/gh/StatisMike/stenR?branch=master)
-[![R-CMD-check](https://github.com/StatisMike/stenR/workflows/R-CMD-check/badge.svg)](https://github.com/StatisMike/stenR/actions)
 <!-- badges: end -->
 
 `stenR` is a package tailored mainly for creators of psychological questionnaires,
@@ -70,7 +68,7 @@ case for a few scores:
 which(HEX_H_ft$table$n == 0)
 ```
 
-We can also see it while plotting the resulting FrequencyTable:
+We can also see it while plotting the resulting *FrequencyTable*:
 
 ```{r FrequencyTable plot}
 plot(HEX_H_ft)
@@ -83,11 +81,11 @@ get more varied, greater number of observations when getting this warning.
 
 ### 2. Generate ScoreTable using FrequencyTable
 
-`FrequencyTable` is a basis for normalizing the distribution of your data. Now,
-the next step is to standardize it using some `StandardScale` and generating
-`ScoreTable`.
+*FrequencyTable* is a basis for normalizing the distribution of your data. Now,
+the next step is to standardize it using some *StandardScale* and generating
+*ScoreTable*.
 
-There are some `StandardScale` object available out of the box. They define
+There are some *StandardScale* objects available in the package. They define
 score scale. We can use the popular in psychology **STEN** scale to calculate
 the scores.
 
@@ -108,13 +106,27 @@ plot(HEX_H_st)
 ```
 
 We can see that the shape of the generated distribution is similar to the
-distribution associated with the `StandardScale`. It is a good sign: number
+distribution associated with the *StandardScale*. It is a good sign: number
 of values of raw scores is appropriate for the chosen scale. In contrast, we
 can see that the **TANINE** scale would be an ill choice:
 
 ```{r HEXACO_tanine}
-ScoreTable(HEX_H_ft, TANINE) |> plot()
+plot(ScoreTable(HEX_H_ft, TANINE))
 ```
+
+You can also define your own *StandardScale* object using the `StandardScale`
+function.
+
+```{r StandardScale}
+new_scale <- StandardScale("my_scale", 10, 3, 0, 20)
+
+# let's see if everything is correct
+new_scale
+
+# how does its distribution looks like?
+plot(new_scale)
+```
+
 
 ### 3. Calculate score for the new results
 

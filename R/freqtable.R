@@ -127,3 +127,95 @@ plot.FrequencyTable <- function(ft) {
     ggplot2::scale_y_continuous(name = "Number of observations")
 
 }
+
+#' @rdname FrequencyTable
+#' @export
+summary.FrequencyTable <- function(ft) {
+  
+  whole_vec <- rep(ft$table$score, ft$table$n)
+  
+  summaries <- list(n = length(whole_vec),
+                    min = min(whole_vec),
+                    max = max(whole_vec),
+                    mean = mean(whole_vec),
+                    median = median(whole_vec),
+                    sd = sd(whole_vec),
+                    skewness = moments::skewness(whole_vec),
+                    kurtosis = moments::kurtosis(whole_vec))
+  
+  cat(sep = "", "<FrequencyTable> object:\n")
+  
+  class(summaries) <- c("summaryDefault", "table")
+  
+  return(summaries)
+  
+}
+
+#' Generate FrequencyTable using simulated distribution
+#' 
+#' @description It is always best to use raw scores for computing the FrequencyTable.
+#' They can be unavaiable, so there is an option to simulate the distribution
+#' given its descriptive statistics.
+#' 
+#' This simulation should be always treated as an estimate.
+#' 
+#' The distribution is generated using the *Fleishmann* method from
+#' [SimMultiCorrData::nonnormvar1()] function is used. The 
+#' `SimMultiCorrData` package needs to be installed.
+#' 
+#' @param min minimum value of raw score
+#' @param max maximum value of raw score
+#' @param M mean of the raw scores distribution 
+#' @param SD standard deviation of the raw scores distribution
+#' @param skew skewness of the raw scores distribution. Defaults to `0` for 
+#' normal distribution
+#' @param kurt kurtosis of the raw scores distribution. Defaults to `3` for
+#' normal distribution
+#' @param n number of observations to simulate. Defaults to `10000`, but greater 
+#' values could be used to generate better estimates. Final number of observations
+#' in the generated Frequency Table may be less - all values lower than `min` and
+#' higher than `max` are filtered out.
+#' @param seed the seed value for random number generation
+#' @return 
+#' FrequencyTable object created with simulated data. Consists of:
+#' 
+#' - table: data.frame with number of observations (`n`), frequency in sample 
+#' (`freq`), quantile (`quan`) and normalized Z-score (`Z`) for each point in 
+#' raw score 
+#' - status: list containing the total number of simulated observations (`n`) 
+#' and information about raw scores range completion (`range`): complete or incomplete 
+#' @export
+SimFrequencyTable <- function(
+  min, max, M, SD, skew = 0, kurt = 3, n = 10000, seed = NULL
+) {
+
+    if (!requireNamespace("SimMultiCorrData", quietly = T)) {
+      stop(paste0(
+        "To use this function, 'SimMultiCorrData' package needs to be installed. ",
+        "You can install it with `install.packages('SimMultiCorrData')`"
+      ))
+    }
+  
+  if (is.null(seed))
+    seed <- as.numeric(paste(round(runif(6, 0, 9), 0), collapse = ""))
+  
+  suppressMessages({
+    simulated <- SimMultiCorrData::nonnormvar1(
+      method = "Fleishman",
+      means = M,
+      vars = SD^2,
+      skews = skew,
+      skurts = kurt-3,
+      n = n,
+      seed = seed
+    )$continuous_variable$V1
+  })
+  
+  simulated <- as.integer(round(simulated, 0))
+  simulated <- simulated[simulated >= min & simulated <= max]
+  
+  ft <- FrequencyTable(simulated)
+  class(ft) <- c(class(ft), "Simulated")
+  return(ft)
+  
+}

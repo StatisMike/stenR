@@ -4,6 +4,7 @@
 \alias{FrequencyTable}
 \alias{print.FrequencyTable}
 \alias{plot.FrequencyTable}
+\alias{summary.FrequencyTable}
 \title{Create a FrequencyTable from raw data}
 \usage{
 FrequencyTable(data)
@@ -11,6 +12,8 @@ FrequencyTable(data)
 \method{print}{FrequencyTable}(ft, max = NULL)
 
 \method{plot}{FrequencyTable}(ft)
+
+\method{summary}{FrequencyTable}(ft)
 }
 \arguments{
 \item{data}{vector of raw scores. Double values are coerced to integer}

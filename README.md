@@ -7,9 +7,6 @@
 
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-blue.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
-[![Codecov test
-coverage](https://codecov.io/gh/StatisMike/stenR/branch/master/graph/badge.svg)](https://app.codecov.io/gh/StatisMike/stenR?branch=master)
-[![R-CMD-check](https://github.com/StatisMike/stenR/workflows/R-CMD-check/badge.svg)](https://github.com/StatisMike/stenR/actions)
 <!-- badges: end -->
 
 `stenR` is a package tailored mainly for creators of psychological
@@ -118,7 +115,7 @@ which(HEX_H_ft$table$n == 0)
 #> [1]  4  9 34 35
 ```
 
-We can also see it while plotting the resulting FrequencyTable:
+We can also see it while plotting the resulting *FrequencyTable*:
 
 ``` r
 plot(HEX_H_ft)
@@ -134,11 +131,11 @@ when getting this warning.
 
 ### 2. Generate ScoreTable using FrequencyTable
 
-`FrequencyTable` is a basis for normalizing the distribution of your
-data. Now, the next step is to standardize it using some `StandardScale`
-and generating `ScoreTable`.
+*FrequencyTable* is a basis for normalizing the distribution of your
+data. Now, the next step is to standardize it using some *StandardScale*
+and generating *ScoreTable*.
 
-There are some `StandardScale` object available out of the box. They
+There are some *StandardScale* objects available in the package. They
 define score scale. We can use the popular in psychology **STEN** scale
 to calculate the scores.
 
@@ -165,15 +162,32 @@ plot(HEX_H_st)
 <img src="man/figures/README-ScoreTable-1.png" width="100%" />
 
 We can see that the shape of the generated distribution is similar to
-the distribution associated with the `StandardScale`. It is a good sign:
+the distribution associated with the *StandardScale*. It is a good sign:
 number of values of raw scores is appropriate for the chosen scale. In
 contrast, we can see that the **TANINE** scale would be an ill choice:
 
 ``` r
-ScoreTable(HEX_H_ft, TANINE) |> plot()
+plot(ScoreTable(HEX_H_ft, TANINE))
 ```
 
 <img src="man/figures/README-HEXACO_tanine-1.png" width="100%" />
+
+You can also define your own *StandardScale* object using the
+`StandardScale` function.
+
+``` r
+new_scale <- StandardScale("my_scale", 10, 3, 0, 20)
+
+# let's see if everything is correct
+new_scale
+#> <StandardScale>: 'my_scale'
+#> ( M: 10; SD: 3; min: 0; max: 20 )
+
+# how does its distribution looks like?
+plot(new_scale)
+```
+
+<img src="man/figures/README-StandardScale-1.png" width="100%" />
 
 ### 3. Calculate score for the new results
 

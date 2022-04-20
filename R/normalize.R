@@ -23,7 +23,7 @@ normalize_score <- function(
   what) {
   
   switch(
-    class(table),
+    class(table)[1],
     "FrequencyTable" = {
       if (!what %in% c("quan", "Z")) 
         stop("Provide either 'quan' or 'Z' to the 'what' argument.")},

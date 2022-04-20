@@ -31,7 +31,7 @@
 ScoreTable <- function(ft,
                        scale) {
   
-  if (class(ft) != "FrequencyTable")
+  if (!"FrequencyTable" %in% class(ft))
     stop("Object of class 'FrequencyTable' needs to be provided to 'ft' argument")
   if (!class(scale) %in% c("StandardScale", "list"))
     stop("Object of class 'StandardScale' or list of such objects needs to be provided to 'scale' argument")
@@ -59,16 +59,17 @@ ScoreTable <- function(ft,
                  status = ft$status,
                  scale = scales_ls)
   
-  class(output) <- c("ScoreTable")
+  class(output) <- c("ScoreTable", if("Simulated" %in% class(ft)) "Simulated")
   return(output)
   
   
 }
 
 #' @rdname ScoreTable
+#' @export
 attach_scales <- function(st, scale) {
   
-  if (class(st) != "ScoreTable")
+  if (!"ScoreTable" %in% class(st))
     stop("Object of class 'ScoreTable' needs to be provided to 'ft' argument")
   if (!class(scale) %in% c("StandardScale", "list"))
     stop("Object of class 'StandardScale' or list of such objects needs to be provided to 'scale' argument")
@@ -93,7 +94,7 @@ attach_scales <- function(st, scale) {
                  status = st$status,
                  scale = st$scale)
   
-  class(output) <- c("ScoreTable")
+  class(output) <- c("ScoreTable", if("Simulated" %in% class(st)) "Simulated")
   return(output)
   
 }
