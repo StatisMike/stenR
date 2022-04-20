@@ -8,7 +8,7 @@
 #' @export
 #' @import R6
 
-CompFreqtable <- R6::R6Class("CompFreqtable",
+Comp_Freqtable <- R6::R6Class("Comp_Freqtable",
 
   private = list(
 
@@ -24,9 +24,6 @@ CompFreqtable <- R6::R6Class("CompFreqtable",
 
     # computed_scores Computed scores for all raw score values present in the source data. Computed in format of scale specified by argument 'score'
     computed_scores = NULL,
-    
-    # scale_params Params for created scales
-    scale_params = NULL,
     
     # scales list of attached scales
     scales = NULL
@@ -178,13 +175,24 @@ CompFreqtable <- R6::R6Class("CompFreqtable",
       }
 
       output <- list()
+      
+      for (var in names(private$freq_tables))
+      
+      if (is.null(private$computed_scores[[var]])) {
+        
+        private$computes_scores
+        
+        
+      }
+      
       for(var in names(private$freq_tables)){
         output[[var]] <- .calc_score(name = var,
                                      table = private$freq_tables[[var]],
                                      private$scales[[scale]]$M,
                                      private$scales[[scale]]$SD,
                                      private$scales[[scale]]$min,
-                                     private$scales[[scale]]$max)
+                                     private$scales[[scale]]$max,
+                                     scale)
       }
 
       private$computed_scores[[scale]] <- output
@@ -194,11 +202,7 @@ CompFreqtable <- R6::R6Class("CompFreqtable",
     #' @description Get computed scoring tables for all variables
     #' @param scale character string indicating for which computed scale return values
     #' @return
-    #' Two lists, containing the actual tables and parameters used for calculation
-    #' \itemize{
-    #' \item tables: tables with raw score and standardized score pairs
-    #' \item params: values of 'M', 'SD', 'min' and 'max' used for calculations
-    #' }
+    #' List containing the actual tables with raw score and standardized score pairs
     #'
     get_scoretables = function(scale){
 
@@ -269,11 +273,16 @@ CompFreqtable <- R6::R6Class("CompFreqtable",
     #' @description Get computed scores for external observations
     #' @param data data.frame containing raw scores to get standardized scores for
     #' @param scale character string defining the computed scale
-    #' @param vars character vector declaring variables for which to get standardized score. If the variables in external data are named differently, the vector should be named accordingly.
+    #' @param vars character vector declaring variables for which to get 
+    #' standardized score. If the variables in external data are named 
+    #' differently, the vector should be named accordingly.
+    #' @param attach boolean indicating if new data should be attached to the
+    #' frequency table. Defaults to TRUE.
 
     get_computed_scores_ext = function(data,
                                        scale,
-                                       vars){
+                                       vars,
+                                       attach = TRUE){
 
       if(is.null(scale) || !is.character(scale) || length(scale) > 1 || !scale %in% names(private$computed_scores)) {
         stop(.warnings$valid_scale_required, call. = F)

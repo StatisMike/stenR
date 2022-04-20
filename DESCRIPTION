@@ -1,16 +1,14 @@
 Package: stenR
 Title: R6-based Standardization of Raw Discrete Scores 
-Version: 0.1.4
+Version: 0.2.0002
 Authors@R: 
     person(given = "Michal",
            family = "Kosinski",
            role = c("aut", "cre"),
            email = "kosinski.mich@gmail.com",
            comment = c(ORCID = "https://orcid.org/0000-0002-8426-3654"))
-Description: stenR creates an user-friendly R6 class to standardize raw discrete
-             scores. It allows exporting standardized results for observations
-             present in source data, as well as exporting frequency tables and
-             scoring tables. It provides support for few standard scales often
+Description: stenR creates an user-friendly framework to standardize raw discrete
+             scores. It provides support for few standard scales often
              used in psychological questionnaires, though also allows using
              custom scales not provided out of the box.
 License: MIT + file LICENSE
@@ -21,11 +19,14 @@ RoxygenNote: 7.1.2
 Depends:
     R6
 Imports:
+    data.table,
     dplyr,
+    moments,
     stats
 Suggests: 
     knitr,
     rmarkdown,
+    SimMultiCorrData,
     testthat (>= 3.0.0),
     covr
 VignetteBuilder: knitr

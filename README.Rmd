@@ -18,140 +18,138 @@ Sys.setenv(LANGUAGE='en')
 
 <!-- badges: start -->
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-blue.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
-[![Codecov test coverage](https://codecov.io/gh/StatisMike/stenR/branch/master/graph/badge.svg)](https://app.codecov.io/gh/StatisMike/stenR?branch=master)
-[![R-CMD-check](https://github.com/StatisMike/stenR/workflows/R-CMD-check/badge.svg)](https://github.com/StatisMike/stenR/actions)
 <!-- badges: end -->
 
 `stenR` is a package tailored mainly for creators of psychological questionnaires,
 though other social science researchers and survey authors can benefit greatly
 from it.
 
-It normalizes and standardizes results to standard scale of your choosing. It
-works on basis of source data: creates frequency table and computes Z score
-corresponding to particular raw score. After that you can get the score for
-all observations in the sourced data, chosen individuals or external data not
-used for calculating the norms.
+It provides straightforward framework for normalization and standardization
+of raw discrete scores to standardized scale of your choosing. It follows simple
+work pattern:
+
+- create frequency table and compute Z-score corresponding to each raw score
+- create score table using some standard scale.
+- provide external raw score to be recalculated to standardized scale.
 
 ## Installation
 
-You can install the development version from [GitHub](https://github.com/) with:
+You can install the current version from [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
 devtools::install_github("StatisMike/stenR")
 ```
-## Recommended workflow for using stenR functionality
+## Procedural workflow for using stenR functionality
 
-`stenR` currently is based entirely on one `R6 class`: computed frequency table,
-or `CompFreqtable`. This document will shortly document the available
-methods and functions.
+`stenR` currently is based on few `S3` classes and can be used in purely
+procedural workflow, which will be described below. Exemplary data provided
+with package will be used:
 
-### Creating `CompFreqtable`
-
-Firstly you need to initialize new computed frequency table. It is recommended
-to do it using `gen_freqtable()` function.
-
-```{r initialize object}
+```{r exemplary_data}
 library(stenR)
 
-# We will use data provided in the package
-
-freqtable <- gen_freqtable(
-  data = HEXACO_60,
-  vars = c("HEX_H", "HEX_E", "HEX_X", "HEX_A", "HEX_C", "HEX_O"),
-  id = "user_id"
-)
+# data gathered in Polish sample - 204 summed results of HEXACO-60 questionnaires
+str(HEXACO_60)
 ```
-After initialization of the object, you can get some warnings. They indicate 
-that there are some values of raw score that weren't represented in the data. 
+
+### 1. Create a Frequency Table object on basis of some variable
+
+```{r FrequencyTable_create}
+HEX_H_ft <- FrequencyTable(HEXACO_60$HEX_H)
+HEX_H_ft
+```
+
+Generated warning tells us that there were some raw scores between `min()` and
+`max()` values that weren't represented in the sample. We can see that was the 
+case for a few scores:
+
+```{r missing_scores}
+which(HEX_H_ft$table$n == 0)
+```
+
+We can also see it while plotting the resulting *FrequencyTable*:
+
+```{r FrequencyTable plot}
+plot(HEX_H_ft)
+```
+
 By the rule of thumb: the more possible values the raw scores can get and the 
-smaller your data, the bigger possibility for it to happen. If you feel that 
+smaller your data, the bigger possibility for this to happen. If you feel that 
 your sample was representative, you can ignore it. It is recommended though to 
-get more varied, greater number of observations when getting this warning - or 
-clean your data more thoroughly.
+get more varied, greater number of observations when getting this warning.
 
-### Computing scores in standard scale
+### 2. Generate ScoreTable using FrequencyTable
 
-After creation of your `CompFreqtable` object, you then need to calculate scores
-in scoring scale of your choice (or multiple of them). You can do it with `compute_scores(scale)` method:
+*FrequencyTable* is a basis for normalizing the distribution of your data. Now,
+the next step is to standardize it using some *StandardScale* and generating
+*ScoreTable*.
 
-```{r compute_scores method}
-# one of most commonly used scales is a STEN scale
-freqtable$compute_scores("sten")
-# though we can also use tanines
-freqtable$compute_scores("tanine")
+There are some *StandardScale* objects available in the package. They define
+score scale. We can use the popular in psychology **STEN** scale to calculate
+the scores.
+
+```{r STEN_scale}
+# check out the scale definition
+STEN
+# see its distribution graphically
+plot(STEN)
 ```
 
-Now `freqtable` object holds scores computed in both *STEN* and *tanine* scales.
-We can check the state using `get_status()` method. It returns a list object,
-and `standardized scores` character vector holds the names of computed
-scores.
+Now, we can generate the ScoreTable using our FrequencyTable and scale of our
+choosing.
 
-```{r get_status method}
-freqtable$get_status()$standardized_scores
+```{r ScoreTable}
+HEX_H_st <- ScoreTable(HEX_H_ft, STEN)
+
+plot(HEX_H_st)
 ```
 
-You can also get complete summary on current state of your object in 
-a human-readable way with `summary()`
+We can see that the shape of the generated distribution is similar to the
+distribution associated with the *StandardScale*. It is a good sign: number
+of values of raw scores is appropriate for the chosen scale. In contrast, we
+can see that the **TANINE** scale would be an ill choice:
 
-```{r summary_method}
-summary(freqtable)
+```{r HEXACO_tanine}
+plot(ScoreTable(HEX_H_ft, TANINE))
 ```
 
-### Getting computed scores for observations
+You can also define your own *StandardScale* object using the `StandardScale`
+function.
 
-When results are available, you can get them using `get_computed_scores()` method:
+```{r StandardScale}
+new_scale <- StandardScale("my_scale", 10, 3, 0, 20)
 
-```{r get_computed_scores all}
-# we will print only few first rows of results
-head(
-  freqtable$get_computed_scores("sten")
-  )
-```
-You can also get only scores for specific observations and variables:
+# let's see if everything is correct
+new_scale
 
-```{r get_computed_scores_individual}
-freqtable$get_computed_scores(
-  "tanine",
-  vars = c("HEX_H", "HEX_C"),
-  ids = c("decrepit_norwayrat", "trapeziform_zebradove")
-)
-```
-If you need to get scores for some other observations, not present in the source data, 
-you can get it with use of `get_computed_scores_ext()` method:
-
-```{r get_computed_scores_ext()}
-external_data <- data.frame(
-  # names of the variables don't need to be the same as in computed freqtable
-  Extraversion = c(25, 42),
-  # and can also be supplied as characters. Just make sure it can be coerced to numerical
-  Openness = c("40", "23")
-)
-
-freqtable$get_computed_scores_ext(
-  data = external_data,
-  scale = "tanine",
-    # if the names are different, you need to provide named character vector
-  vars = c(HEX_X = "Extraversion", HEX_O = "Openness")
-)
+# how does its distribution looks like?
+plot(new_scale)
 ```
 
-## Available methods and their functionality
 
-Besides the basic methods shared by all `R6 class` objects, 
-`CompFreqtable` supports currently following methods:
+### 3. Calculate score for the new results
 
-- `get_status()` - returns list with details of current status of the object,
-- `get_data_info()` - returns list with information of the basic source data structure,
-- `get_freqtables()` - returns frequency tables for each variable
-- `compute_scores()` - compute score in one of the built-in standard scales or a custom one. Currently, there are built-in definitions of following:
-  - *sten* (M = 5.5, SD = 2, min = 1, max = 10),
-  - *stanine* (M = 5, SD = 2, min = 1, max = 9),
-  - *tanine* (M = 50, SD = 10, min = 1, max = 100),
-  - *tetronic* (M = 10, SD = 4, min = 0, max = 20),
-  - *wechsler-iq* (M = 100, SD = 15, min = 40, max = 160)
-- `get_scoretables()` - returns scoring tables in specified computed scale,
-- `get_computed_scores()` - returns scores of source data for specified computed scale,
-- `get_computed_scores_ext()` - returns scores of external data for specified computed scale.
+Now, if we have our *ScoreTable* created, we can use it to standardize some
+scores! We will do it for some randomly generated ones using `normalize_score()`
+function:
+
+```{r}
+set.seed(2137)
+
+# generate some random raw scores of valid values
+raw_scores <- round(runif(10, min = 10, max = 50), 0)
+
+print(raw_scores)
+
+# and now - get the 'STEN' values!
+normalize_score(
+  x = raw_scores,
+  table = HEX_H_st,
+  what = "sten")
+```
+
+## Object oriented workflow
 
 
+IN PROGRESS
