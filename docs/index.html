@@ -36,7 +36,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">stenR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.0003</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.0</span>
       </span>
     </div>
 
@@ -118,28 +118,14 @@
 <p>There is also a special <code>R6</code> class making the whole process more organized with potential inter-session continuity.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># inspect the whole dataset for comparison</span>
-<span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">HEXACO_60</span><span class="op">)</span>
-<span class="co">#&gt;    user_id              sex                 age            HEX_H      </span>
-<span class="co">#&gt;  Length:204         Length:204         Min.   :15.00   Min.   :14.00  </span>
-<span class="co">#&gt;  Class :character   Class :character   1st Qu.:21.00   1st Qu.:29.00  </span>
-<span class="co">#&gt;  Mode  :character   Mode  :character   Median :24.00   Median :34.00  </span>
-<span class="co">#&gt;                                        Mean   :26.29   Mean   :33.75  </span>
-<span class="co">#&gt;                                        3rd Qu.:28.25   3rd Qu.:38.00  </span>
-<span class="co">#&gt;                                        Max.   :62.00   Max.   :50.00  </span>
-<span class="co">#&gt;      HEX_E           HEX_X           HEX_A           HEX_C      </span>
-<span class="co">#&gt;  Min.   :10.00   Min.   :11.00   Min.   :12.00   Min.   :17.00  </span>
-<span class="co">#&gt;  1st Qu.:28.00   1st Qu.:23.00   1st Qu.:24.00   1st Qu.:30.00  </span>
-<span class="co">#&gt;  Median :34.00   Median :29.00   Median :29.00   Median :35.00  </span>
-<span class="co">#&gt;  Mean   :32.73   Mean   :28.81   Mean   :28.91   Mean   :35.42  </span>
-<span class="co">#&gt;  3rd Qu.:38.00   3rd Qu.:34.00   3rd Qu.:33.00   3rd Qu.:40.00  </span>
-<span class="co">#&gt;  Max.   :47.00   Max.   :46.00   Max.   :45.00   Max.   :50.00  </span>
-<span class="co">#&gt;      HEX_O      </span>
-<span class="co">#&gt;  Min.   :18.00  </span>
-<span class="co">#&gt;  1st Qu.:34.00  </span>
-<span class="co">#&gt;  Median :39.00  </span>
-<span class="co">#&gt;  Mean   :38.09  </span>
-<span class="co">#&gt;  3rd Qu.:43.00  </span>
-<span class="co">#&gt;  Max.   :50.00</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">HEXACO_60</span><span class="op">)</span>
+<span class="co">#&gt;                   user_id sex age HEX_H HEX_E HEX_X HEX_A HEX_C HEX_O</span>
+<span class="co">#&gt; 1 neutral_peregrinefalcon   F  26    42    33    34    36    36    31</span>
+<span class="co">#&gt; 2   trapeziform_zebradove   F  24    38    31    36    44    36    28</span>
+<span class="co">#&gt; 3    polyhedral_solenodon   F  26    18    17    16    42    35    37</span>
+<span class="co">#&gt; 4      decrepit_norwayrat   F  25    21    24    29    22    43    47</span>
+<span class="co">#&gt; 5          unawake_wisent   F  31    32    35    24    31    34    28</span>
+<span class="co">#&gt; 6   turophilic_spreadwing   M  25    34    30    34    34    28    39</span>
 
 <span class="co"># initialize the object with some scale attached</span>
 <span class="va">HEX_ST</span> <span class="op">&lt;-</span> <span class="va"><a href="reference/CompScoreTable.html">CompScoreTable</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span>
@@ -156,28 +142,14 @@
   calc <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
 
 <span class="co"># inspect the recalculated dataset</span>
-<span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">HEXACO_sten</span><span class="op">)</span>
-<span class="co">#&gt;    user_id              sex                 age            HEX_H       </span>
-<span class="co">#&gt;  Length:204         Length:204         Min.   :15.00   Min.   : 1.000  </span>
-<span class="co">#&gt;  Class :character   Class :character   1st Qu.:21.00   1st Qu.: 4.000  </span>
-<span class="co">#&gt;  Mode  :character   Mode  :character   Median :24.00   Median : 5.000  </span>
-<span class="co">#&gt;                                        Mean   :26.29   Mean   : 5.466  </span>
-<span class="co">#&gt;                                        3rd Qu.:28.25   3rd Qu.: 7.000  </span>
-<span class="co">#&gt;                                        Max.   :62.00   Max.   :10.000  </span>
-<span class="co">#&gt;      HEX_E            HEX_X           HEX_A            HEX_C       </span>
-<span class="co">#&gt;  Min.   : 1.000   Min.   : 1.00   Min.   : 1.000   Min.   : 1.000  </span>
-<span class="co">#&gt;  1st Qu.: 4.000   1st Qu.: 4.00   1st Qu.: 4.000   1st Qu.: 4.000  </span>
-<span class="co">#&gt;  Median : 6.000   Median : 6.00   Median : 5.000   Median : 5.000  </span>
-<span class="co">#&gt;  Mean   : 5.539   Mean   : 5.51   Mean   : 5.456   Mean   : 5.495  </span>
-<span class="co">#&gt;  3rd Qu.: 7.000   3rd Qu.: 7.00   3rd Qu.: 7.000   3rd Qu.: 7.000  </span>
-<span class="co">#&gt;  Max.   :10.000   Max.   :10.00   Max.   :10.000   Max.   :10.000  </span>
-<span class="co">#&gt;      HEX_O       </span>
-<span class="co">#&gt;  Min.   : 1.000  </span>
-<span class="co">#&gt;  1st Qu.: 4.000  </span>
-<span class="co">#&gt;  Median : 6.000  </span>
-<span class="co">#&gt;  Mean   : 5.495  </span>
-<span class="co">#&gt;  3rd Qu.: 7.000  </span>
-<span class="co">#&gt;  Max.   :10.000</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">HEXACO_sten</span><span class="op">)</span>
+<span class="co">#&gt;                   user_id sex age HEX_H HEX_E HEX_X HEX_A HEX_C HEX_O</span>
+<span class="co">#&gt; 1 neutral_peregrinefalcon   F  26     8     5     7     8     6     3</span>
+<span class="co">#&gt; 2   trapeziform_zebradove   F  24     7     5     7    10     6     2</span>
+<span class="co">#&gt; 3    polyhedral_solenodon   F  26     2     2     2    10     5     5</span>
+<span class="co">#&gt; 4      decrepit_norwayrat   F  25     2     3     6     3     8     9</span>
+<span class="co">#&gt; 5          unawake_wisent   F  31     5     6     4     6     5     2</span>
+<span class="co">#&gt; 6   turophilic_spreadwing   M  25     5     5     7     7     3     6</span>
 
 <span class="co"># CompScoreTable object have the table already populated for next data input</span>
 <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">HEX_ST</span><span class="op">)</span>
@@ -196,18 +168,18 @@
 <span class="co">#&gt;  name   M SD min max</span>
 <span class="co">#&gt;  sten 5.5  2   1  10</span></code></pre></div>
 <p>Above methods were focusing on using raw data available to us. Unfortunately, when using another author’s questionnaire we often don’t have their raw data available for calculating the <em>FrequencyTable</em> in regular way.</p>
-<p>Authors very often provide some descriptive statistics about their data, though. We can use it to estimate the frequencies and use it to normalize scores.</p>
+<p>Authors usually provide descriptive statistics about their data, though. We can use it to estimate the frequencies and use it to normalize raw scores gathered in our study.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">simulated_ft</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/SimFrequencyTable.html">SimFrequencyTable</a></span><span class="op">(</span>
   min <span class="op">=</span> <span class="fl">10</span>, max <span class="op">=</span> <span class="fl">50</span>, M <span class="op">=</span> <span class="fl">31.04</span>, SD <span class="op">=</span> <span class="fl">6.7</span>, 
   skew <span class="op">=</span> <span class="op">-</span><span class="fl">0.3</span>, kurt <span class="op">=</span> <span class="fl">2.89</span>, seed <span class="op">=</span> <span class="fl">2678</span><span class="op">)</span>
 <span class="co">#&gt; Constants: Distribution  1  </span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Constants calculation time: 0.005 minutes </span>
-<span class="co">#&gt; Total Simulation time: 0.005 minutes</span>
+<span class="co">#&gt; Constants calculation time: 0.006 minutes </span>
+<span class="co">#&gt; Total Simulation time: 0.006 minutes</span>
 
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">simulated_ft</span><span class="op">)</span></code></pre></div>
-<p><img src="reference/figures/README-simulated_use-1.png" width="100%" style="display: block; margin: auto;"></p>
+<p><img src="reference/figures/README-simulated_use-1.png"><!-- --></p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="reference/normalize_score.html">normalize_score</a></span><span class="op">(</span><span class="va">HEXACO_60</span><span class="op">$</span><span class="va">HEX_A</span>,
                 table <span class="op">=</span> <span class="fu"><a href="reference/ScoreTable.html">ScoreTable</a></span><span class="op">(</span><span class="va">simulated_ft</span>, <span class="va">STEN</span><span class="op">)</span>,
