@@ -266,7 +266,7 @@ class(sim_ft)
 plot(sim_ft)
 ```
 
-The *Simulated* class will be inerited by *ScoreTable* object created on its basis.
+The *Simulated* class will be inherited by *ScoreTable* object created on its basis.
 
 Simulated tables can be used in every way that regular ones can be with one
 exception: if used to create *CompScoreTable* object, the raw scores cannot be
