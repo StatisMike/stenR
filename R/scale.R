@@ -125,15 +125,17 @@ plot.StandardScale <- function(scale, n = 1000) {
   ggplot2::ggplot(data_points, 
                   ggplot2::aes(x = score)) + 
     ggplot2::stat_function(fun = dnorm, args = c(scale$M, scale$SD), n = n) +
-    ggplot2::stat_function(fun = func1SD, geom = "area", fill = "green", alpha = 0.3, n = n) +
-    ggplot2::stat_function(fun = func2SD, geom = "area", fill = "blue", alpha = 0.3, n = n) +
-    ggplot2::stat_function(fun = func3SD, geom = "area", fill = "red", alpha = 0.3, n = n) +
+    ggplot2::stat_function(fun = func1SD, geom = "area", ggplot2::aes(fill = factor("<1SD", levels = c("<1SD", "1SD-2SD", ">2SD"))), alpha = 0.3, n = n) +
+    ggplot2::stat_function(fun = func2SD, geom = "area", ggplot2::aes(fill = factor("1SD-2SD", levels = c("<1SD", "1SD-2SD", ">2SD"))), alpha = 0.3, n = n) +
+    ggplot2::stat_function(fun = func3SD, geom = "area", ggplot2::aes(fill = factor(">2SD", levels = c("<1SD", "1SD-2SD", ">2SD"))), alpha = 0.3, n = n) +
     ggplot2::scale_x_continuous(breaks = c(scale$min, SD2[1], SD1[1], scale$M, SD1[2], SD2[2], scale$max)) +
     ggplot2::geom_vline(xintercept = scale$M) +
     ggplot2::geom_vline(xintercept = SD1, color = "green") +
     ggplot2::geom_vline(xintercept = SD2, color = "blue") +
     ggplot2::theme_bw() +
-    ggplot2::scale_y_continuous(name = NULL)
+    ggplot2::scale_y_continuous(name = NULL) +
+    ggplot2::scale_fill_manual("Distance from\nthe mean",
+                               values = c("<1SD" = "green", "1SD-2SD" = "blue", ">2SD" = "red"))
   
 }
   
