@@ -5,7 +5,7 @@
 \alias{print.FrequencyTable}
 \alias{plot.FrequencyTable}
 \alias{summary.FrequencyTable}
-\title{Create a FrequencyTable from raw data}
+\title{Create a FrequencyTable}
 \usage{
 FrequencyTable(data)
 
@@ -29,8 +29,17 @@ FrequencyTable object. Consists of:
 \item table: data.frame with number of observations (\code{n}), frequency in sample
 (\code{freq}), quantile (\code{quan}) and normalized Z-score (\code{Z}) for each point in
 raw score
+\item status: list containing the total number of simulated observations (\code{n})
+and information about raw scores range completion (\code{range}): complete or incomplete
 }
 }
 \description{
-Create a FrequencyTable from raw data
+Normalizes the distribution of raw scores. It can be used to construct
+\code{\link[=ScoreTable]{ScoreTable()}} with the use of some \code{\link[=StandardScale]{StandardScale()}} to normalize and
+standardize the raw discrete scores.
+
+\code{plot.FrequencyTable} method requires \code{ggplot2} package to be installed.
+}
+\seealso{
+\code{\link[=SimFrequencyTable]{SimFrequencyTable()}}
 }

@@ -5,6 +5,7 @@
 \alias{attach_scales}
 \alias{print.ScoreTable}
 \alias{plot.ScoreTable}
+\alias{strip_ScoreTable}
 \title{Create a ScoreTable}
 \usage{
 ScoreTable(ft, scale)
@@ -14,13 +15,15 @@ attach_scales(st, scale)
 \method{print}{ScoreTable}(st, max = NULL)
 
 \method{plot}{ScoreTable}(st, scale_name = NULL)
+
+strip_ScoreTable(st)
 }
 \arguments{
 \item{ft}{a \code{FrequencyTable} object}
 
 \item{scale}{a \code{StandardScale} object or list of multiple \code{StandardScale} objects}
 
-\item{st}{a \code{ScoreTable} object}
+\item{st}{ScoreTable object}
 
 \item{max}{numeric or NULL, specifying the maximal number of entries to be
 printed. By default, when NULL, \code{\link{getOption}("max.print")} used.}
@@ -39,12 +42,8 @@ object of class \code{StandardScale}. Consists of:
 \item normalized Z-score (\code{Z}),
 \item score transformed to every of provided \code{StandardScales}
 }
-\item status: list with status description of the table
-\itemize{
-\item range: either 'complete' or 'incomplete', if there were any missing
-raw scores between minimum and maximum
-\item n: complete number or observations for which the \code{ScoreTable} is computed
-}
+\item status: list containing the total number of simulated observations (\code{n})
+and information about raw scores range completion (\code{range}): complete or incomplete
 \item scale: named list of all attached \code{StandardScale} objects
 }
 }
@@ -58,6 +57,9 @@ After creation it can be used to normalize and standardize raw scores with
 \code{\link{normalize_score}}.
 
 \code{plot.ScoreTable} method requires \code{ggplot2} package to be installed.
+
+\code{strip_ScoreTable} function allows to revert the ScoreTable back to FrequencyTable
+object.
 }
 \examples{
 # firstly compute FrequencyTable for a variable
@@ -68,4 +70,8 @@ st <- ScoreTable(ft, STEN)
 
 # possibly attach more scales to ScoreTable
 st <- attach_scales(st, list(STANINE, WECHSLER_IQ))
+
+# revert ScoreTable back to FrequencyTable
+ft2 <- strip_ScoreTable(st)
+identical(ft, ft2)
 }

@@ -10,6 +10,9 @@
 #' 
 #' `plot.ScoreTable` method requires `ggplot2` package to be installed.
 #' 
+#' `strip_ScoreTable` function allows to revert the ScoreTable back to FrequencyTable
+#' object.
+#' 
 #' @param ft a `FrequencyTable` object
 #' @param scale a `StandardScale` object or list of multiple `StandardScale` objects
 #' @example examples/ScoreTable.R
@@ -21,10 +24,8 @@
 #'     - quantile (`quan`), 
 #'     - normalized Z-score (`Z`), 
 #'     - score transformed to every of provided `StandardScales`
-#' - status: list with status description of the table
-#'     - range: either 'complete' or 'incomplete', if there were any missing
-#'     raw scores between minimum and maximum
-#'     - n: complete number or observations for which the `ScoreTable` is computed
+#' - status: list containing the total number of simulated observations (`n`) 
+#' and information about raw scores range completion (`range`): complete or incomplete 
 #' - scale: named list of all attached `StandardScale` objects 
 #' @export
 
@@ -62,40 +63,6 @@ ScoreTable <- function(ft,
   class(output) <- c("ScoreTable", if("Simulated" %in% class(ft)) "Simulated")
   return(output)
   
-  
-}
-
-#' @rdname ScoreTable
-#' @export
-attach_scales <- function(st, scale) {
-  
-  if (!"ScoreTable" %in% class(st))
-    stop("Object of class 'ScoreTable' needs to be provided to 'ft' argument")
-  if (!class(scale) %in% c("StandardScale", "list"))
-    stop("Object of class 'StandardScale' or list of such objects needs to be provided to 'scale' argument")
-  if (class(scale) == "StandardScale") {
-    scales <- list(scale)
-  } else if (class(scale) == "list") {
-    areScales <- all(sapply(scale, \(x) class(x) == "StandardScale"))
-    if (!isTRUE(areScales)) 
-      stop("List provided to 'scale' argument should contain only StandardScale objects")
-    scales <- scale
-  }
-  
-  for (scale in scales) {
-    val <- round(st$table$Z * scale$SD + scale$M)
-    st$table[[scale$name]] <- 
-      ifelse(val < scale$min, scale$min,
-             ifelse(val > scale$max, scale$max, val))
-    st$scale[[scale$name]] <- scale
-  }
-  
-  output <- list(table = st$table,
-                 status = st$status,
-                 scale = st$scale)
-  
-  class(output) <- c("ScoreTable", if("Simulated" %in% class(st)) "Simulated")
-  return(output)
   
 }
 
@@ -163,4 +130,57 @@ plot.ScoreTable <- function(st, scale_name = NULL) {
       breaks = c(scale$min, SD2[1], SD1[1], 
                  scale$M, SD1[2], SD2[2], scale$max))
 
+}
+
+#' @rdname ScoreTable
+#' @param st ScoreTable object
+#' @export
+strip_ScoreTable <- function(st) {
+  
+  if (!"ScoreTable" %in% class(st))
+    stop("Object of class 'ScoreTable' needs to be provided to 'st' argument")
+  
+  ft <- list(
+    table = st$table[, c("score", "n", "freq", "quan", "Z")],
+    status = st$status)
+  
+  class(ft) <- c("FrequencyTable",
+                 class(st)[!class(st) %in% "ScoreTable"])
+  
+  return(ft)
+  
+}
+
+#' @rdname ScoreTable
+#' @export
+attach_scales <- function(st, scale) {
+  
+  if (!"ScoreTable" %in% class(st))
+    stop("Object of class 'ScoreTable' needs to be provided to 'st' argument")
+  if (!class(scale) %in% c("StandardScale", "list"))
+    stop("Object of class 'StandardScale' or list of such objects needs to be provided to 'scale' argument")
+  if (class(scale) == "StandardScale") {
+    scales <- list(scale)
+  } else if (class(scale) == "list") {
+    areScales <- all(sapply(scale, \(x) class(x) == "StandardScale"))
+    if (!isTRUE(areScales)) 
+      stop("List provided to 'scale' argument should contain only StandardScale objects")
+    scales <- scale
+  }
+  
+  for (scale in scales) {
+    val <- round(st$table$Z * scale$SD + scale$M)
+    st$table[[scale$name]] <- 
+      ifelse(val < scale$min, scale$min,
+             ifelse(val > scale$max, scale$max, val))
+    st$scale[[scale$name]] <- scale
+  }
+  
+  output <- list(table = st$table,
+                 status = st$status,
+                 scale = st$scale)
+  
+  class(output) <- c("ScoreTable", if("Simulated" %in% class(st)) "Simulated")
+  return(output)
+  
 }
