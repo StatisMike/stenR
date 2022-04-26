@@ -40,8 +40,8 @@ and information about raw scores range completion (\code{range}): complete or in
 }
 \description{
 It is always best to use raw scores for computing the FrequencyTable.
-They can be unavaiable, so there is an option to simulate the distribution
-given its descriptive statistics.
+They aren't always be available - in that case, this function can be used
+to simulate the distribution given its descriptive statistics.
 
 This simulation should be always treated as an estimate.
 

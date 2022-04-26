@@ -2,7 +2,7 @@
 #' @title R6 class for producing easily re-computable ScoreTable
 #'
 #' @description
-#' Computed ScoreTable class. It can compute and store \code{\link{ScoreTable}s} 
+#' Computable ScoreTable class. It can compute and store \code{\link{ScoreTable}s} 
 #' for multiple variables containing raw score results.
 #' 
 #' After computation, it could be also used to compute new standardized scores 
@@ -94,21 +94,25 @@ CompScoreTable <- R6::R6Class(
     #' @param if_exists Action that should be taken if `FrequencyTable` for 
     #' given variable already exists in the object.
     #' 
+    #' - `stop` DEFAULT: don't do anything
     #' - `append` recalculates existing table
     #' - `replace` replaces existing table
     #' 
     
-    attach_FrequencyTable = function(ft, var, if_exists = "append") {
+    attach_FrequencyTable = function(ft, var, if_exists = "stop") {
       
       if (!is.character(var) || length(var) != 1) 
         stop("Value provided to 'val' should be a string.")
       if (!"FrequencyTable" %in% class(ft))
         stop("Object provided to 'ft' should be a 'FreqencyTable'")
-      if (!if_exists %in% c("append", "replace") || length(if_exists) != 1)
-        stop("Value provided to 'if_exists' should be either 'append' or 'replace'.")
+      if (!if_exists %in% c("stop", "append", "replace") || length(if_exists) != 1)
+        stop("Value provided to 'if_exists' should be either 'stop', 'append' or 'replace'.")
       
-      if (var %in% names(private$tables) && if_exists == "append") {
+      if (var %in% names(private$tables) && if_exists == "stop") {
+        stop(paste0("Table for '", var, "' already exists. To replace or append",
+                    " the frequencies specify `if_exists` argument accordingly"))
         
+      } else if (var %in% names(private$tables) && if_exists == "append") {
         private$merge_ft(data = rep(ft$table$score, ft$table$n),
                          var = var)
         
@@ -117,15 +121,19 @@ CompScoreTable <- R6::R6Class(
         
       }
       
-      if (length(private$attached_scales) > 0)
+      if (length(private$attached_scales) > 0 && "FrequencyTable" %in% class(private$tables[[var]]))
         private$tables[[var]] <- ScoreTable(private$tables[[var]], private$attached_scales)
     },
     
-    #' @description Extract list of ScoreTables from the object
-    #' @param vars Names of the variables for which to get the ScoreTables.
-    #' If left at `NULL` default - get all ScoreTables
+    #' @description Export list of ScoreTables from the object
+    #' @param vars Names of the variables for which to get the tables.
+    #' If left at `NULL` default - get all off them.
+    #' @param strip logical indicating if the ScoreTables should be stripped
+    #' down to FrequencyTables during export. Defaults to `FALSE`
+    #' 
+    #' @return list of ScoreTable or FrequencyTable object
 
-    get_ScoreTable = function(vars = NULL) {
+    export_ScoreTable = function(vars = NULL, strip = FALSE) {
       
       if (length(private$tables) == 0 || 
           !all(sapply(private$tables, \(x) "ScoreTable" %in% class(x))))
@@ -142,6 +150,13 @@ CompScoreTable <- R6::R6Class(
             )
         out <- private$tables[which(names(private$tables) %in% vars)]
       }
+      
+      if (isTRUE(strip)) {
+        temp_names <- names(out)
+        out <- lapply(out, strip_ScoreTable)
+        names(out) <- temp_names
+      }
+      
       return(out)
     },
     
@@ -149,18 +164,18 @@ CompScoreTable <- R6::R6Class(
     #' Additionally, the raw scores can be used to recalculate ScoreTables
     #' before computing.
     #' @param data data.frame containing raw scores.
-    #' @param vars vector of variable names which will taken into account
     #' @param what the values to get. One of either:
     #' 
     #' - `quan` - the quantile of raw score in the distribution
     #' - `Z` - normalized Z score for the raw scores
-    #' - name of the scale attached to the `CompScoreTable` object 
+    #' - name of the scale attached to the `CompScoreTable` object
     #' 
+    #' @param vars vector of variable names which will taken into account 
     #' @param calc should the ScoreTables be computed (or recalculated, if
-    #' some are already provided?)
+    #' some are already provided?). Default to `TRUE`
     #' @return data.frame with values recalculated
     #' 
-    standardize = function(data, vars = names(data), what, calc = TRUE) {
+    standardize = function(data, what, vars = names(data), calc = FALSE) {
       
       if (length(private$attached_scales) == 0)
         stop("No 'StandardScales' are currently attached. Attach some of them first.")
@@ -170,6 +185,10 @@ CompScoreTable <- R6::R6Class(
         stop("Object provided to 'data' argument should be a 'data.frame'")
       if (!all(vars %in% names(data)))
         stop("All 'vars' should be pointing to columns in provided 'data.frame'")
+      if (!all(sapply(vars, \(x) is.numeric(data[[x]]))))
+        stop("All specified 'vars' should be of type 'numeric'")
+      
+      data[, vars] <- sapply(data[, vars], as.integer)
       
       # calculate the ScoreTables
       if (isTRUE(calc)) {
@@ -241,10 +260,10 @@ CompScoreTable <- R6::R6Class(
     calculate_ft = function(data, var = NULL) {
       
       if (!is.null(var)) 
-        private$tables[[var]] <- FrequencyTable(data)
+        suppressWarnings(private$tables[[var]] <- FrequencyTable(data))
       else 
         for (v in names(private$tables))
-          private$tables[[v]] <- FrequencyTable(data)
+          suppressWarnings(private$tables[[v]] <- FrequencyTable(data))
       
       private$calculate_st(var = var)  
         
@@ -253,16 +272,61 @@ CompScoreTable <- R6::R6Class(
     ## merge Frequency tables ##
     merge_ft = function(data, var) {
       
-      if (any(c(class(private$tables[[var]]), class(ft)) == "Simulated"))
-        stop("You can't merge Simulated FrequencyTable", call. = F)
+      if (any(c(class(private$tables[[var]]), class(data)) == "Simulated"))
+        stop("You can't add new raw values to Simulated FrequencyTable", call. = F)
       
       vals <- rep(private$tables[[var]]$table$score, 
                   private$tables[[var]]$table$n)
       
-      private$tables[[var]] <- FrequencyTable(c(data, vals))
+      suppressWarnings(private$tables[[var]] <- FrequencyTable(c(data, vals)))
       private$calculate_st(var = var)
       
     }
   )
 )
+
+#' @rdname CompScoreTable
+#' @export
+summary.CompScoreTable <- function(x) {
+  
+  cat("<CompScoreTable> object\n\n")
+  
+  summaries <- list()
+  
+  if (length(x$.__enclos_env__$private$tables) > 0) {
+    
+    table_class <- unique(sapply(x$.__enclos_env__$private$tables, \(t) class(t)))
+    
+    cat("Attached <", table_class, "s>:\n", sep = "")
+    summaries[["tables"]] <- 
+      data.frame(
+        variable = names(x$.__enclos_env__$private$tables),
+        n = sapply(x$.__enclos_env__$private$tables, \(t) t$status$n),
+        range = sapply(x$.__enclos_env__$private$tables, \(t) t$status$range))
+    print(summaries[["tables"]], row.names = F)
+  } else {
+    cat("No tables attached.\n")
+  }
+  
+  if(length(summaries) == 1) cat("\n")
+  
+  if (length(x$.__enclos_env__$private$attached_scales) > 0){
+    
+    cat("Attached <StandardScales>:\n")
+    summaries[["scales"]] <-
+      data.frame(
+        name = names(x$.__enclos_env__$private$attached_scales),
+        M = sapply(x$.__enclos_env__$private$attached_scales, \(s) s$M),
+        SD = sapply(x$.__enclos_env__$private$attached_scales, \(s) s$SD),
+        min = sapply(x$.__enclos_env__$private$attached_scales, \(s) s$min),
+        max = sapply(x$.__enclos_env__$private$attached_scales, \(s) s$max)
+      )
+    print(summaries[["scales"]], row.names = F)
+  } else {
+    cat("No StandardScales attached.")
+  }
+  
+  return(invisible(summaries))
+  
+}
                              

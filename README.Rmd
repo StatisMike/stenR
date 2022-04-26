@@ -9,7 +9,8 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   fig.path = "man/figures/README-",
-  out.width = "100%"
+  fig.width = 6,
+  fig.height = 4
 )
 Sys.setenv(LANGUAGE='en')
 ```
@@ -40,116 +41,75 @@ You can install the current version from [GitHub](https://github.com/) with:
 # install.packages("devtools")
 devtools::install_github("StatisMike/stenR")
 ```
-## Procedural workflow for using stenR functionality
 
-`stenR` currently is based on few `S3` classes and can be used in purely
-procedural workflow, which will be described below. Exemplary data provided
-with package will be used:
+## Usage
 
-```{r exemplary_data}
+There are numerous functions and `S3` classes constructors to help normalize
+and standardize discrete data.
+
+```{r procedural_use}
 library(stenR)
 
-# data gathered in Polish sample - 204 summed results of HEXACO-60 questionnaires
-str(HEXACO_60)
+# build-in dataset with questionnaire data
+summary(HEXACO_60$HEX_C)
+
+# create STEN score table for variable
+HEX_C_st <- HEXACO_60$HEX_C |>
+  FrequencyTable() |>
+  ScoreTable(STEN)
+
+# use the STEN table to normalize and standardize data
+HEX_C_sten <- HEXACO_60$HEX_C |>
+  normalize_score(HEX_C_st, "sten")
+
+summary(HEX_C_sten)
 ```
 
-### 1. Create a Frequency Table object on basis of some variable
+There is also a special `R6` class making the whole process more organized 
+with potential inter-session continuity.
 
-```{r FrequencyTable_create}
-HEX_H_ft <- FrequencyTable(HEXACO_60$HEX_H)
-HEX_H_ft
+```{r oop_use}
+# inspect the whole dataset for comparison
+head(HEXACO_60)
+
+# initialize the object with some scale attached
+HEX_ST <- CompScoreTable$new(
+  scales = STEN
+)
+
+# you can use the `standardize` method to automatically calculate the tables
+# during data calculation
+HEXACO_sten <- HEX_ST$standardize(
+  HEXACO_60,
+  # specify the variables to calculate if there are any other in the data.frame
+  vars = c("HEX_H", "HEX_E", "HEX_X", "HEX_A", "HEX_C", "HEX_O"),
+  what = "sten",
+  calc = TRUE)
+
+# inspect the recalculated dataset
+head(HEXACO_sten)
+
+# CompScoreTable object have the table already populated for next data input
+summary(HEX_ST)
 ```
 
-Generated warning tells us that there were some raw scores between `min()` and
-`max()` values that weren't represented in the sample. We can see that was the 
-case for a few scores:
+Above methods were focusing on using raw data available to us. Unfortunately,
+when using another author's questionnaire we often don't have their raw data
+available for calculating the *FrequencyTable* in regular way.
 
-```{r missing_scores}
-which(HEX_H_ft$table$n == 0)
+Authors usually provide descriptive statistics about their data, though.
+We can use it to estimate the frequencies and use it to normalize raw scores
+gathered in our study.
+
+```{r simulated_use}
+simulated_ft <- SimFrequencyTable(
+  min = 10, max = 50, M = 31.04, SD = 6.7, 
+  skew = -0.3, kurt = 2.89, seed = 2678)
+
+plot(simulated_ft)
+
+normalize_score(HEXACO_60$HEX_A,
+                table = ScoreTable(simulated_ft, STEN),
+                "sten") |>
+  summary()
 ```
-
-We can also see it while plotting the resulting *FrequencyTable*:
-
-```{r FrequencyTable plot}
-plot(HEX_H_ft)
-```
-
-By the rule of thumb: the more possible values the raw scores can get and the 
-smaller your data, the bigger possibility for this to happen. If you feel that 
-your sample was representative, you can ignore it. It is recommended though to 
-get more varied, greater number of observations when getting this warning.
-
-### 2. Generate ScoreTable using FrequencyTable
-
-*FrequencyTable* is a basis for normalizing the distribution of your data. Now,
-the next step is to standardize it using some *StandardScale* and generating
-*ScoreTable*.
-
-There are some *StandardScale* objects available in the package. They define
-score scale. We can use the popular in psychology **STEN** scale to calculate
-the scores.
-
-```{r STEN_scale}
-# check out the scale definition
-STEN
-# see its distribution graphically
-plot(STEN)
-```
-
-Now, we can generate the ScoreTable using our FrequencyTable and scale of our
-choosing.
-
-```{r ScoreTable}
-HEX_H_st <- ScoreTable(HEX_H_ft, STEN)
-
-plot(HEX_H_st)
-```
-
-We can see that the shape of the generated distribution is similar to the
-distribution associated with the *StandardScale*. It is a good sign: number
-of values of raw scores is appropriate for the chosen scale. In contrast, we
-can see that the **TANINE** scale would be an ill choice:
-
-```{r HEXACO_tanine}
-plot(ScoreTable(HEX_H_ft, TANINE))
-```
-
-You can also define your own *StandardScale* object using the `StandardScale`
-function.
-
-```{r StandardScale}
-new_scale <- StandardScale("my_scale", 10, 3, 0, 20)
-
-# let's see if everything is correct
-new_scale
-
-# how does its distribution looks like?
-plot(new_scale)
-```
-
-
-### 3. Calculate score for the new results
-
-Now, if we have our *ScoreTable* created, we can use it to standardize some
-scores! We will do it for some randomly generated ones using `normalize_score()`
-function:
-
-```{r}
-set.seed(2137)
-
-# generate some random raw scores of valid values
-raw_scores <- round(runif(10, min = 10, max = 50), 0)
-
-print(raw_scores)
-
-# and now - get the 'STEN' values!
-normalize_score(
-  x = raw_scores,
-  table = HEX_H_st,
-  what = "sten")
-```
-
-## Object oriented workflow
-
-
-IN PROGRESS

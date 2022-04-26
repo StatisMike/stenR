@@ -1,12 +1,21 @@
-#' Create a FrequencyTable from raw data
+#' Create a FrequencyTable
 #' 
 #' @param data vector of raw scores. Double values are coerced to integer
+#' @description 
+#' Normalizes the distribution of raw scores. It can be used to construct 
+#' [ScoreTable()] with the use of some [StandardScale()] to normalize and
+#' standardize the raw discrete scores.
+#' 
+#' `plot.FrequencyTable` method requires `ggplot2` package to be installed.
 #' @return 
 #' FrequencyTable object. Consists of:
 #' 
 #' - table: data.frame with number of observations (`n`), frequency in sample 
 #' (`freq`), quantile (`quan`) and normalized Z-score (`Z`) for each point in 
 #' raw score 
+#' - status: list containing the total number of simulated observations (`n`) 
+#' and information about raw scores range completion (`range`): complete or incomplete 
+#' @seealso [SimFrequencyTable()]
 #' @export
 
 FrequencyTable <- function(data) {
@@ -154,8 +163,8 @@ summary.FrequencyTable <- function(ft) {
 #' Generate FrequencyTable using simulated distribution
 #' 
 #' @description It is always best to use raw scores for computing the FrequencyTable.
-#' They can be unavaiable, so there is an option to simulate the distribution
-#' given its descriptive statistics.
+#' They aren't always be available - in that case, this function can be used
+#' to simulate the distribution given its descriptive statistics.
 #' 
 #' This simulation should be always treated as an estimate.
 #' 
