@@ -19,6 +19,7 @@ Sys.setenv(LANGUAGE='en')
 
 <!-- badges: start -->
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-blue.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+[![codecov](https://codecov.io/gh/StatisMike/stenR/branch/master/graph/badge.svg?token=H62VR1J454)](https://codecov.io/gh/StatisMike/stenR)
 <!-- badges: end -->
 
 `stenR` is a package tailored mainly for creators of psychological questionnaires,
