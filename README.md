@@ -7,6 +7,7 @@
 
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-blue.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+[![codecov](https://codecov.io/gh/StatisMike/stenR/branch/master/graph/badge.svg?token=H62VR1J454)](https://codecov.io/gh/StatisMike/stenR)
 <!-- badges: end -->
 
 `stenR` is a package tailored mainly for creators of psychological
@@ -131,8 +132,8 @@ simulated_ft <- SimFrequencyTable(
   skew = -0.3, kurt = 2.89, seed = 2678)
 #> Constants: Distribution  1  
 #> 
-#> Constants calculation time: 0.006 minutes 
-#> Total Simulation time: 0.006 minutes
+#> Constants calculation time: 0.008 minutes 
+#> Total Simulation time: 0.009 minutes
 
 plot(simulated_ft)
 ```

@@ -135,7 +135,8 @@ plot.StandardScale <- function(scale, n = 1000) {
     ggplot2::theme_bw() +
     ggplot2::scale_y_continuous(name = NULL) +
     ggplot2::scale_fill_manual("Distance from\nthe mean",
-                               values = c("<1SD" = "green", "1SD-2SD" = "blue", ">2SD" = "red"))
+                               values = c("<1SD" = "green", "1SD-2SD" = "blue", ">2SD" = "red")) +
+    ggplot2::guides(fill = ggplot2::guide_legend(override.aes = list(alpha = 0.15)))
   
 }
   

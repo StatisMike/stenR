@@ -295,7 +295,11 @@ summary.CompScoreTable <- function(x) {
   
   if (length(x$.__enclos_env__$private$tables) > 0) {
     
-    table_class <- unique(sapply(x$.__enclos_env__$private$tables, \(t) class(t)))
+    table_class <- 
+      unique(unlist(sapply(x$.__enclos_env__$private$tables, \(t) class(t))))
+    
+    table_class <-
+      table_class[table_class != "Simulated"]
     
     cat("Attached <", table_class, "s>:\n", sep = "")
     summaries[["tables"]] <- 
@@ -303,6 +307,7 @@ summary.CompScoreTable <- function(x) {
         variable = names(x$.__enclos_env__$private$tables),
         n = sapply(x$.__enclos_env__$private$tables, \(t) t$status$n),
         range = sapply(x$.__enclos_env__$private$tables, \(t) t$status$range))
+    rownames(summaries[["tables"]]) <- NULL
     print(summaries[["tables"]], row.names = F)
   } else {
     cat("No tables attached.\n")
@@ -321,6 +326,7 @@ summary.CompScoreTable <- function(x) {
         min = sapply(x$.__enclos_env__$private$attached_scales, \(s) s$min),
         max = sapply(x$.__enclos_env__$private$attached_scales, \(s) s$max)
       )
+    rownames(summaries[["scales"]]) <- NULL
     print(summaries[["scales"]], row.names = F)
   } else {
     cat("No StandardScales attached.")

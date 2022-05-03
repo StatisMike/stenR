@@ -1,0 +1,75 @@
+st <- NULL
+
+test_that("ScoreTable is can be contructed", {
+  
+  # incomplete warning
+  expect_warning(
+    st <<- ScoreTable(FrequencyTable(HEXACO_60$HEX_H), STEN)
+  )
+
+  expect_s3_class(st, "ScoreTable")
+  
+})
+
+test_that("ScoreTable prints", {
+  
+  expect_output(
+    print(st),
+    regex = paste0("^<ScoreTable>.*", nrow(HEXACO_60), " observations")
+  )
+})
+
+test_that("ScoreTable plots", {
+  
+  expect_s3_class(
+    plot(st),
+    c("gg", "ggplot")
+  )
+})
+
+test_that("ScoreTable can be changed to FrequencyTable", {
+  
+  expect_s3_class(
+    strip_ScoreTable(st),
+    "FrequencyTable"
+  )
+})
+
+test_that("New scale can be attached to ScoreTable", {
+  
+  first_scale <- length(st$scale)
+  
+  st <<- attach_scales(st, STANINE)
+  
+  second_scales <- length(st$scale)
+  
+  st <<- attach_scales(st, list(TANINE, WECHSLER_IQ))
+  
+  third_scales <- length(st$scale)
+  
+  expect_gt(second_scales, first_scale)
+  expect_gt(third_scales, second_scales)
+  
+  expect_true(
+    all(names(st$scale) %in% names(st$table))
+  )
+  
+})
+
+test_that("ScoreTable can be used to normalize raw scores", {
+  
+  vals_to_norm <- c(4, 55, 23, 46, 30, 17)
+  
+  for (st_scale in st$scale) {
+    
+    norm_vec <- normalize_score(
+      vals_to_norm,
+      st,
+      st_scale$name
+    )
+    
+    expect_true(all(norm_vec >= st_scale$min))
+    expect_true(all(norm_vec <= st_scale$max))
+    
+  }
+})
