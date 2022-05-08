@@ -1,4 +1,27 @@
 url: https://statismike.github.io/stenR/
 template:
   bootstrap: 5
-
+reference:
+- title: S3 classes constructors
+  desc: Functions to create basic objects in procedural workflow
+- contents:
+  - StandardScale
+  - FrequencyTable
+  - ScoreTable
+  - SimFrequencyTable
+- title: Mutate raw scores
+  desc: Normalize and standardize raw scores using `FrequencyTable` or `ScoreTable` objects
+- contents:
+  - normalize_score
+- title: S3 classes manipulators
+  desc:  Manipulate and transform objects of S3 classes
+- contents:
+  - attach_scales
+  - strip_ScoreTable
+- title: R6 class for Object Oriented workflow
+- contents:
+  - CompScoreTable
+- title: Objects provided within the package
+- contents:
+  - default_scales
+  - HEXACO_60
