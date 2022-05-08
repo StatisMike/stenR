@@ -40,6 +40,9 @@
     <loc>https://statismike.github.io/stenR/reference/StandardScale.html</loc>
   </url>
   <url>
+    <loc>https://statismike.github.io/stenR/reference/attach_scales.html</loc>
+  </url>
+  <url>
     <loc>https://statismike.github.io/stenR/reference/default_scales.html</loc>
   </url>
   <url>
@@ -47,5 +50,8 @@
   </url>
   <url>
     <loc>https://statismike.github.io/stenR/reference/normalize_score.html</loc>
+  </url>
+  <url>
+    <loc>https://statismike.github.io/stenR/reference/strip_ScoreTable.html</loc>
   </url>
 </urlset>
