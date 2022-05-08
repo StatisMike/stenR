@@ -4,8 +4,6 @@
 \alias{ScoreTable}
 \alias{print.ScoreTable}
 \alias{plot.ScoreTable}
-\alias{strip_ScoreTable}
-\alias{attach_scales}
 \title{Create a ScoreTable}
 \usage{
 ScoreTable(ft, scale)
@@ -13,17 +11,13 @@ ScoreTable(ft, scale)
 \method{print}{ScoreTable}(st, max = NULL)
 
 \method{plot}{ScoreTable}(st, scale_name = NULL)
-
-strip_ScoreTable(st)
-
-attach_scales(st, scale)
 }
 \arguments{
 \item{ft}{a \code{FrequencyTable} object}
 
 \item{scale}{a \code{StandardScale} object or list of multiple \code{StandardScale} objects}
 
-\item{st}{ScoreTable object}
+\item{st}{a \code{ScoreTable} object}
 
 \item{max}{numeric or NULL, specifying the maximal number of entries to be
 printed. By default, when NULL, \code{\link{getOption}("max.print")} used.}
@@ -32,7 +26,7 @@ printed. By default, when NULL, \code{\link{getOption}("max.print")} used.}
 of the scale for plotting.}
 }
 \value{
-object of class \code{StandardScale}. Consists of:
+object of class \code{ScoreTable}. Consists of:
 \itemize{
 \item table: data.frame containing for each point in the raw score:
 \itemize{
@@ -57,9 +51,6 @@ After creation it can be used to normalize and standardize raw scores with
 \code{\link{normalize_score}}.
 
 \code{plot.ScoreTable} method requires \code{ggplot2} package to be installed.
-
-\code{strip_ScoreTable} function allows to revert the ScoreTable back to FrequencyTable
-object.
 }
 \examples{
 # firstly compute FrequencyTable for a variable
@@ -68,10 +59,6 @@ ft <- FrequencyTable(HEXACO_60$HEX_A)
 # then create a ScoreTable
 st <- ScoreTable(ft, STEN)
 
-# possibly attach more scales to ScoreTable
-st <- attach_scales(st, list(STANINE, WECHSLER_IQ))
-
-# revert ScoreTable back to FrequencyTable
-ft2 <- strip_ScoreTable(st)
-identical(ft, ft2)
+# ScoreTable is ready to use!
+st
 }

@@ -10,13 +10,10 @@
 #' 
 #' `plot.ScoreTable` method requires `ggplot2` package to be installed.
 #' 
-#' `strip_ScoreTable` function allows to revert the ScoreTable back to FrequencyTable
-#' object.
-#' 
 #' @param ft a `FrequencyTable` object
 #' @param scale a `StandardScale` object or list of multiple `StandardScale` objects
 #' @example examples/ScoreTable.R
-#' @return object of class `StandardScale`. Consists of:
+#' @return object of class `ScoreTable`. Consists of:
 #' 
 #' - table: data.frame containing for each point in the raw score: 
 #'     - number of observations (`n`), 
@@ -132,8 +129,9 @@ plot.ScoreTable <- function(st, scale_name = NULL) {
 
 }
 
-#' @rdname ScoreTable
+#' Revert the ScoreTable back to FrequencyTable object.
 #' @param st ScoreTable object
+#' @example examples/strip_ScoreTable.R
 #' @export
 strip_ScoreTable <- function(st) {
   
@@ -151,7 +149,10 @@ strip_ScoreTable <- function(st) {
   
 }
 
-#' @rdname ScoreTable
+#' Attach additional `StandardScale` to already created `ScoreTable`
+#' @param st A `ScoreTable` object
+#' @param scale a `StandardScale` object or list of multiple `StandardScale` objects
+#' @example examples/attach_scales.R
 #' @export
 attach_scales <- function(st, scale) {
   
