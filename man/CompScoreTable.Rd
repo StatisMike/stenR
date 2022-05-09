@@ -3,17 +3,16 @@
 \docType{class}
 \name{CompScoreTable}
 \alias{CompScoreTable}
-\alias{summary.CompScoreTable}
 \title{R6 class for producing easily re-computable ScoreTable}
-\usage{
-\method{summary}{CompScoreTable}(x)
-}
 \description{
 Computable ScoreTable class. It can compute and store \code{\link{ScoreTable}s}
 for multiple variables containing raw score results.
 
 After computation, it could be also used to compute new standardized scores
 for provided raw scores and integrate them into stored tables.
+
+\code{summary()} function can be used to get general information about
+\code{CompScoreTable} object.
 }
 \section{Methods}{
 \subsection{Public methods}{
@@ -30,8 +29,8 @@ for provided raw scores and integrate them into stored tables.
 \if{html}{\out{<a id="method-new"></a>}}
 \if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
-Initialize a CompScoreTable object. You can attach one or many
-StandardScale and FrequencyTable objects
+Initialize a \code{CompScoreTable} object. You can attach one or many
+\code{StandardScale} and \code{FrequencyTable} objects
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{CompScoreTable$new(tables = NULL, scales = NULL)}\if{html}{\out{</div>}}
 }
@@ -39,13 +38,13 @@ StandardScale and FrequencyTable objects
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{tables}}{Named list of FrequencyTable objects to be attached. Names
+\item{\code{tables}}{Named list of \code{FrequencyTable} objects to be attached. Names
 will indicate the name of variable for which the table is calculated.
-Defaults to NULL, so no tables will be available at the beginning.}
+Defaults to \code{NULL}, so no tables will be available at the beginning.}
 
-\item{\code{scales}}{StandardScale object or list of such objects to be attached.
-They will be used for calculation of ScoreTables. Default to NULL, so no
-scales wil be attached.}
+\item{\code{scales}}{\code{StandardScale} object or list of such objects to be attached.
+They will be used for calculation of \code{ScoreTables.} Defaults to \code{NULL}, so no
+scales wil be available at the beginning.}
 }
 \if{html}{\out{</div>}}
 }
@@ -54,6 +53,9 @@ Both \code{FrequencyTable} and \code{StandardScale} objects can be attached
 with appropriate methods after object initialization.
 }
 
+\subsection{Returns}{
+CompScoreTable object
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-attach_StandardScale"></a>}}
@@ -109,7 +111,7 @@ given variable already exists in the object.
 \if{html}{\out{<a id="method-export_ScoreTable"></a>}}
 \if{latex}{\out{\hypertarget{method-export_ScoreTable}{}}}
 \subsection{Method \code{export_ScoreTable()}}{
-Export list of ScoreTables from the object
+Export list of \code{ScoreTables} from the object
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{CompScoreTable$export_ScoreTable(vars = NULL, strip = FALSE)}\if{html}{\out{</div>}}
 }
@@ -120,22 +122,22 @@ Export list of ScoreTables from the object
 \item{\code{vars}}{Names of the variables for which to get the tables.
 If left at \code{NULL} default - get all off them.}
 
-\item{\code{strip}}{logical indicating if the ScoreTables should be stripped
-down to FrequencyTables during export. Defaults to \code{FALSE}}
+\item{\code{strip}}{logical indicating if the \code{ScoreTables} should be stripped
+down to \code{FrequencyTables} during export. Defaults to \code{FALSE}}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-list of ScoreTable or FrequencyTable object
+list of \code{ScoreTable} or \code{FrequencyTable} object
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-standardize"></a>}}
 \if{latex}{\out{\hypertarget{method-standardize}{}}}
 \subsection{Method \code{standardize()}}{
-Compute standardize scores for data.frame of raw scores.
+Compute standardize scores for \code{data.frame} of raw scores.
 Additionally, the raw scores can be used to recalculate ScoreTables
-before computing.
+before computing (using \code{calc = T}).
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{CompScoreTable$standardize(data, what, vars = names(data), calc = FALSE)}\if{html}{\out{</div>}}
 }
@@ -154,13 +156,13 @@ before computing.
 
 \item{\code{vars}}{vector of variable names which will taken into account}
 
-\item{\code{calc}}{should the ScoreTables be computed (or recalculated, if
+\item{\code{calc}}{should the \code{ScoreTables} be computed (or recalculated, if
 some are already provided?). Default to \code{TRUE}}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-data.frame with values recalculated
+\code{data.frame} with standardized values
 }
 }
 \if{html}{\out{<hr>}}

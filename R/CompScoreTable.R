@@ -7,7 +7,11 @@
 #' 
 #' After computation, it could be also used to compute new standardized scores 
 #' for provided raw scores and integrate them into stored tables.
+#' 
+#' `summary()` function can be used to get general information about 
+#' `CompScoreTable` object.
 #'
+#' @rdname CompScoreTable
 #' @export
 #' @import R6
 #' 
@@ -16,16 +20,17 @@ CompScoreTable <- R6::R6Class(
   
   public = list(
     
-    #' @description Initialize a CompScoreTable object. You can attach one or many
-    #' StandardScale and FrequencyTable objects
-    #' @param tables Named list of FrequencyTable objects to be attached. Names
+    #' @description Initialize a `CompScoreTable` object. You can attach one or many
+    #' `StandardScale` and `FrequencyTable` objects
+    #' @param tables Named list of `FrequencyTable` objects to be attached. Names
     #' will indicate the name of variable for which the table is calculated.
-    #' Defaults to NULL, so no tables will be available at the beginning.
-    #' @param scales StandardScale object or list of such objects to be attached. 
-    #' They will be used for calculation of ScoreTables. Default to NULL, so no
-    #' scales wil be attached.
+    #' Defaults to `NULL`, so no tables will be available at the beginning.
+    #' @param scales `StandardScale` object or list of such objects to be attached. 
+    #' They will be used for calculation of `ScoreTables.` Defaults to `NULL`, so no
+    #' scales wil be available at the beginning.
     #' @details Both `FrequencyTable` and `StandardScale` objects can be attached
     #' with appropriate methods after object initialization.
+    #' @return CompScoreTable object
     
     initialize = function(tables = NULL, scales = NULL) {
       
@@ -125,13 +130,13 @@ CompScoreTable <- R6::R6Class(
         private$tables[[var]] <- ScoreTable(private$tables[[var]], private$attached_scales)
     },
     
-    #' @description Export list of ScoreTables from the object
+    #' @description Export list of `ScoreTables` from the object
     #' @param vars Names of the variables for which to get the tables.
     #' If left at `NULL` default - get all off them.
-    #' @param strip logical indicating if the ScoreTables should be stripped
-    #' down to FrequencyTables during export. Defaults to `FALSE`
+    #' @param strip logical indicating if the `ScoreTables` should be stripped
+    #' down to `FrequencyTables` during export. Defaults to `FALSE`
     #' 
-    #' @return list of ScoreTable or FrequencyTable object
+    #' @return list of `ScoreTable` or `FrequencyTable` object
 
     export_ScoreTable = function(vars = NULL, strip = FALSE) {
       
@@ -160,9 +165,9 @@ CompScoreTable <- R6::R6Class(
       return(out)
     },
     
-    #' @description Compute standardize scores for data.frame of raw scores.
+    #' @description Compute standardize scores for `data.frame` of raw scores.
     #' Additionally, the raw scores can be used to recalculate ScoreTables
-    #' before computing.
+    #' before computing (using `calc = T`).
     #' @param data data.frame containing raw scores.
     #' @param what the values to get. One of either:
     #' 
@@ -171,9 +176,9 @@ CompScoreTable <- R6::R6Class(
     #' - name of the scale attached to the `CompScoreTable` object
     #' 
     #' @param vars vector of variable names which will taken into account 
-    #' @param calc should the ScoreTables be computed (or recalculated, if
+    #' @param calc should the `ScoreTables` be computed (or recalculated, if
     #' some are already provided?). Default to `TRUE`
-    #' @return data.frame with values recalculated
+    #' @return `data.frame` with standardized values 
     #' 
     standardize = function(data, what, vars = names(data), calc = FALSE) {
       
@@ -285,7 +290,6 @@ CompScoreTable <- R6::R6Class(
   )
 )
 
-#' @rdname CompScoreTable
 #' @export
 summary.CompScoreTable <- function(x) {
   
