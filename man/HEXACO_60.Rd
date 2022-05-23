@@ -3,7 +3,7 @@
 \docType{data}
 \name{HEXACO_60}
 \alias{HEXACO_60}
-\title{Sample data of results for HEXACO-60 questionnaire}
+\title{Sample data of HEXACO-60 questionnaire results (summed scales)}
 \format{
 A data frame with 204 rows and 9 variables
 \describe{
@@ -22,8 +22,8 @@ A data frame with 204 rows and 9 variables
 HEXACO_60
 }
 \description{
-Dataset containing raw scores of HEXACO-60 questionnaire. They were obtained
-during 2020 study on Polish incidental sample.
+Dataset containing summed scale scores of HEXACO-60 questionnaire. They
+were obtained during 2020 study on Polish incidental sample.
 }
 \details{
 All HEXACO scales consists of 10 items with responses as numeric values 1-5

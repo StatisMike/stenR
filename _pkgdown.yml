@@ -21,7 +21,11 @@ reference:
 - title: R6 class for Object Oriented workflow
 - contents:
   - CompScoreTable
-- title: Objects provided within the package
+- title: Helper functions for handling items into `stenR` compatible scales
+- contents:
+  - ScaleSpec
+  - sum_items_to_scale
+- title: Various objects provided within the package
 - contents:
   - default_scales
   - HEXACO_60
