@@ -11,7 +11,8 @@ ScaleSpec(
   min,
   max,
   na_value = as.integer(NA),
-  reverse_custom
+  reverse_custom,
+  na_value_custom
 )
 }
 \arguments{
@@ -33,7 +34,11 @@ Defaults to \code{as.integer(NA)}.}
 
 \item{reverse_custom}{if there are any differently-scored items in need of
 reverse scoring, their specification need to be given there as a \emph{data.frame}
-containing columns: \code{item_names}, \code{min}, \code{max} and, optionally, \code{na_value}.}
+containing columns: \code{item_names}, \code{min} and \code{max}.}
+
+\item{na_value_custom}{if there are any need for specific questions be gives
+specific values in place of \code{NA}s, provide a named integer vector there. Names
+should be the names of the questons.}
 }
 \value{
 object of \emph{ScaleSpec} class
@@ -45,34 +50,39 @@ of it, which need to be summed with reverse scoring, and how to handle \code{NA}
 To be used with \code{\link[=sum_items_to_scale]{sum_items_to_scale()}} function to preprocess item data.
 }
 \examples{
-# create the Scale Specifications for SLCS dataset
-## Self-Liking specification
-SL_spec <- ScaleSpec(
-  name = "SL",
-  item_names = paste("SLCS", c(1, 3, 5, 6, 7, 9, 11, 15), sep = "_"),
-  reverse = paste("SLCS", c(1, 6, 7, 15), sep = "_"),
+# simple scale specification
+
+simple_scaleSpec <- ScaleSpec(
+  name = "simple",
+  # scale consists of 5 items
+  item_names = c("item_1", "item_2", "item_3", "item_4", "item_5"),
+  # item 2 and 5 need to be reversed
+  reverse = c("item_2", "item_5"),
+  # item scores can take range of values: 1-5
   min = 1,
   max = 5)
 
-## Self-Competence specification
-SC_spec <- ScaleSpec(
-  name = "SC",
-  item_names = paste("SLCS", c(2, 4, 8, 10, 12, 13, 14, 16), sep = "_"),
-  reverse = paste("SLCS", c(8, 10, 13), sep = "_"),
+
+
+# complec scale specification
+
+complex_scaleSpec <- ScaleSpec(
+  name = "complex",
+  item_names = c("item_1", "item_2", "item_3", "item_4", "item_5"),
+  reverse = "item_2",
   min = 1,
-  max = 5)
-
-## General Score specification
-GS_spec <- ScaleSpec(
-  name = "GS",
-  item_names = paste("SLCS", 1:16, sep = "_"),
-  reverse = paste("SLCS", c(1, 6, 7, 8, 10, 13, 15), sep = "_"),
-  min = 1, 
-  max = 5)
-
-# Sum the raw item scores to raw scale scores
-SLCS_summed <- sum_items_to_scale(SLCS, SL_spec, SC_spec, GS_spec, id_col = "user_id")
-summary(SLCS_summed)
+  max = 5,
+  # na values by default will be filled with `3`
+  na_value = 3,
+  # except for item_4, where they will be filled with `2`
+  na_value_custom = c(item_4 = 2),
+  # item 4 and 5 can take custom range of values, so the reversing
+  # of score need to be handled customly
+  reverse_custom = 
+    data.frame(item_names = c("item_4", "item_5"),
+               min = c(1, 1),
+               max = c(3, 7))
+)
 }
 \seealso{
 Other item preprocessing functions: 
