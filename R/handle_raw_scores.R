@@ -16,9 +16,12 @@
 #' Defaults to `as.integer(NA)`.
 #' @param reverse_custom if there are any differently-scored items in need of
 #' reverse scoring, their specification need to be given there as a *data.frame*
-#' containing columns: `item_names`, `min`, `max` and, optionally, `na_value`.
+#' containing columns: `item_names`, `min` and `max`.
+#' @param na_value_custom if there are any need for specific questions be gives
+#' specific values in place of `NA`s, provide a named integer vector there. Names
+#' should be the names of the questons.
 #' @return object of *ScaleSpec* class
-#' @example examples/handle_raw_scores.R
+#' @example examples/ScaleSpec.R
 #' @family item preprocessing functions
 #' @export
 #' 
@@ -29,7 +32,8 @@ ScaleSpec <- function(
     min,
     max,
     na_value = as.integer(NA),
-    reverse_custom) {
+    reverse_custom,
+    na_value_custom) {
   
   out <- list(
     name = name,
@@ -56,6 +60,20 @@ ScaleSpec <- function(
   }
   
   out[["na_value"]] <- na_value
+  
+  if (!missing(na_value_custom)) {
+    if (any(sapply(names(na_value_custom), \(x) is.null(x))) || !is.numeric(na_value_custom))
+      stop("Integer vector assigned to the `na_value_custom` should be named.")
+    
+    na_value_names_missing <- names(na_value_custom)
+    na_value_names_missing <- na_value_names_missing[!na_value_names_missing %in% item_names]
+    
+    if (length(na_value_names_missing) > 0)
+      stop(paste0("There are some item names specified in `na_value_custom` that are missing from the `item_names`:\n",
+                  "'", paste(na_value_names_missing, sep = "', '"), "'."))
+    
+    out[["na_value_custom"]] <- na_value_custom
+  }
   
   if (!missing(reverse_custom)) {
     
@@ -94,7 +112,11 @@ ScaleSpec <- function(
 
 #' @title Sum up discrete raw data
 #' @description Helper function to sum-up and - if needed - automatically 
-#' reverse discrete raw data. 
+#' reverse discrete raw item values to scale or factor that they
+#' are measuring.
+#' @details All summing up of the raw discrete values into scale or factor
+#' score is done according to provided specifications utilizing [ScaleSpec()]
+#' objects. For more information refer to their constructor help page.
 #' @param data `data.frame` object containing numerical values of items data
 #' @param ... objects of class *ScaleSpec*. If all item names for *ScaleSpec*
 #' are found in `data`, summed items will be available in returned data.frame
@@ -104,7 +126,7 @@ ScaleSpec <- function(
 #' @param .dots *ScaleSpec* objects provided as a list, instead of individually
 #' in `...`. 
 #' @return object of class *data.frame*
-#' @example examples/handle_raw_scores.R
+#' @example examples/sum_items_to_scale.R
 #' @family item preprocessing functions
 #' @export
 sum_items_to_scale <- function(
@@ -145,21 +167,30 @@ sum_items_to_scale <- function(
         
         custom_spec <- spec$custom_reverse[spec$custom_reverse$item_names == item, ]
         item_vals <- custom_spec$max + custom_spec$min - data[, item, drop = F]
-        item_vals[is.na(item_vals)] <- custom_spec$na_value
+        item_vals[is.na(item_vals)] <- 
+          if (item %in% names(spec$na_value_custom)) spec$na_value_custom[[item]]
+        else spec$na_value
+        
         return(item_vals)
         
         # if item is to be reversed as default
       } else if (item %in% spec$reverse) {
         
         item_vals <- spec$max + spec$min - data[, item, drop = F]
-        item_vals[is.na(item_vals)] <- spec$na_value
+        item_vals[is.na(item_vals)] <- 
+          if (item %in% names(spec$na_value_custom)) spec$na_value_custom[[item]]
+        else spec$na_value
+        
         return (item_vals)
         
         # if no reverse will be made
       } else {
-        
+
         item_vals <- data[, item, drop = F]
-        item_vals[is.na(item_vals)] <- spec$na_value
+        item_vals[is.na(item_vals)] <- 
+          if (item %in% names(spec$na_value_custom)) spec$na_value_custom[[item]]
+        else spec$na_value
+        
         return(item_vals)
         
       }

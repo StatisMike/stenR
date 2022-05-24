@@ -24,7 +24,13 @@ object of class \emph{data.frame}
 }
 \description{
 Helper function to sum-up and - if needed - automatically
-reverse discrete raw data.
+reverse discrete raw item values to scale or factor that they
+are measuring.
+}
+\details{
+All summing up of the raw discrete values into scale or factor
+score is done according to provided specifications utilizing \code{\link[=ScaleSpec]{ScaleSpec()}}
+objects. For more information refer to their constructor help page.
 }
 \examples{
 # create the Scale Specifications for SLCS dataset
