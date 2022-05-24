@@ -45,4 +45,5 @@
 #'  \item{age}{age of the participant (15--68)}
 #'  \item{SLCS_1 to SLCS_16}{Score for each of measure items. (1--5)}
 #' }
+#' 
 "SLCS"
