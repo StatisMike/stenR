@@ -76,13 +76,14 @@
 </h1>
 </div>
 <!-- badges: start -->
-<p><code>stenR</code> is a package tailored mainly for creators of psychological questionnaires, though other social science researchers and survey authors can benefit greatly from it.</p>
+<p><code>stenR</code> is a package tailored mainly for users and creators of psychological questionnaires, though other social science researchers and survey authors can benefit greatly from it.</p>
 <p>It provides straightforward framework for normalization and standardization of raw discrete scores to standardized scale of your choosing. It follows simple work pattern:</p>
 <ul>
 <li>create frequency table and compute Z-score corresponding to each raw score</li>
 <li>create score table using some standard scale.</li>
-<li>provide external raw score to be recalculated to standardized scale.</li>
+<li>provide external raw score to be recalculated to standardized scale</li>
 </ul>
+<p>Additionally, it introduces compatible with rest of the workflow helper functions to preprocess data: from user answers on each item, to summarized scales/factors score.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
@@ -176,8 +177,8 @@
   skew <span class="op">=</span> <span class="op">-</span><span class="fl">0.3</span>, kurt <span class="op">=</span> <span class="fl">2.89</span>, seed <span class="op">=</span> <span class="fl">2678</span><span class="op">)</span>
 <span class="co">#&gt; Constants: Distribution  1  </span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Constants calculation time: 0.008 minutes </span>
-<span class="co">#&gt; Total Simulation time: 0.009 minutes</span>
+<span class="co">#&gt; Constants calculation time: 0.007 minutes </span>
+<span class="co">#&gt; Total Simulation time: 0.008 minutes</span>
 
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">simulated_ft</span><span class="op">)</span></code></pre></div>
 <p><img src="reference/figures/README-simulated_use-1.png"><!-- --></p>
@@ -188,6 +189,74 @@
   <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span>
 <span class="co">#&gt;   1.000   3.000   5.000   4.892   6.000  10.000</span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="data-preprocessing">Data preprocessing<a class="anchor" aria-label="anchor" href="#data-preprocessing"></a>
+</h2>
+<p>Workflow above assumes that your data is already preprocessed, and summarized score for each construct is presented to the functions.</p>
+<p>When working with actual data, it is most commonly presented as answers to individual items. It is then needed to summarize them into distinct scales or factors. Author may also chose to handle <code>NA</code>s in some way, and commonly there are items in need of reversing before summarizing into scale score.</p>
+<p>All of these steps can be achieved using <code>ScaleSpec</code> objects with <code>sum_items_to_scale</code> function.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># Answers per item: Self-liking self-competence scale</span>
+<span class="co"># (dataset included within package)</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">SLCS</span><span class="op">)</span>
+<span class="co">#&gt;                                   user_id sex age SLCS_1 SLCS_2 SLCS_3 SLCS_4</span>
+<span class="co">#&gt; 1                            damaged_kiwi   M  30      4      2      1      2</span>
+<span class="co">#&gt; 2               unilateralised_anglerfish   K  31      5      2      2      1</span>
+<span class="co">#&gt; 3                   technical_anemonecrab   K  22      4      4      4      4</span>
+<span class="co">#&gt; 4                  temperate_americancurl   K  26      5      3      2      2</span>
+<span class="co">#&gt; 5 uncontradictious_irishredandwhitesetter   K  22      5      2      3      4</span>
+<span class="co">#&gt; 6              simaroubaceous_acornweevil   K  17      5      3      1      2</span>
+<span class="co">#&gt;   SLCS_5 SLCS_6 SLCS_7 SLCS_8 SLCS_9 SLCS_10 SLCS_11 SLCS_12 SLCS_13 SLCS_14</span>
+<span class="co">#&gt; 1      2      4      4      4      2       4       1       4       4       2</span>
+<span class="co">#&gt; 2      2      4      4      5      3       4       1       2       5       1</span>
+<span class="co">#&gt; 3      4      5      4      4      2       3       2       4       5       3</span>
+<span class="co">#&gt; 4      1      5      5      5      1       4       1       3       4       2</span>
+<span class="co">#&gt; 5      2      5      3      4      3       4       1       3       3       4</span>
+<span class="co">#&gt; 6      2      5      5      5      1       4       2       2       4       1</span>
+<span class="co">#&gt;   SLCS_15 SLCS_16</span>
+<span class="co">#&gt; 1       5       4</span>
+<span class="co">#&gt; 2       4       5</span>
+<span class="co">#&gt; 3       4       5</span>
+<span class="co">#&gt; 4       4       4</span>
+<span class="co">#&gt; 5       4       5</span>
+<span class="co">#&gt; 6       3       4</span>
+
+<span class="co"># Scale specification for each of subscales and general score:</span>
+<span class="co">## Self-Liking specification</span>
+<span class="va">SL_spec</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/ScaleSpec.html">ScaleSpec</a></span><span class="op">(</span>
+  name <span class="op">=</span> <span class="st">"SL"</span>,
+  item_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"SLCS"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span>, <span class="fl">5</span>, <span class="fl">6</span>, <span class="fl">7</span>, <span class="fl">9</span>, <span class="fl">11</span>, <span class="fl">15</span><span class="op">)</span>, sep <span class="op">=</span> <span class="st">"_"</span><span class="op">)</span>,
+  reverse <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"SLCS"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">6</span>, <span class="fl">7</span>, <span class="fl">15</span><span class="op">)</span>, sep <span class="op">=</span> <span class="st">"_"</span><span class="op">)</span>,
+  min <span class="op">=</span> <span class="fl">1</span>,
+  max <span class="op">=</span> <span class="fl">5</span><span class="op">)</span>
+
+<span class="co">## Self-Competence specification</span>
+<span class="va">SC_spec</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/ScaleSpec.html">ScaleSpec</a></span><span class="op">(</span>
+  name <span class="op">=</span> <span class="st">"SC"</span>,
+  item_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"SLCS"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">4</span>, <span class="fl">8</span>, <span class="fl">10</span>, <span class="fl">12</span>, <span class="fl">13</span>, <span class="fl">14</span>, <span class="fl">16</span><span class="op">)</span>, sep <span class="op">=</span> <span class="st">"_"</span><span class="op">)</span>,
+  reverse <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"SLCS"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">8</span>, <span class="fl">10</span>, <span class="fl">13</span><span class="op">)</span>, sep <span class="op">=</span> <span class="st">"_"</span><span class="op">)</span>,
+  min <span class="op">=</span> <span class="fl">1</span>,
+  max <span class="op">=</span> <span class="fl">5</span><span class="op">)</span>
+
+<span class="co">## General Score specification</span>
+<span class="va">GS_spec</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/ScaleSpec.html">ScaleSpec</a></span><span class="op">(</span>
+  name <span class="op">=</span> <span class="st">"GS"</span>,
+  item_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"SLCS"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">16</span>, sep <span class="op">=</span> <span class="st">"_"</span><span class="op">)</span>,
+  reverse <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"SLCS"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">6</span>, <span class="fl">7</span>, <span class="fl">8</span>, <span class="fl">10</span>, <span class="fl">13</span>, <span class="fl">15</span><span class="op">)</span>, sep <span class="op">=</span> <span class="st">"_"</span><span class="op">)</span>,
+  min <span class="op">=</span> <span class="fl">1</span>, 
+  max <span class="op">=</span> <span class="fl">5</span><span class="op">)</span>
+
+<span class="co"># Sum the data</span>
+<span class="va">SLCS_summed</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/sum_items_to_scale.html">sum_items_to_scale</a></span><span class="op">(</span><span class="va">SLCS</span>, <span class="va">SL_spec</span>, <span class="va">SC_spec</span>, <span class="va">GS_spec</span>, id_col <span class="op">=</span> <span class="st">"user_id"</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">SLCS_summed</span><span class="op">)</span>
+<span class="co">#&gt;                                   user_id SL SC GS</span>
+<span class="co">#&gt; 1                            damaged_kiwi 13 20 33</span>
+<span class="co">#&gt; 2               unilateralised_anglerfish 15 15 30</span>
+<span class="co">#&gt; 3                   technical_anemonecrab 19 26 45</span>
+<span class="co">#&gt; 4                  temperate_americancurl 10 19 29</span>
+<span class="co">#&gt; 5 uncontradictious_irishredandwhitesetter 16 25 41</span>
+<span class="co">#&gt; 6              simaroubaceous_acornweevil 12 17 29</span></code></pre></div>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="license">
