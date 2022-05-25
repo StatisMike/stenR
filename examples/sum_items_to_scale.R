@@ -24,5 +24,5 @@ GS_spec <- ScaleSpec(
   max = 5)
 
 # Sum the raw item scores to raw scale scores
-SLCS_summed <- sum_items_to_scale(SLCS, SL_spec, SC_spec, GS_spec, id_col = "user_id")
+SLCS_summed <- sum_items_to_scale(SLCS, SL_spec, SC_spec, GS_spec, retain = "user_id")
 summary(SLCS_summed)
