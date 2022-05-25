@@ -121,8 +121,8 @@ ScaleSpec <- function(
 #' @param ... objects of class *ScaleSpec*. If all item names for *ScaleSpec*
 #' are found in `data`, summed items will be available in returned data.frame
 #' as column named as the *ScaleSpec* `name` value.
-#' @param id_col character describing which column should be retained as
-#' observation id. If kept as default `NULL`, then no column will be retained.
+#' @param retain either *boolean*: `TRUE` if all columns in the `data` are to be
+#' retained, `FALSE` if none, or character vector with names of columns to be retained
 #' @param .dots *ScaleSpec* objects provided as a list, instead of individually
 #' in `...`. 
 #' @return object of class *data.frame*
@@ -132,7 +132,7 @@ ScaleSpec <- function(
 sum_items_to_scale <- function(
     data,
     ...,
-    id_col = NULL,
+    retain = FALSE,
     .dots) {
   
   if (!missing(.dots)) 
@@ -146,11 +146,16 @@ sum_items_to_scale <- function(
   if (length(ScaleSpecs) == 0)
     stop ("There should be at least one `ScaleSpec` object provided in `...` argument")
   
-  if (!is.null(id_col)) {
-    id_obs <- data.frame(id = data[[id_col]])
-    names(id_obs) <- id_col
-  } else 
-    id_obs <- NULL
+  if (!is.logical(retain) && !is.character(retain)) 
+    stop ("`retain` argument need to be either a character vector with column names to retain or boolean.")
+  
+  if (is.character(retain)) {
+    retain_missing <- retain[!retain %in% names(data)]
+    
+    if (length(retain_missing) > 0)
+      stop(paste0("There are some colnames specified in `retain` that are not in the data:\n",
+                  "'", paste(retain_missing, sep = "', '"), "'."))
+  }
   
   # sum scales
   summed_scales <- lapply(ScaleSpecs, \(spec) {
@@ -203,9 +208,16 @@ sum_items_to_scale <- function(
     
   })
   
-  return(
-    dplyr::bind_cols(list(id_obs),
-                     summed_scales)
-  )
+  if (isTRUE(retain)) {
+    out <- dplyr::bind_cols(data,
+                            summed_scales)
+  } else if (isFALSE(retain)) {
+    out <- summed_scales
+  } else {
+    out <- dplyr::bind_cols(data[, retain, drop = F],
+                            summed_scales)
+  }
+  
+  return(out)
   
 }

@@ -4,7 +4,7 @@
 \alias{sum_items_to_scale}
 \title{Sum up discrete raw data}
 \usage{
-sum_items_to_scale(data, ..., id_col = NULL, .dots)
+sum_items_to_scale(data, ..., retain = FALSE, .dots)
 }
 \arguments{
 \item{data}{\code{data.frame} object containing numerical values of items data}
@@ -13,8 +13,8 @@ sum_items_to_scale(data, ..., id_col = NULL, .dots)
 are found in \code{data}, summed items will be available in returned data.frame
 as column named as the \emph{ScaleSpec} \code{name} value.}
 
-\item{id_col}{character describing which column should be retained as
-observation id. If kept as default \code{NULL}, then no column will be retained.}
+\item{retain}{either \emph{boolean}: \code{TRUE} if all columns in the \code{data} are to be
+retained, \code{FALSE} if none, or character vector with names of columns to be retained}
 
 \item{.dots}{\emph{ScaleSpec} objects provided as a list, instead of individually
 in \code{...}.}
@@ -59,7 +59,7 @@ GS_spec <- ScaleSpec(
   max = 5)
 
 # Sum the raw item scores to raw scale scores
-SLCS_summed <- sum_items_to_scale(SLCS, SL_spec, SC_spec, GS_spec, id_col = "user_id")
+SLCS_summed <- sum_items_to_scale(SLCS, SL_spec, SC_spec, GS_spec, retain = "user_id")
 summary(SLCS_summed)
 }
 \seealso{

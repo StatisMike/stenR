@@ -57,7 +57,7 @@ test_that("Calculation from raw item scores to scales works", {
   
   summed <- sum_items_to_scale(
     data = mockup_data,
-    id_col = "some_id",
+    retain = "some_id",
     scale_reg,
     scale_reg_NA,
     scale_custom_NA,

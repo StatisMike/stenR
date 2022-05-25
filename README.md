@@ -219,13 +219,13 @@ GS_spec <- ScaleSpec(
   max = 5)
 
 # Sum the data
-SLCS_summed <- sum_items_to_scale(SLCS, SL_spec, SC_spec, GS_spec, id_col = "user_id")
+SLCS_summed <- sum_items_to_scale(SLCS, SL_spec, SC_spec, GS_spec, retain = c("user_id", "sex", "age"))
 head(SLCS_summed)
-#>                                   user_id SL SC GS
-#> 1                            damaged_kiwi 13 20 33
-#> 2               unilateralised_anglerfish 15 15 30
-#> 3                   technical_anemonecrab 19 26 45
-#> 4                  temperate_americancurl 10 19 29
-#> 5 uncontradictious_irishredandwhitesetter 16 25 41
-#> 6              simaroubaceous_acornweevil 12 17 29
+#>                                   user_id sex age SL SC GS
+#> 1                            damaged_kiwi   M  30 13 20 33
+#> 2               unilateralised_anglerfish   K  31 15 15 30
+#> 3                   technical_anemonecrab   K  22 19 26 45
+#> 4                  temperate_americancurl   K  26 10 19 29
+#> 5 uncontradictious_irishredandwhitesetter   K  22 16 25 41
+#> 6              simaroubaceous_acornweevil   K  17 12 17 29
 ```
