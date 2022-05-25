@@ -1,9 +1,7 @@
 # create mockup dataset
 
-set.seed(2137)
-
 mockup_data <- data.frame(
-  some_id = ids::adjective_animal(4),
+  some_id = paste("user", 1:4, sep = "_"),
   item_1_reg = 2,
   item_2_reg_to_rev = 4,
   item_3_na = c(NA, 2, NA, 2),

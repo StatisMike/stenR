@@ -10,9 +10,9 @@ experimental](https://img.shields.io/badge/lifecycle-experimental-blue.svg)](htt
 [![codecov](https://codecov.io/gh/StatisMike/stenR/branch/master/graph/badge.svg?token=H62VR1J454)](https://codecov.io/gh/StatisMike/stenR)
 <!-- badges: end -->
 
-`stenR` is a package tailored mainly for creators of psychological
-questionnaires, though other social science researchers and survey
-authors can benefit greatly from it.
+`stenR` is a package tailored mainly for users and creators of
+psychological questionnaires, though other social science researchers
+and survey authors can benefit greatly from it.
 
 It provides straightforward framework for normalization and
 standardization of raw discrete scores to standardized scale of your
@@ -21,7 +21,11 @@ choosing. It follows simple work pattern:
 -   create frequency table and compute Z-score corresponding to each raw
     score
 -   create score table using some standard scale.
--   provide external raw score to be recalculated to standardized scale.
+-   provide external raw score to be recalculated to standardized scale
+
+Additionally, it introduces compatible with rest of the workflow helper
+functions to preprocess data: from user answers on each item, to
+summarized scales/factors score.
 
 ## Installation
 
@@ -132,8 +136,8 @@ simulated_ft <- SimFrequencyTable(
   skew = -0.3, kurt = 2.89, seed = 2678)
 #> Constants: Distribution  1  
 #> 
-#> Constants calculation time: 0.008 minutes 
-#> Total Simulation time: 0.009 minutes
+#> Constants calculation time: 0.007 minutes 
+#> Total Simulation time: 0.008 minutes
 
 plot(simulated_ft)
 ```
@@ -147,4 +151,81 @@ normalize_score(HEXACO_60$HEX_A,
   summary()
 #>    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
 #>   1.000   3.000   5.000   4.892   6.000  10.000
+```
+
+## Data preprocessing
+
+Workflow above assumes that your data is already preprocessed, and
+summarized score for each construct is presented to the functions.
+
+When working with actual data, it is most commonly presented as answers
+to individual items. It is then needed to summarize them into distinct
+scales or factors. Author may also chose to handle `NA`s in some way,
+and commonly there are items in need of reversing before summarizing
+into scale score.
+
+All of these steps can be achieved using `ScaleSpec` objects with
+`sum_items_to_scale` function.
+
+``` r
+# Answers per item: Self-liking self-competence scale
+# (dataset included within package)
+head(SLCS)
+#>                                   user_id sex age SLCS_1 SLCS_2 SLCS_3 SLCS_4
+#> 1                            damaged_kiwi   M  30      4      2      1      2
+#> 2               unilateralised_anglerfish   K  31      5      2      2      1
+#> 3                   technical_anemonecrab   K  22      4      4      4      4
+#> 4                  temperate_americancurl   K  26      5      3      2      2
+#> 5 uncontradictious_irishredandwhitesetter   K  22      5      2      3      4
+#> 6              simaroubaceous_acornweevil   K  17      5      3      1      2
+#>   SLCS_5 SLCS_6 SLCS_7 SLCS_8 SLCS_9 SLCS_10 SLCS_11 SLCS_12 SLCS_13 SLCS_14
+#> 1      2      4      4      4      2       4       1       4       4       2
+#> 2      2      4      4      5      3       4       1       2       5       1
+#> 3      4      5      4      4      2       3       2       4       5       3
+#> 4      1      5      5      5      1       4       1       3       4       2
+#> 5      2      5      3      4      3       4       1       3       3       4
+#> 6      2      5      5      5      1       4       2       2       4       1
+#>   SLCS_15 SLCS_16
+#> 1       5       4
+#> 2       4       5
+#> 3       4       5
+#> 4       4       4
+#> 5       4       5
+#> 6       3       4
+
+# Scale specification for each of subscales and general score:
+## Self-Liking specification
+SL_spec <- ScaleSpec(
+  name = "SL",
+  item_names = paste("SLCS", c(1, 3, 5, 6, 7, 9, 11, 15), sep = "_"),
+  reverse = paste("SLCS", c(1, 6, 7, 15), sep = "_"),
+  min = 1,
+  max = 5)
+
+## Self-Competence specification
+SC_spec <- ScaleSpec(
+  name = "SC",
+  item_names = paste("SLCS", c(2, 4, 8, 10, 12, 13, 14, 16), sep = "_"),
+  reverse = paste("SLCS", c(8, 10, 13), sep = "_"),
+  min = 1,
+  max = 5)
+
+## General Score specification
+GS_spec <- ScaleSpec(
+  name = "GS",
+  item_names = paste("SLCS", 1:16, sep = "_"),
+  reverse = paste("SLCS", c(1, 6, 7, 8, 10, 13, 15), sep = "_"),
+  min = 1, 
+  max = 5)
+
+# Sum the data
+SLCS_summed <- sum_items_to_scale(SLCS, SL_spec, SC_spec, GS_spec, id_col = "user_id")
+head(SLCS_summed)
+#>                                   user_id SL SC GS
+#> 1                            damaged_kiwi 13 20 33
+#> 2               unilateralised_anglerfish 15 15 30
+#> 3                   technical_anemonecrab 19 26 45
+#> 4                  temperate_americancurl 10 19 29
+#> 5 uncontradictious_irishredandwhitesetter 16 25 41
+#> 6              simaroubaceous_acornweevil 12 17 29
 ```
