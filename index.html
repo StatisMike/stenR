@@ -248,15 +248,15 @@
   max <span class="op">=</span> <span class="fl">5</span><span class="op">)</span>
 
 <span class="co"># Sum the data</span>
-<span class="va">SLCS_summed</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/sum_items_to_scale.html">sum_items_to_scale</a></span><span class="op">(</span><span class="va">SLCS</span>, <span class="va">SL_spec</span>, <span class="va">SC_spec</span>, <span class="va">GS_spec</span>, id_col <span class="op">=</span> <span class="st">"user_id"</span><span class="op">)</span>
+<span class="va">SLCS_summed</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/sum_items_to_scale.html">sum_items_to_scale</a></span><span class="op">(</span><span class="va">SLCS</span>, <span class="va">SL_spec</span>, <span class="va">SC_spec</span>, <span class="va">GS_spec</span>, retain <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"user_id"</span>, <span class="st">"sex"</span>, <span class="st">"age"</span><span class="op">)</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">SLCS_summed</span><span class="op">)</span>
-<span class="co">#&gt;                                   user_id SL SC GS</span>
-<span class="co">#&gt; 1                            damaged_kiwi 13 20 33</span>
-<span class="co">#&gt; 2               unilateralised_anglerfish 15 15 30</span>
-<span class="co">#&gt; 3                   technical_anemonecrab 19 26 45</span>
-<span class="co">#&gt; 4                  temperate_americancurl 10 19 29</span>
-<span class="co">#&gt; 5 uncontradictious_irishredandwhitesetter 16 25 41</span>
-<span class="co">#&gt; 6              simaroubaceous_acornweevil 12 17 29</span></code></pre></div>
+<span class="co">#&gt;                                   user_id sex age SL SC GS</span>
+<span class="co">#&gt; 1                            damaged_kiwi   M  30 13 20 33</span>
+<span class="co">#&gt; 2               unilateralised_anglerfish   K  31 15 15 30</span>
+<span class="co">#&gt; 3                   technical_anemonecrab   K  22 19 26 45</span>
+<span class="co">#&gt; 4                  temperate_americancurl   K  26 10 19 29</span>
+<span class="co">#&gt; 5 uncontradictious_irishredandwhitesetter   K  22 16 25 41</span>
+<span class="co">#&gt; 6              simaroubaceous_acornweevil   K  17 12 17 29</span></code></pre></div>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="license">

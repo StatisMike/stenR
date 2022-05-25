@@ -54,7 +54,7 @@ are measuring.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">sum_items_to_scale</span><span class="op">(</span><span class="va">data</span>, <span class="va">...</span>, id_col <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">.dots</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">sum_items_to_scale</span><span class="op">(</span><span class="va">data</span>, <span class="va">...</span>, retain <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">.dots</span><span class="op">)</span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -65,9 +65,9 @@ are measuring.</p>
 <dd><p>objects of class <em>ScaleSpec</em>. If all item names for <em>ScaleSpec</em>
 are found in <code>data</code>, summed items will be available in returned data.frame
 as column named as the <em>ScaleSpec</em> <code>name</code> value.</p></dd>
-<dt>id_col</dt>
-<dd><p>character describing which column should be retained as
-observation id. If kept as default <code>NULL</code>, then no column will be retained.</p></dd>
+<dt>retain</dt>
+<dd><p>either <em>boolean</em>: <code>TRUE</code> if all columns in the <code>data</code> are to be
+retained, <code>FALSE</code> if none, or character vector with names of columns to be retained</p></dd>
 <dt>.dots</dt>
 <dd><p><em>ScaleSpec</em> objects provided as a list, instead of individually
 in <code>...</code>.</p></dd>
@@ -116,7 +116,7 @@ objects. For more information refer to their constructor help page.</p>
 <span class="r-in">  max <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># Sum the raw item scores to raw scale scores</span></span>
-<span class="r-in"><span class="va">SLCS_summed</span> <span class="op">&lt;-</span> <span class="fu">sum_items_to_scale</span><span class="op">(</span><span class="va">SLCS</span>, <span class="va">SL_spec</span>, <span class="va">SC_spec</span>, <span class="va">GS_spec</span>, id_col <span class="op">=</span> <span class="st">"user_id"</span><span class="op">)</span></span>
+<span class="r-in"><span class="va">SLCS_summed</span> <span class="op">&lt;-</span> <span class="fu">sum_items_to_scale</span><span class="op">(</span><span class="va">SLCS</span>, <span class="va">SL_spec</span>, <span class="va">SC_spec</span>, <span class="va">GS_spec</span>, retain <span class="op">=</span> <span class="st">"user_id"</span><span class="op">)</span></span>
 <span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">SLCS_summed</span><span class="op">)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    user_id                SL              SC              GS       </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  Length:103         Min.   : 8.00   Min.   :10.00   Min.   :20.00  </span>
