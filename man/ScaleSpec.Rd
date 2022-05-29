@@ -10,8 +10,8 @@ ScaleSpec(
   reverse,
   min,
   max,
+  na_strategy = c("asis", "mean", "median", "mode"),
   na_value = as.integer(NA),
-  reverse_custom,
   na_value_custom
 )
 }
@@ -26,15 +26,14 @@ reversed during scale/factor summing. Reversed using the default \code{min} and
 \code{max} values.}
 
 \item{min, max}{integer containing the default minimal/maximal value that the
-answer to the item can be scored as. Needed only if there are any names
-presented in \code{reverse}.}
+answer to the item can be scored as.}
+
+\item{na_strategy}{character vector specifying which strategy should be taken
+during filling of \code{NA}. Defaults to \code{"asis"} and, other options are \code{"mean"},
+\code{"median"} and \code{"mode"}. Strategies are explained in the details section.}
 
 \item{na_value}{integer value to be input in missing values as default.
 Defaults to \code{as.integer(NA)}.}
-
-\item{reverse_custom}{if there are any differently-scored items in need of
-reverse scoring, their specification need to be given there as a \emph{data.frame}
-containing columns: \code{item_names}, \code{min} and \code{max}.}
 
 \item{na_value_custom}{if there are any need for specific questions be gives
 specific values in place of \code{NA}s, provide a named integer vector there. Names
@@ -49,6 +48,28 @@ the scale or factor, with regard to which items from the source data are part
 of it, which need to be summed with reverse scoring, and how to handle \code{NA}s.
 To be used with \code{\link[=sum_items_to_scale]{sum_items_to_scale()}} function to preprocess item data.
 }
+\details{
+\subsection{NA imputation}{
+
+it specifies how \code{NA} values should be treated during \code{\link[=sum_items_to_scales]{sum_items_to_scales()}}
+function run.
+\strong{asis} strategy is literal: the values specified in \code{na_value} or \code{na_value_custom}
+will be used without any changes.
+\strong{mean}, \strong{median} and \strong{mode} are functional strategies. They work on a
+rowwise basis, so the appropriate value for every observation will be used.
+If there are no values provided to check for the \emph{mean}, \emph{median} or \emph{mode},
+the value provided in \code{na_value} or \code{na_value_custom} will be used. The
+values of \emph{mean} and \emph{median} will be rounded before imputation.
+}
+
+\subsection{Order of operations}{
+\itemize{
+\item item reversion
+\item functional \code{NA}s imputation
+\item literal \code{NA}s imputation
+}
+}
+}
 \examples{
 # simple scale specification
 
@@ -62,9 +83,7 @@ simple_scaleSpec <- ScaleSpec(
   min = 1,
   max = 5)
 
-
-
-# complec scale specification
+# complex scale specification
 
 complex_scaleSpec <- ScaleSpec(
   name = "complex",
@@ -83,9 +102,22 @@ complex_scaleSpec <- ScaleSpec(
                min = c(1, 1),
                max = c(3, 7))
 )
+
+# scale specification with functional NA imputation strategy
+
+func_scaleSpec <- ScaleSpec(
+  name = "complex",
+  item_names = c("item_1", "item_2", "item_3", "item_4", "item_5"),
+  reverse = "item_2",
+  min = 1,
+  max = 5,
+  # strategies available are 'mean', 'median' and 'mode'
+  na_strategy = "mean"
+)
 }
 \seealso{
 Other item preprocessing functions: 
+\code{\link{CombScaleSpec}()},
 \code{\link{sum_items_to_scale}()}
 }
 \concept{item preprocessing functions}

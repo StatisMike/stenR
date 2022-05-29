@@ -10,9 +10,7 @@ simple_scaleSpec <- ScaleSpec(
   min = 1,
   max = 5)
 
-
-
-# complec scale specification
+# complex scale specification
 
 complex_scaleSpec <- ScaleSpec(
   name = "complex",
@@ -30,4 +28,16 @@ complex_scaleSpec <- ScaleSpec(
     data.frame(item_names = c("item_4", "item_5"),
                min = c(1, 1),
                max = c(3, 7))
+)
+
+# scale specification with functional NA imputation strategy
+
+func_scaleSpec <- ScaleSpec(
+  name = "complex",
+  item_names = c("item_1", "item_2", "item_3", "item_4", "item_5"),
+  reverse = "item_2",
+  min = 1,
+  max = 5,
+  # strategies available are 'mean', 'median' and 'mode'
+  na_strategy = "mean"
 )
