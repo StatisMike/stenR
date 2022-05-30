@@ -24,6 +24,7 @@ reference:
 - title: Helper functions for handling items into `stenR` compatible scales
 - contents:
   - ScaleSpec
+  - CombScaleSpec
   - sum_items_to_scale
 - title: Various objects provided within the package
 - contents:

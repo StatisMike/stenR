@@ -37,46 +37,141 @@ scale_custom_NA <- ScaleSpec(
   na_value_custom = c(item_4_custom_na = 2)
 )
 
-scale_wider_rev <- ScaleSpec(
-  name = "wider_rev",
+scale_mode_func <- ScaleSpec(
+  name = "mode",
   item_names = c("item_1_reg", "item_2_reg_to_rev", "item_3_na", "item_4_custom_na", "item_5_wider_rev"),
   reverse = "item_2_reg_to_rev",
   min = 1,
   max = 5,
-  na_value = 3,
-  na_value_custom = c(item_4_custom_na = 2),
-  reverse_custom = data.frame(
-    item_names = "item_5_wider_rev",
-    min = 1,
-    max = 7,
-    na_value = 5
-  )
+  na_strategy = "mode"
 )
 
-test_that("Calculation from raw item scores to scales works", {
+scale_median_func <- ScaleSpec(
+  name = "median",
+  item_names = c("item_1_reg", "item_2_reg_to_rev", "item_3_na", "item_4_custom_na", "item_5_wider_rev"),
+  reverse = "item_2_reg_to_rev",
+  min = 1,
+  max = 5,
+  na_strategy = "median"
+)
+
+scale_mean_func <- ScaleSpec(
+  name = "mean",
+  item_names = c("item_1_reg", "item_2_reg_to_rev", "item_3_na", "item_4_custom_na", "item_5_wider_rev"),
+  reverse = "item_2_reg_to_rev",
+  min = 1,
+  max = 5,
+  na_strategy = "mean"
+)
+
+comb_asis <- CombScaleSpec(
+  name = "comb_asis",
+  scale_reg_NA,
+  scale_custom_NA
+)
+
+comb_func <- CombScaleSpec(
+  name = "comb_func",
+  scale_mode_func,
+  scale_median_func,
+  scale_mean_func
+)
+
+rec_straight <- CombScaleSpec(
+  name = "rec_straight",
+  comb_asis,
+  comb_func
+)
+
+rec_rev <- CombScaleSpec(
+  name = "rec_rev",
+  comb_asis,
+  comb_func,
+  reverse = "comb_func"
+)
+
+summed <- sum_items_to_scale(
+  data = mockup_data,
+  retain = "some_id",
+  scale_reg,
+  scale_reg_NA,
+  scale_custom_NA,
+  scale_mode_func,
+  scale_median_func,
+  scale_mean_func,
+  comb_asis,
+  comb_func,
+  rec_straight,
+  rec_rev
+)
+
+test_that("NAs without NA handling are retained", {
+  expect_equal(sum(is.na(summed$reg)), 2)
+  })
+
+test_that("NAs with regular and custom NA handling works correctly", {
+  expect_gt(sum(summed$reg_NA, na.rm = T), sum(summed$custom_NA))
+  })
+
+test_that("CombScaleSpec works as intended", {
   
-  summed <- sum_items_to_scale(
-    data = mockup_data,
-    retain = "some_id",
-    scale_reg,
-    scale_reg_NA,
-    scale_custom_NA,
-    scale_wider_rev
+  expect_equal(rowSums(summed[, c("reg_NA", "custom_NA")]),
+               summed$comb_asis)
+  
+  expect_equal(rowSums(summed[, c("mode", "median", "mean")]),
+               summed$comb_func)
+  
+})
+
+test_that("CombScaleSpec recursion works", {
+  
+  expect_equal(rowSums(summed[, c("comb_asis", "comb_func")]),
+               summed$rec_straight)
+  
+  with_revs <- cbind(
+    summed[, "comb_asis", drop = F],
+    comb_func$min + comb_func$max - summed[, "comb_func", drop = F]
   )
   
-  expect_equal(sum(is.na(summed$reg)), 2)
+  expect_equal(rowSums(with_revs), summed$rec_rev)
   
-  expect_gt(sum(summed$reg_NA), sum(summed$custom_NA))
   
-  expect_lt(sum(summed$wider_rev), sum(summed$custom_NA))
-  
+})
+
+
+test_that("Only retained colums are of original class", {
   expect_equal(sum(sapply(names(summed), \(x) is.character(summed[[x]]))),
                1)
+})
+
   
+test_that("All scales that are to be calculated are present in the final data", {
   expect_equal(sum(sapply(names(summed), \(x) is.numeric(summed[[x]]))),
-               4)
+               10)
+})
+
+test_that("Printing methods work", {
   
+  expect_output(print(scale_median_func),
+                regexp = "<ScaleSpec>")
   
+  expect_output(print(comb_func),
+                regexp = "<CombScaleSpec>")
+  
+  expect_output(print(rec_rev),
+                regexp = "<CombScaleSpec>.*<CombScaleSpec>.*<reversed>")
+})
+
+test_that("Summary methods work", {
+  
+  expect_output(summary(scale_median_func),
+                regexp = "<ScaleSpec>")
+  
+  expect_output(summary(comb_func),
+                regexp = "<CombScaleSpec>")
+  
+  expect_output(summary(rec_rev),
+                regexp = "<CombScaleSpec>.*<ScaleSpec>")
 })
 
 
