@@ -1,5 +1,5 @@
 #' Internal items summing for one ScaleSpec
-#' @param ScaleSpec object of ScaleSpec class
+#' @param ScaleSpec object of ScaleSpec or CombScaleSpec class
 #' @param data Data for all operations
 #' @param warn_env Environment for warnings
 #' @return data.frame of items reversed, NA inputted and summed to scale
@@ -7,6 +7,30 @@
 #' @noRd
 
 items_summing <- function(spec, data, warn_env) {
+  
+ if (class(spec) == "CombScaleSpec") {
+    
+    comb_scale <- lapply(spec$ScaleSpecs, \(single_spec) {
+      
+      single_scale <- items_summing(single_spec, data, warn_env)
+      
+      if (single_spec$name %in% spec$reverse && class(single_spec) == "ScaleSpec") {
+        single_scale <- 
+          (single_spec$min * length(single_spec$item_names) + 
+             single_spec$max * length(single_spec$item_names)) - single_scale
+      }
+      
+      if (single_spec$name %in% spec$reverse && class(single_spec) == "CombScaleSpec") {
+        single_scale <- single_spec$min + single_spec$max - single_scale
+      }
+      
+      return(single_scale)
+      
+    })
+    summed_scale <- data.frame(item = rowSums(dplyr::bind_cols(comb_scale)))
+    names(summed_scale) <- spec$name
+    return(summed_scale)
+  }
   
   # if any of the item names is not available in data, skip the scale
   if (any(!spec$item_names %in% names(data))) {
@@ -102,11 +126,11 @@ items_summing <- function(spec, data, warn_env) {
 #' @param name character with name of the scale/factor
 #' @param item_names character vector containing names of the items that the
 #' scale/factor consists of. 
+#' @param min,max integer containing the default minimal/maximal value that the
+#' answer to the item can be scored as. 
 #' @param reverse character vector containing names of the items that need to be
 #' reversed during scale/factor summing. Reversed using the default `min` and
 #' `max` values.
-#' @param min,max integer containing the default minimal/maximal value that the
-#' answer to the item can be scored as. 
 #' @param na_strategy character vector specifying which strategy should be taken
 #' during filling of `NA`. Defaults to `"asis"` and, other options are `"mean"`, 
 #' `"median"` and `"mode"`. Strategies are explained in the details section. 
@@ -136,14 +160,15 @@ items_summing <- function(spec, data, warn_env) {
 #' @return object of *ScaleSpec* class
 #' @example examples/ScaleSpec.R
 #' @family item preprocessing functions
+#' @rdname ScaleSpec
 #' @export
 #' 
 ScaleSpec <- function(
     name,
     item_names,
-    reverse,
     min,
     max,
+    reverse = character(0),
     na_strategy = c("asis", "mean", "median", "mode"),
     na_value = as.integer(NA),
     na_value_custom) {
@@ -155,6 +180,8 @@ ScaleSpec <- function(
     stop("'min' needs to be lesser than 'max'")
   if (min < 0 || max < 0)
     stop("Only non-negative 'min' and 'max' values are supported.")
+  if (!is.character(reverse))
+    stop("Character vector should be specified for 'reverse' argument.")
   
   out <- list(
     name = name,
@@ -167,7 +194,7 @@ ScaleSpec <- function(
   
   class(out) <- "ScaleSpec"
   
-  if (!missing(reverse)) {
+  if (length(reverse) > 0) {
     
     out[["reverse"]] <- reverse
     
@@ -197,8 +224,24 @@ ScaleSpec <- function(
   
 }
 
+#' @rdname ScaleSpec
+#' @param spec *ScaleSpec* object
 #' @export
 print.ScaleSpec <- function(spec) {
+  
+  cat(sep = "", "<ScaleSpec>: '", spec$name, "'\n")
+  cat(sep = "", "No. items: ", length(spec$item_names))
+  if (length(spec$reverse) > 0) 
+    cat(sep = "", " (", length(spec$reverse), " reversed)")
+  cat("\nNA imputation method:", spec$na_strategy, "\n")
+  cat("NA literal value:", spec$na_value, "\n")
+  
+}
+
+#' @rdname ScaleSpec
+#' @param spec *ScaleSpec* object
+#' @export
+summary.ScaleSpec <- function(spec) {
   
   cat(sep = "", "<ScaleSpec>: '", spec$name, "'\n")
   
@@ -217,20 +260,27 @@ print.ScaleSpec <- function(spec) {
     
   }))
   
-  return(NULL)
+  return(invisible(NULL))
   
 }
 
-#' Combined Scale Specification
+#' @title Combined Scale Specification
 #' @description
 #' Combine multiple *ScaleSpec* objects into one in regards of [sum_items_to_scales()]
 #' function. Useful when one scale of factor contains items of different possible
-#' values or if there is hierarchy of scale or factors
+#' values or if there is hierarchy of scale or factors.
+#' 
+#' Also allows combining *CombScaleSpec* object, if the factor structure have deeper
+#' hierarchy.
+#' 
 #' @param name Name of the combined scale or factor
-#' @param ... *ScaleSpec* objects
+#' @param ... *ScaleSpec* or other *CombScaleSpec* objects
 #' @param reverse character vector containing names of the underlying subscales
 #' of factors that need to be reversed
 #' @family item preprocessing functions
+#' @return *CombScaleSpec* object
+#' @example examples/CombScaleSpec.R
+#' @rdname CombScaleSpec
 #' @export
 CombScaleSpec <- function(name, ..., reverse = character(0)) {
   
@@ -240,16 +290,72 @@ CombScaleSpec <- function(name, ..., reverse = character(0)) {
   
   class(out) <- "CombScaleSpec"
   
-  if (any(sapply(out$ScaleSpecs, \(x) class(x) != "ScaleSpec")))
-    stop("Objects of class 'ScaleSpec' need to be provided in '...' argument.")
+  if (any(sapply(out$ScaleSpecs, \(x) !class(x) %in% c("ScaleSpec", "CombScaleSpec"))))
+    stop("Objects of class 'ScaleSpec' or 'CombScaleSpec' need to be provided in '...' argument.")
   if (!is.character(reverse))
     stop("Character vector need to be provided to 'reverse' argument.")
   else if (length(reverse) > 0 && any(!reverse %in% sapply(out$ScaleSpecs, \(spec) spec$name)))
     stop("Some names provided in 'reverse' argument are reffering to the names of provided scales.")
   
+  out[["item_names"]] <- lapply(out$ScaleSpecs, \(spec) {
+    spec$item_names
+  })
+  
+  out[["item_names"]] <- unlist(out[["item_names"]])
+  
+  out[["min"]] <- sapply(out$ScaleSpecs, \(spec) {
+    if (class(spec) == "ScaleSpec")
+      spec$min * length(spec$item_names)
+    else if (class(spec) == "CombScaleSpec")
+      spec$min
+  })
+  
+  out[["min"]] <- sum(out[["min"]])
+  
+  out[["max"]] <- sapply(out$ScaleSpecs, \(spec) {
+    if (class(spec) == "ScaleSpec")
+      spec$max * length(spec$item_names)
+    else if (class(spec) == "CombScaleSpec")
+      spec$max
+  })
+  
+  out[["max"]] <- sum(out[["max"]])
+  
   return(out)
   
 } 
+
+#' @rdname CombScaleSpec
+#' @param spec *CombScaleSpec* object
+#' @export
+print.CombScaleSpec <- function(spec) {
+  
+  cat(sep = "", "<CombScaleSpec>: '", spec$name, "'\n")
+  cat(sep = "", "No. items total: ", length(spec$item_names), "\n\n")
+  cat("Underlying objects:\n")
+  invisible(lapply(spec$ScaleSpecs, \(x) {
+    cat(sep = "", "<", class(x), ">: ", x$name)
+    if (x$name %in% spec$reverse) cat(" <reversed>")
+    cat("\n")
+  }))
+  
+}
+
+#' @rdname CombScaleSpec
+#' @param spec *CombScaleSpec* object
+#' @export
+summary.CombScaleSpec <- function(spec) {
+  
+  cat(sep = "", "<CombScaleSpec>: '", spec$name, "'\n")
+  cat(sep = "", "No. items total: ", length(spec$item_names), "\n\n")
+  cat("Underlying objects:\n")
+  invisible(lapply(spec$ScaleSpecs, \(x) {
+    cat("- ")
+    print(x)
+    cat("\n")
+  }))
+  
+}
 # #' @rdname ScaleSpec
 # #' @param ss *ScaleSpec* object
 # summary.ScaleSpec <- function(ss) {
@@ -311,30 +417,32 @@ sum_items_to_scale <- function(
   warn_env[["mode"]] <- 0
 
   # sum scales
-  summed_scales <- lapply(ScaleSpecs, \(spec) {
-    
-    if (class(spec) == "ScaleSpec")
-      summed_scale <- items_summing(spec = spec, data = data, warn_env = warn_env)
-    else if (class(spec) == "CombScaleSpec") {
-      
-      comb_scale <- lapply(spec$ScaleSpecs, \(single_spec) {
-        
-        single_scale <- items_summing(single_spec, data, warn_env)
-        
-        if (single_spec$name %in% spec$reverse) {
-          single_scale <- 
-            (single_spec$min * length(single_spec$item_names) + 
-            single_spec$max * length(single_spec$item_names)) - single_scale
-        }
-        
-        return(single_scale)
-        
-      })
-      summed_scale <- data.frame(item = rowSums(dplyr::bind_cols(comb_scale)))
-      names(summed_scale) <- spec$name
-    }
-    return(summed_scale)
-  })
+  # summed_scales <- lapply(ScaleSpecs, \(spec) {
+  #   
+  #   if (class(spec) == "ScaleSpec")
+  #     summed_scale <- items_summing(spec = spec, data = data, warn_env = warn_env)
+  #   else if (class(spec) == "CombScaleSpec") {
+  #     
+  #     comb_scale <- lapply(spec$ScaleSpecs, \(single_spec) {
+  #       
+  #       single_scale <- items_summing(single_spec, data, warn_env)
+  #       
+  #       if (single_spec$name %in% spec$reverse) {
+  #         single_scale <- 
+  #           (single_spec$min * length(single_spec$item_names) + 
+  #           single_spec$max * length(single_spec$item_names)) - single_scale
+  #       }
+  #       
+  #       return(single_scale)
+  #       
+  #     })
+  #     summed_scale <- data.frame(item = rowSums(dplyr::bind_cols(comb_scale)))
+  #     names(summed_scale) <- spec$name
+  #   }
+  #   return(summed_scale)
+  # })
+  
+  summed_scales <- lapply(ScaleSpecs, items_summing, data = data, warn_env = warn_env)
   
   if (length(warn_env$not_summed) > 0) 
     warning(paste0("Some of the scales were not summed: not all specified items were available in data:\n",

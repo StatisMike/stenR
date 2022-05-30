@@ -136,7 +136,7 @@ simulated_ft <- SimFrequencyTable(
   skew = -0.3, kurt = 2.89, seed = 2678)
 #> Constants: Distribution  1  
 #> 
-#> Constants calculation time: 0.007 minutes 
+#> Constants calculation time: 0.008 minutes 
 #> Total Simulation time: 0.008 minutes
 
 plot(simulated_ft)

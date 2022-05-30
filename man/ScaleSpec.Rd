@@ -2,18 +2,24 @@
 % Please edit documentation in R/handle_raw_scores.R
 \name{ScaleSpec}
 \alias{ScaleSpec}
+\alias{print.ScaleSpec}
+\alias{summary.ScaleSpec}
 \title{Scale Specification object}
 \usage{
 ScaleSpec(
   name,
   item_names,
-  reverse,
   min,
   max,
+  reverse = character(0),
   na_strategy = c("asis", "mean", "median", "mode"),
   na_value = as.integer(NA),
   na_value_custom
 )
+
+\method{print}{ScaleSpec}(spec)
+
+\method{summary}{ScaleSpec}(spec)
 }
 \arguments{
 \item{name}{character with name of the scale/factor}
@@ -21,12 +27,12 @@ ScaleSpec(
 \item{item_names}{character vector containing names of the items that the
 scale/factor consists of.}
 
+\item{min, max}{integer containing the default minimal/maximal value that the
+answer to the item can be scored as.}
+
 \item{reverse}{character vector containing names of the items that need to be
 reversed during scale/factor summing. Reversed using the default \code{min} and
 \code{max} values.}
-
-\item{min, max}{integer containing the default minimal/maximal value that the
-answer to the item can be scored as.}
 
 \item{na_strategy}{character vector specifying which strategy should be taken
 during filling of \code{NA}. Defaults to \code{"asis"} and, other options are \code{"mean"},
@@ -38,6 +44,8 @@ Defaults to \code{as.integer(NA)}.}
 \item{na_value_custom}{if there are any need for specific questions be gives
 specific values in place of \code{NA}s, provide a named integer vector there. Names
 should be the names of the questons.}
+
+\item{spec}{\emph{ScaleSpec} object}
 }
 \value{
 object of \emph{ScaleSpec} class
@@ -77,43 +85,43 @@ simple_scaleSpec <- ScaleSpec(
   name = "simple",
   # scale consists of 5 items
   item_names = c("item_1", "item_2", "item_3", "item_4", "item_5"),
-  # item 2 and 5 need to be reversed
-  reverse = c("item_2", "item_5"),
   # item scores can take range of values: 1-5
   min = 1,
-  max = 5)
+  max = 5,
+  # item 2 and 5 need to be reversed
+  reverse = c("item_2", "item_5"))
 
-# complex scale specification
+print(simple_scale)
 
-complex_scaleSpec <- ScaleSpec(
-  name = "complex",
+# scale specification with literal NA imputation strategy 
+
+asis_scaleSpec <- ScaleSpec(
+  name = "w_asis",
   item_names = c("item_1", "item_2", "item_3", "item_4", "item_5"),
-  reverse = "item_2",
   min = 1,
   max = 5,
+  reverse = "item_2",
   # na values by default will be filled with `3`
   na_value = 3,
   # except for item_4, where they will be filled with `2`
-  na_value_custom = c(item_4 = 2),
-  # item 4 and 5 can take custom range of values, so the reversing
-  # of score need to be handled customly
-  reverse_custom = 
-    data.frame(item_names = c("item_4", "item_5"),
-               min = c(1, 1),
-               max = c(3, 7))
+  na_value_custom = c(item_4 = 2)
 )
+
+print(asis_scaleSpec)
 
 # scale specification with functional NA imputation strategy
 
 func_scaleSpec <- ScaleSpec(
-  name = "complex",
+  name = "w_func",
   item_names = c("item_1", "item_2", "item_3", "item_4", "item_5"),
-  reverse = "item_2",
   min = 1,
   max = 5,
+  reverse = "item_2",
   # strategies available are 'mean', 'median' and 'mode'
   na_strategy = "mean"
 )
+
+print(func_scaleSpec)
 }
 \seealso{
 Other item preprocessing functions: 
