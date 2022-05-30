@@ -16,7 +16,7 @@ To be used with sum_items_to_scale() function to preprocess item data."><meta pr
     
     <a class="navbar-brand me-2" href="../index.html">stenR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -60,13 +60,19 @@ To be used with <code><a href="sum_items_to_scale.html">sum_items_to_scale()</a>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">ScaleSpec</span><span class="op">(</span>
   <span class="va">name</span>,
   <span class="va">item_names</span>,
-  <span class="va">reverse</span>,
   <span class="va">min</span>,
   <span class="va">max</span>,
+  reverse <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span>,
+  na_strategy <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"asis"</span>, <span class="st">"mean"</span>, <span class="st">"median"</span>, <span class="st">"mode"</span><span class="op">)</span>,
   na_value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="cn">NA</span><span class="op">)</span>,
-  <span class="va">reverse_custom</span>,
   <span class="va">na_value_custom</span>
-<span class="op">)</span></code></pre></div>
+<span class="op">)</span>
+
+<span class="co"># S3 method for ScaleSpec</span>
+<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">spec</span><span class="op">)</span>
+
+<span class="co"># S3 method for ScaleSpec</span>
+<span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">spec</span><span class="op">)</span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -76,33 +82,62 @@ To be used with <code><a href="sum_items_to_scale.html">sum_items_to_scale()</a>
 <dt>item_names</dt>
 <dd><p>character vector containing names of the items that the
 scale/factor consists of.</p></dd>
+<dt>min, max</dt>
+<dd><p>integer containing the default minimal/maximal value that the
+answer to the item can be scored as.</p></dd>
 <dt>reverse</dt>
 <dd><p>character vector containing names of the items that need to be
 reversed during scale/factor summing. Reversed using the default <code>min</code> and
 <code>max</code> values.</p></dd>
-<dt>min, max</dt>
-<dd><p>integer containing the default minimal/maximal value that the
-answer to the item can be scored as. Needed only if there are any names
-presented in <code>reverse</code>.</p></dd>
+<dt>na_strategy</dt>
+<dd><p>character vector specifying which strategy should be taken
+during filling of <code>NA</code>. Defaults to <code>"asis"</code> and, other options are <code>"mean"</code>,
+<code>"median"</code> and <code>"mode"</code>. Strategies are explained in the details section.</p></dd>
 <dt>na_value</dt>
 <dd><p>integer value to be input in missing values as default.
 Defaults to <code>as.integer(NA)</code>.</p></dd>
-<dt>reverse_custom</dt>
-<dd><p>if there are any differently-scored items in need of
-reverse scoring, their specification need to be given there as a <em>data.frame</em>
-containing columns: <code>item_names</code>, <code>min</code> and <code>max</code>.</p></dd>
 <dt>na_value_custom</dt>
 <dd><p>if there are any need for specific questions be gives
 specific values in place of <code>NA</code>s, provide a named integer vector there. Names
 should be the names of the questons.</p></dd>
+<dt>spec</dt>
+<dd><p><em>ScaleSpec</em> object</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>object of <em>ScaleSpec</em> class</p>
     </div>
     <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    
+<div class="section">
+<h3 id="na-imputation">NA imputation<a class="anchor" aria-label="anchor" href="#na-imputation"></a></h3>
+
+
+<p>it specifies how <code>NA</code> values should be treated during <code>sum_items_to_scales()</code>
+function run.
+<strong>asis</strong> strategy is literal: the values specified in <code>na_value</code> or <code>na_value_custom</code>
+will be used without any changes.
+<strong>mean</strong>, <strong>median</strong> and <strong>mode</strong> are functional strategies. They work on a
+rowwise basis, so the appropriate value for every observation will be used.
+If there are no values provided to check for the <em>mean</em>, <em>median</em> or <em>mode</em>,
+the value provided in <code>na_value</code> or <code>na_value_custom</code> will be used. The
+values of <em>mean</em> and <em>median</em> will be rounded before imputation.</p>
+</div>
+
+<div class="section">
+<h3 id="order-of-operations">Order of operations<a class="anchor" aria-label="anchor" href="#order-of-operations"></a></h3>
+
+<ul><li><p>item reversion</p></li>
+<li><p>functional <code>NA</code>s imputation</p></li>
+<li><p>literal <code>NA</code>s imputation</p></li>
+</ul></div>
+
+    </div>
+    <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Other item preprocessing functions: 
+<code><a href="CombScaleSpec.html">CombScaleSpec</a>()</code>,
 <code><a href="sum_items_to_scale.html">sum_items_to_scale</a>()</code></p></div>
     </div>
 
@@ -114,33 +149,52 @@ should be the names of the questons.</p></dd>
 <span class="r-in">  name <span class="op">=</span> <span class="st">"simple"</span>,</span>
 <span class="r-in">  <span class="co"># scale consists of 5 items</span></span>
 <span class="r-in">  item_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"item_1"</span>, <span class="st">"item_2"</span>, <span class="st">"item_3"</span>, <span class="st">"item_4"</span>, <span class="st">"item_5"</span><span class="op">)</span>,</span>
-<span class="r-in">  <span class="co"># item 2 and 5 need to be reversed</span></span>
-<span class="r-in">  reverse <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"item_2"</span>, <span class="st">"item_5"</span><span class="op">)</span>,</span>
 <span class="r-in">  <span class="co"># item scores can take range of values: 1-5</span></span>
 <span class="r-in">  min <span class="op">=</span> <span class="fl">1</span>,</span>
-<span class="r-in">  max <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
+<span class="r-in">  max <span class="op">=</span> <span class="fl">5</span>,</span>
+<span class="r-in">  <span class="co"># item 2 and 5 need to be reversed</span></span>
+<span class="r-in">  reverse <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"item_2"</span>, <span class="st">"item_5"</span><span class="op">)</span><span class="op">)</span></span>
 <span class="r-in"></span>
+<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">simple_scale</span><span class="op">)</span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in print(simple_scale):</span> object 'simple_scale' not found</span>
 <span class="r-in"></span>
+<span class="r-in"><span class="co"># scale specification with literal NA imputation strategy </span></span>
 <span class="r-in"></span>
-<span class="r-in"><span class="co"># complec scale specification</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="va">complex_scaleSpec</span> <span class="op">&lt;-</span> <span class="fu">ScaleSpec</span><span class="op">(</span></span>
-<span class="r-in">  name <span class="op">=</span> <span class="st">"complex"</span>,</span>
+<span class="r-in"><span class="va">asis_scaleSpec</span> <span class="op">&lt;-</span> <span class="fu">ScaleSpec</span><span class="op">(</span></span>
+<span class="r-in">  name <span class="op">=</span> <span class="st">"w_asis"</span>,</span>
 <span class="r-in">  item_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"item_1"</span>, <span class="st">"item_2"</span>, <span class="st">"item_3"</span>, <span class="st">"item_4"</span>, <span class="st">"item_5"</span><span class="op">)</span>,</span>
-<span class="r-in">  reverse <span class="op">=</span> <span class="st">"item_2"</span>,</span>
 <span class="r-in">  min <span class="op">=</span> <span class="fl">1</span>,</span>
 <span class="r-in">  max <span class="op">=</span> <span class="fl">5</span>,</span>
+<span class="r-in">  reverse <span class="op">=</span> <span class="st">"item_2"</span>,</span>
 <span class="r-in">  <span class="co"># na values by default will be filled with `3`</span></span>
 <span class="r-in">  na_value <span class="op">=</span> <span class="fl">3</span>,</span>
 <span class="r-in">  <span class="co"># except for item_4, where they will be filled with `2`</span></span>
-<span class="r-in">  na_value_custom <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>item_4 <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>,</span>
-<span class="r-in">  <span class="co"># item 4 and 5 can take custom range of values, so the reversing</span></span>
-<span class="r-in">  <span class="co"># of score need to be handled customly</span></span>
-<span class="r-in">  reverse_custom <span class="op">=</span> </span>
-<span class="r-in">    <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>item_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"item_4"</span>, <span class="st">"item_5"</span><span class="op">)</span>,</span>
-<span class="r-in">               min <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>,</span>
-<span class="r-in">               max <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">7</span><span class="op">)</span><span class="op">)</span></span>
+<span class="r-in">  na_value_custom <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>item_4 <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span class="r-in"><span class="op">)</span></span>
+<span class="r-in"></span>
+<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">asis_scaleSpec</span><span class="op">)</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;ScaleSpec&gt;: 'w_asis'</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> No. items: 5 (1 reversed)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NA imputation method: asis </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NA literal value: 3 </span>
+<span class="r-in"></span>
+<span class="r-in"><span class="co"># scale specification with functional NA imputation strategy</span></span>
+<span class="r-in"></span>
+<span class="r-in"><span class="va">func_scaleSpec</span> <span class="op">&lt;-</span> <span class="fu">ScaleSpec</span><span class="op">(</span></span>
+<span class="r-in">  name <span class="op">=</span> <span class="st">"w_func"</span>,</span>
+<span class="r-in">  item_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"item_1"</span>, <span class="st">"item_2"</span>, <span class="st">"item_3"</span>, <span class="st">"item_4"</span>, <span class="st">"item_5"</span><span class="op">)</span>,</span>
+<span class="r-in">  min <span class="op">=</span> <span class="fl">1</span>,</span>
+<span class="r-in">  max <span class="op">=</span> <span class="fl">5</span>,</span>
+<span class="r-in">  reverse <span class="op">=</span> <span class="st">"item_2"</span>,</span>
+<span class="r-in">  <span class="co"># strategies available are 'mean', 'median' and 'mode'</span></span>
+<span class="r-in">  na_strategy <span class="op">=</span> <span class="st">"mean"</span></span>
+<span class="r-in"><span class="op">)</span></span>
+<span class="r-in"></span>
+<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">func_scaleSpec</span><span class="op">)</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;ScaleSpec&gt;: 'w_func'</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> No. items: 5 (1 reversed)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NA imputation method: mean </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NA literal value: NA </span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

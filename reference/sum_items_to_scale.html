@@ -14,7 +14,7 @@ are measuring."><meta property="og:image" content="https://statismike.github.io/
     
     <a class="navbar-brand me-2" href="../index.html">stenR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -85,6 +85,7 @@ objects. For more information refer to their constructor help page.</p>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Other item preprocessing functions: 
+<code><a href="CombScaleSpec.html">CombScaleSpec</a>()</code>,
 <code><a href="ScaleSpec.html">ScaleSpec</a>()</code></p></div>
     </div>
 
@@ -93,7 +94,7 @@ objects. For more information refer to their constructor help page.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="co"># create the Scale Specifications for SLCS dataset</span></span>
 <span class="r-in"><span class="co">## Self-Liking specification</span></span>
 <span class="r-in"><span class="va">SL_spec</span> <span class="op">&lt;-</span> <span class="fu"><a href="ScaleSpec.html">ScaleSpec</a></span><span class="op">(</span></span>
-<span class="r-in">  name <span class="op">=</span> <span class="st">"SL"</span>,</span>
+<span class="r-in">  name <span class="op">=</span> <span class="st">"Self-Liking"</span>,</span>
 <span class="r-in">  item_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"SLCS"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span>, <span class="fl">5</span>, <span class="fl">6</span>, <span class="fl">7</span>, <span class="fl">9</span>, <span class="fl">11</span>, <span class="fl">15</span><span class="op">)</span>, sep <span class="op">=</span> <span class="st">"_"</span><span class="op">)</span>,</span>
 <span class="r-in">  reverse <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"SLCS"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">6</span>, <span class="fl">7</span>, <span class="fl">15</span><span class="op">)</span>, sep <span class="op">=</span> <span class="st">"_"</span><span class="op">)</span>,</span>
 <span class="r-in">  min <span class="op">=</span> <span class="fl">1</span>,</span>
@@ -101,24 +102,22 @@ objects. For more information refer to their constructor help page.</p>
 <span class="r-in"></span>
 <span class="r-in"><span class="co">## Self-Competence specification</span></span>
 <span class="r-in"><span class="va">SC_spec</span> <span class="op">&lt;-</span> <span class="fu"><a href="ScaleSpec.html">ScaleSpec</a></span><span class="op">(</span></span>
-<span class="r-in">  name <span class="op">=</span> <span class="st">"SC"</span>,</span>
+<span class="r-in">  name <span class="op">=</span> <span class="st">"Self-Competence"</span>,</span>
 <span class="r-in">  item_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"SLCS"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">4</span>, <span class="fl">8</span>, <span class="fl">10</span>, <span class="fl">12</span>, <span class="fl">13</span>, <span class="fl">14</span>, <span class="fl">16</span><span class="op">)</span>, sep <span class="op">=</span> <span class="st">"_"</span><span class="op">)</span>,</span>
 <span class="r-in">  reverse <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"SLCS"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">8</span>, <span class="fl">10</span>, <span class="fl">13</span><span class="op">)</span>, sep <span class="op">=</span> <span class="st">"_"</span><span class="op">)</span>,</span>
 <span class="r-in">  min <span class="op">=</span> <span class="fl">1</span>,</span>
 <span class="r-in">  max <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co">## General Score specification</span></span>
-<span class="r-in"><span class="va">GS_spec</span> <span class="op">&lt;-</span> <span class="fu"><a href="ScaleSpec.html">ScaleSpec</a></span><span class="op">(</span></span>
-<span class="r-in">  name <span class="op">=</span> <span class="st">"GS"</span>,</span>
-<span class="r-in">  item_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"SLCS"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">16</span>, sep <span class="op">=</span> <span class="st">"_"</span><span class="op">)</span>,</span>
-<span class="r-in">  reverse <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"SLCS"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">6</span>, <span class="fl">7</span>, <span class="fl">8</span>, <span class="fl">10</span>, <span class="fl">13</span>, <span class="fl">15</span><span class="op">)</span>, sep <span class="op">=</span> <span class="st">"_"</span><span class="op">)</span>,</span>
-<span class="r-in">  min <span class="op">=</span> <span class="fl">1</span>, </span>
-<span class="r-in">  max <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
+<span class="r-in"><span class="va">GS_spec</span> <span class="op">&lt;-</span> <span class="fu"><a href="CombScaleSpec.html">CombScaleSpec</a></span><span class="op">(</span></span>
+<span class="r-in">  name <span class="op">=</span> <span class="st">"General Score"</span>,</span>
+<span class="r-in">  <span class="va">SL_spec</span>,</span>
+<span class="r-in">  <span class="va">SC_spec</span><span class="op">)</span></span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># Sum the raw item scores to raw scale scores</span></span>
 <span class="r-in"><span class="va">SLCS_summed</span> <span class="op">&lt;-</span> <span class="fu">sum_items_to_scale</span><span class="op">(</span><span class="va">SLCS</span>, <span class="va">SL_spec</span>, <span class="va">SC_spec</span>, <span class="va">GS_spec</span>, retain <span class="op">=</span> <span class="st">"user_id"</span><span class="op">)</span></span>
 <span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">SLCS_summed</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    user_id                SL              SC              GS       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    user_id           Self-Liking    Self-Competence General Score  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  Length:103         Min.   : 8.00   Min.   :10.00   Min.   :20.00  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  Class :character   1st Qu.:15.00   1st Qu.:19.00   1st Qu.:35.00  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  Mode  :character   Median :19.00   Median :22.00   Median :42.00  </span>
