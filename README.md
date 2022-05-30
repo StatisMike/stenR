@@ -136,7 +136,7 @@ simulated_ft <- SimFrequencyTable(
   skew = -0.3, kurt = 2.89, seed = 2678)
 #> Constants: Distribution  1  
 #> 
-#> Constants calculation time: 0.008 minutes 
+#> Constants calculation time: 0.007 minutes 
 #> Total Simulation time: 0.008 minutes
 
 plot(simulated_ft)
@@ -211,12 +211,10 @@ SC_spec <- ScaleSpec(
   max = 5)
 
 ## General Score specification
-GS_spec <- ScaleSpec(
+GS_spec <- CombScaleSpec(
   name = "GS",
-  item_names = paste("SLCS", 1:16, sep = "_"),
-  reverse = paste("SLCS", c(1, 6, 7, 8, 10, 13, 15), sep = "_"),
-  min = 1, 
-  max = 5)
+  SL_spec,
+  SC_spec)
 
 # Sum the data
 SLCS_summed <- sum_items_to_scale(SLCS, SL_spec, SC_spec, GS_spec, retain = c("user_id", "sex", "age"))
