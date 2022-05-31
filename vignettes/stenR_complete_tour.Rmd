@@ -1,0 +1,229 @@
+---
+title: "Complete tour from data to results"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Complete tour from data to results}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Introduction
+
+`stenR` main focus in on **standardization** and **normalization** of raw scores of
+questionnaire or survey on basis of Classical Test Theorem.
+
+Particularly in psychology and other social studies it is very common to not 
+interpretate the raw results of measurement in individual context. In actuality, 
+it would be usually a mistake to do so. Instead, there is a need to evaluate 
+the score of single questionee on the basis of larger sample. It can be done
+by finding the place of every individual raw score in the distribution of
+representative sample. One can refer to this process as **normalization**. Additional
+step in this phase would be to **standardize** the data even further: from the
+quantile to fitting standard scale.
+
+It need to be noted that rarely one answer for one question (or *item*) is enough 
+to measure a latent variable. Almost always there is a need to construct scale or 
+factor of similar items to gather a behavioral sample. This vital preprocessing 
+phase of transforming the *item-level* raw scores to *scale-level* can be also
+handled by functions available in this package, though this feature is not the
+main focus. 
+
+>Factor analysis and actual construction of scales or factors is beyond the 
+scope of this package. There are multiple useful and solid tools available for
+this. Look upon `psych` and/or `lavaan` for these features.
+
+This journey from raw, questionnaire data to normalized and standardized results
+will be presented in this vignette.
+
+## Raw questionnaire data preprocessing
+
+We will work on the dataset available in this package: `SLCS`. It contains
+answers of 103 people to the Polish version of Self-Liking Self-Competence Scale.
+
+```{r SLCS_overview}
+library(stenR)
+str(SLCS)
+```
+
+As can be seen above, it contains some demographical data and each questionee
+answers to 16 diagnostic items.
+
+Authors of the measure have prepared instructions for calculating the scores for
+two subscales (*Self-Liking* and *Self-Competence*). *General Score* is, actually,
+just sum of the subscale scores.
+
+- Self-Liking: 1R, 3, 5, 6R, 7R, 9, 11, 15R
+- Self-Competence: 2, 4, 8R, 10R, 12, 13R, 14, 16
+
+Items numbers suffixed with `R` means, that this particular item need to be *reversed*
+before summarizing with the rest of them to calculate the raw score for a subscale.
+That's because during the measure construction, the answers to these items
+were negatively correlated with the whole scale.
+
+All of this steps can be achieved using the **item-preprocessing functions** from
+`stenR`.
+
+Firstly, you need to create scale specification objects that refer to the items
+in the available data by their name. It need to also list the items that need
+reversing (if any) and declare `NA` insertion strategies (by default: no insertion). 
+
+**Absolute** minimum and maximum score for each item need to be also provided
+on this step. It allows correct computation even if the absolute values are not
+actually available in the data that will be summed into factor. This situation
+should happen during first computation of the score table on full representative
+sample, but it is very likely to happen when summarizing scores for only
+few observations.
+
+```{r preprocessing-ScaleSpec}
+# create ScaleSpec objects for sub-scales
+SL_spec <- ScaleSpec(
+  name = "Self-Liking",
+  item_names = c("SLCS_1", "SLCS_3", "SLCS_5", "SLCS_6", "SLCS_7", 
+                 "SLCS_9", "SLCS_11", "SLCS_15"),
+  min = 1,
+  max = 5,
+  reverse = c("SLCS_1", "SLCS_6", "SLCS_7", "SLCS_15")
+)
+
+SC_spec <- ScaleSpec(
+  name = "Self-Competence",
+  item_names = c("SLCS_2", "SLCS_4", "SLCS_8", "SLCS_10", "SLCS_12",
+                 "SLCS_13", "SLCS_14", "SLCS_16"),
+  min = 1,
+  max = 5,
+  reverse = c("SLCS_8", "SLCS_10", "SLCS_13")
+)
+
+# create CombScaleSpec object for general scale using single-scale 
+# specification
+GS_spec <- CombScaleSpec(
+  name = "General Score",
+  SL_spec,
+  SC_spec
+)
+
+print(SL_spec)
+print(SC_spec)
+print(GS_spec)
+```
+
+After the scale specification objects have been created, we can finally transform
+our *item-level* raw scores to *scale-level* ones using `sum_items_to_scale()` 
+function. 
+
+Each *ScaleSpec* or *CombScaleSpec* object provided during its call will be used 
+to create one variable, taking into account items that need reversing 
+(or sub-scales in case of *CombScaleSpec*), as well as `NA` imputation strategies 
+chosen for each of the scales.
+
+By default only these columns will be available in the resulting *data.frame*,
+but by specifying the `retain` argument we can control that.
+
+```{r preprocessing-sum_items_to_scale}
+summed_data <- sum_items_to_scale(
+  data = SLCS,
+  SL_spec,
+  SC_spec,
+  GS_spec,
+  retain = c("user_id", "sex")
+)
+
+str(summed_data)
+```
+
+At this point we successfully prepared our data: it now describes the latent
+variables that we actually wanted to measure, not individual items. All is in
+place for next step: results **normalization** and **standardization**.
+
+>Both **ScaleSpec** and **CombScaleSpec** objects have their specific `print` 
+and `summary` methods defined.
+
+## Normalize and standardize the results
+
+We will take a brief look at the *procedural workflow* of normalization and
+standardization. It should be noted, that it is more verbose and have less
+features than the *object-oriented workflow*. Nevertheless, it is recommended for useRs
+that don't have much experience utilizing `R6` classes. For more information
+about both, read **Procedural and Object-oriented workflows of stenR** vignette.
+
+To process the data, `stenR` need to compute the object of class *ScoreTable*.
+It is very similar to the regular score tables that can be seen in many
+measures documentations, though it is computed directly on the basis of available
+raw scores from representative sample. After that first, initial construction
+it can be reused on new observations.
+
+This is a two step process. Firstly, we need to compute a *FrequencyTable* object
+that is void of any standard score scale for every sub-scale and scale.
+
+```{r table_construction-FreqTable}
+# Create the FrequencyTables
+SL_ft <- FrequencyTable(summed_data$`Self-Liking`)
+SC_ft <- FrequencyTable(summed_data$`Self-Competence`)
+GS_ft <- FrequencyTable(summed_data$`General Score`)
+```
+
+>There were some warnings printed out there: they are generated if there
+were any raw score values that were missing in-between *actual* minimal
+and maximal values of raw scores. By the rule of the thumb - the wider
+the raw score range and the smaller and less-representative the sample
+is, the bigger possibility for this to happen. It is recommended to try and
+gather bigger sample if this happens - unless you are sure that it is representative
+enough.
+
+After they are defined, they can be transformed into *ScreTable* objects by
+providing them some *StandardScale* object. Objects for some of more popular
+scales in psychology are already defined - we will use very commonly utilized
+*Standard Ten Scale*: `STEN`
+
+```{r table_construction-ScoreTable}
+# Check what is the STEN *StandardScale* definition
+print(STEN)
+
+# Calculate the ScoreTables
+SL_st <- ScoreTable(SL_ft, STEN)
+SC_st <- ScoreTable(SC_ft, STEN)
+GS_st <- ScoreTable(GS_ft, STEN)
+```
+
+At this point, the last thing that remains is to normalize the scores. It can be
+done using `normalize_score()` function.
+
+```{r normalize_scores}
+# normalize each of the scale results
+summed_data$`Self-Liking` <- 
+  normalize_score(summed_data$`Self-Liking`,
+                  table = SL_st,
+                  what = "sten")
+
+summed_data$`Self-Competence` <- 
+  normalize_score(summed_data$`Self-Competence`,
+                  table = SC_st,
+                  what = "sten")
+
+summed_data$`General Score` <- 
+  normalize_score(summed_data$`General Score`,
+                  table = GS_st,
+                  what = "sten")
+
+# check the structure
+str(summed_data)
+````
+
+## Summary
+
+And with that, we cane to the end of our journey. To summarize:
+
+- we've transformed the data from *item-level* to *scale-level* raw scores using:
+  - `ScaleSpec()` and `CombScaleSpec()`
+  - `sum_items_to_scale()`
+- we've normalized and standardized the *scale-level* raw scores using:
+  - `FrequencyTable()`
+  - `ScoreTable()`
+  - `normalize_score()`
