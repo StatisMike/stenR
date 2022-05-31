@@ -156,7 +156,7 @@ There is one useful feature of this object, mainly the ability to automatically
 recalculate *ScoreTables* based on raw score values calculated using the `standardize`
 method. It can be helpful for inter-session continuity.
 
-### Initialize the object
+### 1. Initialize the object
 
 During object initialization you can attach some previously calculated *FrequencyTables*
 and/or *StandardScales*. It is fully optional, as it can also be done afterwards.
@@ -178,7 +178,7 @@ summary(HexCST)
 summary(altCST)
 ```
 
-### Expand *CompScoreTable*
+### 2. Expand *CompScoreTable*
 
 After creation the object can be expanded with more *FrequencyTables* and *StandardScales.*
 All *ScoreTables* will be internally recalculated
@@ -193,7 +193,7 @@ HexCST$attach_StandardScale(STANINE)
 summary(HexCST)
 ```
 
-### Standardize scores
+### 3a. Standardize scores
 
 After the object is ready, the score standardization may begin. Let's feed
 it some raw scores!
@@ -212,13 +212,17 @@ HEXACO_60[1:5, c("HEX_H", "HEX_C")] |>
   HexCST$standardize("sten")
 ```
 
-### Automatically recalculate ScoreTables
+### 3b. Automatically recalculate ScoreTables
 
 During score standardization, you can also automatically add new raw scores
 to existing frequencies and recalculate the *ScoreTables* automatically.
 
 It is done before returning the values, so they will be based on the most recent
 ScoreTables.
+
+> You can actually use `standardize()` with `calc = TRUE` just after attaching
+the scale or scales. *ScoreTables* will be generated automatically before the data
+standardization - so you will receive both the data and computed *ScoreTables*
 
 ```{r CST_append}
 # check the current state of the object
@@ -232,7 +236,7 @@ HEXACO_60[1:5, c("HEX_H", "HEX_C")] |>
 summary(HexCST)
 ```
 
-### Export tables
+### 3c. Export tables
 
 There is also option to export the *ScoreTables* - either to use them later 
 in procedural way or to create new *CompScoreTable* in another session - 

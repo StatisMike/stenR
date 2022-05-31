@@ -27,7 +27,7 @@ items_summing <- function(spec, data, warn_env) {
       return(single_scale)
       
     })
-    summed_scale <- data.frame(item = rowSums(dplyr::bind_cols(comb_scale)))
+    summed_scale <- data.frame(item = as.integer(rowSums(dplyr::bind_cols(comb_scale))))
     names(summed_scale) <- spec$name
     return(summed_scale)
   }
@@ -112,7 +112,7 @@ items_summing <- function(spec, data, warn_env) {
   }
   
   # sum items to scale
-  scale_summed <- data.frame(item = rowSums(scale_items))
+  scale_summed <- data.frame(item = as.integer(rowSums(scale_items)))
   names(scale_summed) <- spec$name
   return(scale_summed)
   
@@ -356,13 +356,6 @@ summary.CombScaleSpec <- function(spec) {
   }))
   
 }
-# #' @rdname ScaleSpec
-# #' @param ss *ScaleSpec* object
-# summary.ScaleSpec <- function(ss) {
-#   
-#   
-#   
-# }
 
 #' @title Sum up discrete raw data
 #' @description Helper function to sum-up and - if needed - automatically 
@@ -415,32 +408,6 @@ sum_items_to_scale <- function(
   warn_env[["not_summed"]] <- c()
   warn_env[["not_enough"]] <- 0
   warn_env[["mode"]] <- 0
-
-  # sum scales
-  # summed_scales <- lapply(ScaleSpecs, \(spec) {
-  #   
-  #   if (class(spec) == "ScaleSpec")
-  #     summed_scale <- items_summing(spec = spec, data = data, warn_env = warn_env)
-  #   else if (class(spec) == "CombScaleSpec") {
-  #     
-  #     comb_scale <- lapply(spec$ScaleSpecs, \(single_spec) {
-  #       
-  #       single_scale <- items_summing(single_spec, data, warn_env)
-  #       
-  #       if (single_spec$name %in% spec$reverse) {
-  #         single_scale <- 
-  #           (single_spec$min * length(single_spec$item_names) + 
-  #           single_spec$max * length(single_spec$item_names)) - single_scale
-  #       }
-  #       
-  #       return(single_scale)
-  #       
-  #     })
-  #     summed_scale <- data.frame(item = rowSums(dplyr::bind_cols(comb_scale)))
-  #     names(summed_scale) <- spec$name
-  #   }
-  #   return(summed_scale)
-  # })
   
   summed_scales <- lapply(ScaleSpecs, items_summing, data = data, warn_env = warn_env)
   
@@ -472,103 +439,3 @@ sum_items_to_scale <- function(
   return(out)
   
 }
-# sum_items_to_scale <- function(
-#     data,
-#     ...,
-#     retain = FALSE,
-#     .dots) {
-#   
-#   if (!missing(.dots)) 
-#     ScaleSpacs <- .dots
-#   else
-#     ScaleSpecs <- list(...)
-#   
-#   if (any(sapply(ScaleSpecs, \(x) class(x) != "ScaleSpec")))
-#     stop ("Objects of class `ScaleSpec` need to be provided in `...` argument")
-#   
-#   if (length(ScaleSpecs) == 0)
-#     stop ("There should be at least one `ScaleSpec` object provided in `...` argument")
-#   
-#   if (!is.logical(retain) && !is.character(retain)) 
-#     stop ("`retain` argument need to be either a character vector with column names to retain or boolean.")
-#   
-#   if (is.character(retain)) {
-#     retain_missing <- retain[!retain %in% names(data)]
-#     
-#     if (length(retain_missing) > 0)
-#       stop(paste0("There are some colnames specified in `retain` that are not in the data:\n",
-#                   "'", paste(retain_missing, sep = "', '"), "'."))
-#   }
-#   
-#   # sum scales
-#   summed_scales <- lapply(ScaleSpecs, \(spec) {
-#     
-#     # if any of the item names is not available in data, skip the scale
-#     if (any(!spec$item_names %in% names(data)))
-#       return(NULL)
-#     
-#     # every item reversion need to be handled separately, depending on the item specification
-#     scale_items <- lapply(spec$item_names, \(item) {
-#       
-#       # if item is supposed to be reversed customly
-#       if (item %in% spec$custom_reverse$item_names) {
-#         
-#         custom_spec <- spec$custom_reverse[spec$custom_reverse$item_names == item, ]
-#         item_vals <- custom_spec$max + custom_spec$min - data[, item, drop = F]
-#         # item_vals[is.na(item_vals)] <- 
-#         #   if (item %in% names(spec$na_value_custom)) {
-#         #     as.integer(spec$na_value_custom[[item]])
-#         #   }
-#         # else spec$na_value
-#         
-#         return(item_vals)
-#         
-#         # if item is to be reversed as default
-#       } else if (item %in% spec$reverse) {
-#         
-#         item_vals <- spec$max + spec$min - data[, item, drop = F]
-#         # item_vals[is.na(item_vals)] <- 
-#         #   if (item %in% names(spec$na_value_custom)) spec$na_value_custom[[item]]
-#         # else spec$na_value
-#         
-#         return (item_vals)
-#         
-#         # if no reverse will be made
-#       } else {
-# 
-#         item_vals <- data[, item, drop = F]
-#         # item_vals[is.na(item_vals)] <- 
-#         #   if (item %in% names(spec$na_value_custom)) spec$na_value_custom[[item]]
-#         # else spec$na_value
-#         
-#         return(item_vals)
-#         
-#       }
-#     })
-#     
-#     scale_items <- dplyr::bind_cols(scale_items)
-#     
-#     if (spec$na_strategy != "asis") {
-#       na_input <- switch()
-#     }
-#     
-# 
-#     scale_summed <- data.frame(item = rowSums(scale_items))
-#     names(scale_summed) <- spec$name
-#     return(scale_summed)
-#     
-#   })
-#   
-#   if (isTRUE(retain)) {
-#     out <- dplyr::bind_cols(data,
-#                             summed_scales)
-#   } else if (isFALSE(retain)) {
-#     out <- summed_scales
-#   } else {
-#     out <- dplyr::bind_cols(data[, retain, drop = F],
-#                             summed_scales)
-#   }
-#   
-#   return(out)
-#   
-# }
