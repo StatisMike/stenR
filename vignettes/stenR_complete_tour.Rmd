@@ -77,7 +77,7 @@ reversing (if any) and declare `NA` insertion strategies (by default: no inserti
 **Absolute** minimum and maximum score for each item need to be also provided
 on this step. It allows correct computation even if the absolute values are not
 actually available in the data that will be summed into factor. This situation
-should happen during first computation of the score table on full representative
+should **not** happen during first computation of the score table on full representative
 sample, but it is very likely to happen when summarizing scores for only
 few observations.
 
@@ -177,7 +177,7 @@ is, the bigger possibility for this to happen. It is recommended to try and
 gather bigger sample if this happens - unless you are sure that it is representative
 enough.
 
-After they are defined, they can be transformed into *ScreTable* objects by
+After they are defined, they can be transformed into *ScoreTable* objects by
 providing them some *StandardScale* object. Objects for some of more popular
 scales in psychology are already defined - we will use very commonly utilized
 *Standard Ten Scale*: `STEN`
@@ -193,32 +193,46 @@ GS_st <- ScoreTable(GS_ft, STEN)
 ```
 
 At this point, the last thing that remains is to normalize the scores. It can be
-done using `normalize_score()` function.
+done using `normalize_score()` or `normalize_scores_df()` functions.
 
 ```{r normalize_scores}
-# normalize each of the scale results
-summed_data$`Self-Liking` <- 
+# normalize each of the scores in one call
+normalized_at_once <- normalize_scores_df(
+  summed_data,
+  vars = c("Self-Liking", "Self-Competence", "General Score"),
+  SL_st,
+  SC_st,
+  GS_st,
+  what = "sten",
+  retain = c("user_id", "sex")
+)
+
+str(normalized_at_once)
+
+# or normalize scores individually
+SL_sten <- 
   normalize_score(summed_data$`Self-Liking`,
                   table = SL_st,
                   what = "sten")
 
-summed_data$`Self-Competence` <- 
+SC_sten <- 
   normalize_score(summed_data$`Self-Competence`,
                   table = SC_st,
                   what = "sten")
 
-summed_data$`General Score` <- 
+GC_sten <- 
   normalize_score(summed_data$`General Score`,
                   table = GS_st,
                   what = "sten")
 
 # check the structure
-str(summed_data)
-````
+str(list(SL_sten, SC_sten, GC_sten))
+
+```
 
 ## Summary
 
-And with that, we cane to the end of our journey. To summarize:
+And with that, we came to the end of our journey. To summarize:
 
 - we've transformed the data from *item-level* to *scale-level* raw scores using:
   - `ScaleSpec()` and `CombScaleSpec()`
