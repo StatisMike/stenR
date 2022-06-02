@@ -58,18 +58,23 @@ test_that("New scale can be attached to ScoreTable", {
 
 test_that("ScoreTable can be used to normalize raw scores", {
   
-  vals_to_norm <- c(4, 55, 23, 46, 30, 17)
-  
   for (st_scale in st$scale) {
     
     norm_vec <- normalize_score(
-      vals_to_norm,
+      HEXACO_60$HEX_H,
       st,
       st_scale$name
     )
     
     expect_true(all(norm_vec >= st_scale$min))
     expect_true(all(norm_vec <= st_scale$max))
+    
+    norm_df <- normalize_scores_df(HEXACO_60,
+                                   "HEX_H",
+                                   st,
+                                   what = st_scale$name)
+    
+    expect_equal(norm_vec, norm_df$HEX_H)
     
   }
 })

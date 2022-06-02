@@ -13,6 +13,7 @@ reference:
   desc: Normalize and standardize raw scores using `FrequencyTable` or `ScoreTable` objects
 - contents:
   - normalize_score
+  - normalize_scores_df
 - title: S3 classes manipulators
   desc:  Manipulate and transform objects of S3 classes
 - contents:
@@ -21,7 +22,7 @@ reference:
 - title: R6 class for Object Oriented workflow
 - contents:
   - CompScoreTable
-- title: Helper functions for handling items into `stenR` compatible scales
+- title: Item score preprocessors
 - contents:
   - ScaleSpec
   - CombScaleSpec

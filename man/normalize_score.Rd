@@ -29,11 +29,14 @@ provided raw scores.
 # normalize with FrequencyTable
 ft <- FrequencyTable(HEXACO_60$HEX_H)
 
-normalizeScore(HEXACO_60$HEX_H[1:5], ft)
+normalize_score(HEXACO_60$HEX_H[1:5], ft)
 
 # normalize with ScoreTable
 st <- ScoreTable(ft, list(STEN, STANINE))
 
-normalizeScore(HEXACO_60$HEX_H[1:5], st, "sten")
-normalizeScore(HEXACO_60$HEX_H[1:5], st, "stanine")
+normalize_score(HEXACO_60$HEX_H[1:5], st, "sten")
+normalize_score(HEXACO_60$HEX_H[1:5], st, "stanine")
+}
+\seealso{
+\code{\link[=normalize_scores_df]{normalize_scores_df()}}
 }
