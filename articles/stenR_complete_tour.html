@@ -34,7 +34,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">stenR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.2</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -127,7 +127,7 @@
 <p>Items numbers suffixed with <code>R</code> means, that this particular item need to be <em>reversed</em> before summarizing with the rest of them to calculate the raw score for a subscale. That’s because during the measure construction, the answers to these items were negatively correlated with the whole scale.</p>
 <p>All of this steps can be achieved using the <strong>item-preprocessing functions</strong> from <code>stenR</code>.</p>
 <p>Firstly, you need to create scale specification objects that refer to the items in the available data by their name. It need to also list the items that need reversing (if any) and declare <code>NA</code> insertion strategies (by default: no insertion).</p>
-<p><strong>Absolute</strong> minimum and maximum score for each item need to be also provided on this step. It allows correct computation even if the absolute values are not actually available in the data that will be summed into factor. This situation should happen during first computation of the score table on full representative sample, but it is very likely to happen when summarizing scores for only few observations.</p>
+<p><strong>Absolute</strong> minimum and maximum score for each item need to be also provided on this step. It allows correct computation even if the absolute values are not actually available in the data that will be summed into factor. This situation should <strong>not</strong> happen during first computation of the score table on full representative sample, but it is very likely to happen when summarizing scores for only few observations.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># create ScaleSpec objects for sub-scales</span>
 <span class="va">SL_spec</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ScaleSpec.html">ScaleSpec</a></span><span class="op">(</span>
@@ -218,7 +218,7 @@
 <blockquote>
 <p>There were some warnings printed out there: they are generated if there were any raw score values that were missing in-between <em>actual</em> minimal and maximal values of raw scores. By the rule of the thumb - the wider the raw score range and the smaller and less-representative the sample is, the bigger possibility for this to happen. It is recommended to try and gather bigger sample if this happens - unless you are sure that it is representative enough.</p>
 </blockquote>
-<p>After they are defined, they can be transformed into <em>ScreTable</em> objects by providing them some <em>StandardScale</em> object. Objects for some of more popular scales in psychology are already defined - we will use very commonly utilized <em>Standard Ten Scale</em>: <code>STEN</code></p>
+<p>After they are defined, they can be transformed into <em>ScoreTable</em> objects by providing them some <em>StandardScale</em> object. Objects for some of more popular scales in psychology are already defined - we will use very commonly utilized <em>Standard Ten Scale</em>: <code>STEN</code></p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Check what is the STEN *StandardScale* definition</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">STEN</span><span class="op">)</span>
@@ -229,37 +229,54 @@
 <span class="va">SL_st</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ScoreTable.html">ScoreTable</a></span><span class="op">(</span><span class="va">SL_ft</span>, <span class="va">STEN</span><span class="op">)</span>
 <span class="va">SC_st</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ScoreTable.html">ScoreTable</a></span><span class="op">(</span><span class="va">SC_ft</span>, <span class="va">STEN</span><span class="op">)</span>
 <span class="va">GS_st</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ScoreTable.html">ScoreTable</a></span><span class="op">(</span><span class="va">GS_ft</span>, <span class="va">STEN</span><span class="op">)</span></code></pre></div>
-<p>At this point, the last thing that remains is to normalize the scores. It can be done using <code><a href="../reference/normalize_score.html">normalize_score()</a></code> function.</p>
+<p>At this point, the last thing that remains is to normalize the scores. It can be done using <code><a href="../reference/normalize_score.html">normalize_score()</a></code> or <code><a href="../reference/normalize_scores_df.html">normalize_scores_df()</a></code> functions.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># normalize each of the scale results</span>
-<span class="va">summed_data</span><span class="op">$</span><span class="va">`Self-Liking`</span> <span class="op">&lt;-</span> 
-  <span class="fu"><a href="../reference/normalize_score.html">normalize_score</a></span><span class="op">(</span><span class="va">summed_data</span><span class="op">$</span><span class="va">`Self-Liking`</span>,
-                  table <span class="op">=</span> <span class="va">SL_st</span>,
-                  what <span class="op">=</span> <span class="st">"sten"</span><span class="op">)</span>
+<code class="sourceCode R"><span class="co"># normalize each of the scores in one call</span>
+<span class="va">normalized_at_once</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/normalize_scores_df.html">normalize_scores_df</a></span><span class="op">(</span>
+  <span class="va">summed_data</span>,
+  vars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Self-Liking"</span>, <span class="st">"Self-Competence"</span>, <span class="st">"General Score"</span><span class="op">)</span>,
+  <span class="va">SL_st</span>,
+  <span class="va">SC_st</span>,
+  <span class="va">GS_st</span>,
+  what <span class="op">=</span> <span class="st">"sten"</span>,
+  retain <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"user_id"</span>, <span class="st">"sex"</span><span class="op">)</span>
+<span class="op">)</span>
 
-<span class="va">summed_data</span><span class="op">$</span><span class="va">`Self-Competence`</span> <span class="op">&lt;-</span> 
-  <span class="fu"><a href="../reference/normalize_score.html">normalize_score</a></span><span class="op">(</span><span class="va">summed_data</span><span class="op">$</span><span class="va">`Self-Competence`</span>,
-                  table <span class="op">=</span> <span class="va">SC_st</span>,
-                  what <span class="op">=</span> <span class="st">"sten"</span><span class="op">)</span>
-
-<span class="va">summed_data</span><span class="op">$</span><span class="va">`General Score`</span> <span class="op">&lt;-</span> 
-  <span class="fu"><a href="../reference/normalize_score.html">normalize_score</a></span><span class="op">(</span><span class="va">summed_data</span><span class="op">$</span><span class="va">`General Score`</span>,
-                  table <span class="op">=</span> <span class="va">GS_st</span>,
-                  what <span class="op">=</span> <span class="st">"sten"</span><span class="op">)</span>
-
-<span class="co"># check the structure</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">summed_data</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">normalized_at_once</span><span class="op">)</span>
 <span class="co">#&gt; 'data.frame':    103 obs. of  5 variables:</span>
 <span class="co">#&gt;  $ user_id        : chr  "damaged_kiwi" "unilateralised_anglerfish" "technical_anemonecrab" "temperate_americancurl" ...</span>
 <span class="co">#&gt;  $ sex            : chr  "M" "K" "K" "K" ...</span>
 <span class="co">#&gt;  $ Self-Liking    : num  3 4 5 2 4 3 5 8 2 4 ...</span>
 <span class="co">#&gt;  $ Self-Competence: num  5 2 7 4 7 3 2 8 4 2 ...</span>
-<span class="co">#&gt;  $ General Score  : num  4 3 6 3 5 3 4 8 3 2 ...</span></code></pre></div>
+<span class="co">#&gt;  $ General Score  : num  4 3 6 3 5 3 4 8 3 2 ...</span>
+
+<span class="co"># or normalize scores individually</span>
+<span class="va">SL_sten</span> <span class="op">&lt;-</span> 
+  <span class="fu"><a href="../reference/normalize_score.html">normalize_score</a></span><span class="op">(</span><span class="va">summed_data</span><span class="op">$</span><span class="va">`Self-Liking`</span>,
+                  table <span class="op">=</span> <span class="va">SL_st</span>,
+                  what <span class="op">=</span> <span class="st">"sten"</span><span class="op">)</span>
+
+<span class="va">SC_sten</span> <span class="op">&lt;-</span> 
+  <span class="fu"><a href="../reference/normalize_score.html">normalize_score</a></span><span class="op">(</span><span class="va">summed_data</span><span class="op">$</span><span class="va">`Self-Competence`</span>,
+                  table <span class="op">=</span> <span class="va">SC_st</span>,
+                  what <span class="op">=</span> <span class="st">"sten"</span><span class="op">)</span>
+
+<span class="va">GC_sten</span> <span class="op">&lt;-</span> 
+  <span class="fu"><a href="../reference/normalize_score.html">normalize_score</a></span><span class="op">(</span><span class="va">summed_data</span><span class="op">$</span><span class="va">`General Score`</span>,
+                  table <span class="op">=</span> <span class="va">GS_st</span>,
+                  what <span class="op">=</span> <span class="st">"sten"</span><span class="op">)</span>
+
+<span class="co"># check the structure</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">SL_sten</span>, <span class="va">SC_sten</span>, <span class="va">GC_sten</span><span class="op">)</span><span class="op">)</span>
+<span class="co">#&gt; List of 3</span>
+<span class="co">#&gt;  $ : num [1:103] 3 4 5 2 4 3 5 8 2 4 ...</span>
+<span class="co">#&gt;  $ : num [1:103] 5 2 7 4 7 3 2 8 4 2 ...</span>
+<span class="co">#&gt;  $ : num [1:103] 4 3 6 3 5 3 4 8 3 2 ...</span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="summary">Summary<a class="anchor" aria-label="anchor" href="#summary"></a>
 </h2>
-<p>And with that, we cane to the end of our journey. To summarize:</p>
+<p>And with that, we came to the end of our journey. To summarize:</p>
 <ul>
 <li>we’ve transformed the data from <em>item-level</em> to <em>scale-level</em> raw scores using:
 <ul>
