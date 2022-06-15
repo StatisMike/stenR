@@ -15,7 +15,7 @@ normalize_score(x, table, what)
 \itemize{
 \item \code{quan} - the quantile of x in the raw score distribution
 \item \code{Z} - normalized Z score for the x raw score
-\item name of the scale calculated in \code{StandardScale} provided to \code{x} argument
+\item name of the scale calculated in \emph{ScoreTable} provided to \code{table} argument
 }}
 }
 \value{
@@ -38,5 +38,8 @@ normalize_score(HEXACO_60$HEX_H[1:5], st, "sten")
 normalize_score(HEXACO_60$HEX_H[1:5], st, "stanine")
 }
 \seealso{
-\code{\link[=normalize_scores_df]{normalize_scores_df()}}
+Other score-normalization functions: 
+\code{\link{normalize_score_grouped}()},
+\code{\link{normalize_scores_df}()}
 }
+\concept{score-normalization functions}

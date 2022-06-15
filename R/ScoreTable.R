@@ -185,3 +185,27 @@ attach_scales <- function(st, scale) {
   return(output)
   
 }
+
+
+#' @title Create GroupedScoreTable
+#' @param table *GroupedFrequencyTable* object
+#' @param scale a `StandardScale` object or list of multiple `StandardScale` objects
+#' @export
+
+GroupedScoreTable <- function(table,
+                              scale) {
+  
+  STs <- list()
+  
+  for (i in seq_along(table)) {
+    
+    STs[[names(table)[i]]] <-
+      ScoreTable(table[[i]], scale)
+  
+  }
+  
+  attr(STs, "conditions") <- attr(table, "conditions")
+  class(STs) <- "GroupedScoreTable"
+  
+  return(STs)
+}

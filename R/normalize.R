@@ -9,11 +9,11 @@
 #' 
 #' - `quan` - the quantile of x in the raw score distribution
 #' - `Z` - normalized Z score for the x raw score
-#' - name of the scale calculated in `StandardScale` provided to `x` argument 
+#' - name of the scale calculated in *ScoreTable* provided to `table` argument 
 #' 
 #' @example examples/normalize_score.R
 #' @return Numeric vector with values specified in `what` argument
-#' @seealso [normalize_scores_df()]
+#' @family score-normalization functions
 #' 
 #' @export
 
@@ -61,7 +61,7 @@ normalize_score <- function(
 #' 
 #' - `quan` - the quantile of x in the raw score distribution
 #' - `Z` - normalized Z score for the x raw score
-#' - name of the scale calculated in `StandardScale`s provided to `...` or
+#' - name of the scale calculated in *ScoreTables* provided to `...` or
 #' `.dots` argument
 #' 
 #' @param retain either *boolean*: `TRUE` if all columns in the `data` are to be
@@ -70,7 +70,7 @@ normalize_score <- function(
 #' instead of individually in `...`. 
 #' @example examples/normalize_scores_df.R
 #' @export
-#' @seealso [normalize_score()]
+#' @family score-normalization functions
 #' @return *data.frame* with normalized scores
 #' 
 
@@ -82,7 +82,7 @@ normalize_scores_df <- function(
     retain = FALSE,
     .dots = list()) {
   
-  if (!"data.frame" %in% class(data))
+  if (!is.data.frame(data))
     stop("'data.frame' need to be provided to 'data' argument.")
   if (!is.character(vars))
     stop("Character vector need to be provided to 'vars' argument.")
@@ -129,5 +129,97 @@ normalize_scores_df <- function(
   }
   
   return(out)
+  
+}
+
+#' @title Normalize scores using Grouped table
+#' @description Normalize scores using either *GroupedFrequencyTable* or
+#' *GroupedScoreTable* for one or more variables. Given *data.frame* should also
+#' contain columns used in *GroupingConditions* attached to the table
+#' @param data *data.frame* object containing raw scores
+#' @param vars *character vector* with names of columns to normalize. Length of vars
+#' need to be the same as number of tables provided to either `...` or `.dots`
+#' @param ... *GroupedFrequencyTable* or *GroupedScoreTable* objects to be used 
+#' for normalization
+#' @param what the values to get. One of either:
+#' 
+#' - `quan` - the quantile of x in the raw score distribution
+#' - `Z` - normalized Z score for the x raw score
+#' - name of the scale calculated in *GroupedScoreTables* provided to `...` or
+#' `.dots` argument
+#' 
+#' @param retain either *boolean*: `TRUE` if all columns in the `data` are to be
+#' retained, `FALSE` if none, or *character vector* with names of columns to be retained
+#' @param .dots *GroupedFrequencyTable* or *GroupedScoreTable* objects provided 
+#' as a list, instead of individually in `...`. 
+#' @export
+#' @family score-normalization functions
+#' @return *data.frame* with normalized scores
+
+normalize_score_grouped <- function(
+    data,
+    vars,
+    ...,
+    what,
+    retain = FALSE,
+    .dots = list()) {
+  
+  if (!is.data.frame(data))
+    stop("'data.frame' need to be provided to 'data' argument.")
+  if (!is.character(vars))
+    stop("Character vector need to be provided to 'vars' argument.")
+  if (any(!vars %in% names(data)))
+    stop("All 'vars' need to be available in the 'data'.")
+  if (!is.logical(retain) && !(is.character(retain) && all(retain %in% names(data))))
+    stop("Bool value or character vector containing column names available in 'data' need to be provided to 'retain' argument.")
+  
+  tables <- list(...)
+  if (length(tables) == 0 && length(.dots) > 0)
+    tables <- .dots
+  
+  if (!all(sapply(tables, \(x) class(x) %in% c("GroupedFrequencyTable", "GroupedScoreTable"))))
+    stop("All objects provided to '...' or '.dots' need to be of class 'GroupedFrequencyTable' or 'GroupedScoreTable'")
+  
+  if (length(vars) != length(tables))
+    stop("Number of provided tables and 'vars' to normalize need to be the same.")
+  
+  if (all(sapply(tables, \(x) class(x) == "GroupedScoreTable")) && !what %in% c("quan", "Z")) {
+    if (!all(sapply(tables, \(x) what %in% names(x$scale))))
+      stop("Scale of the name provided in 'what' need to be available in all provided 'GroupedScoreTable' objects.")
+  } else if (!what %in% c("quan", "Z"))
+    stop("'what' argument can be one of: 'quan', 'Z' or name of the scale in provided 'GroupedScoreTable' objects.")
+  
+  # check if all conditions are true
+  conditions <- lapply(tables, attr, which = "conditions")
+  cond_comb <- combn(conditions, 2)
+  equal_comb <- all(sapply(1:ncol(cond_comb), \(x) test_comb[1, x] == test_comb[2, x]))
+  if (!isTRUE(equal_comb))
+    stop("All ", class(tables[[1]]), " objects need to be created on the basis of the same 'GroupConditions'.")
+  
+  
+  
+  normalized <- lapply(1:length(vars), \(i) {
+    
+    res <- data.frame(var = normalize_score(x = data[, vars[i]],
+                                            table = tables[[i]],
+                                            what = what))
+    names(res) <- vars[i]
+    return(res)
+  })
+  
+  normalized <- dplyr::bind_cols(normalized)
+  
+  if (isTRUE(retain)) {
+    data[, vars] <- normalized
+    out <- data
+  } else if (isFALSE(retain))
+    out <- normalized
+  else {
+    out <- dplyr::bind_cols(data[, retain],
+                            normalized)
+  }
+  
+  return(out)
+  
   
 }

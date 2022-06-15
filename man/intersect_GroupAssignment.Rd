@@ -8,7 +8,8 @@ intersect_GroupAssignment(
   GA1,
   GA2,
   force_disjoint = TRUE,
-  force_exhaustive = FALSE
+  force_exhaustive = FALSE,
+  .all = FALSE
 )
 }
 \arguments{
@@ -20,7 +21,8 @@ forced in case when one observation would end in multiple intersections.
 If \code{TRUE}, observation will remain only in the first intersection to which
 it will be assigned. Default to \code{TRUE}.}
 
-\item{force_exhaustive}{\emph{boolean} indicating if groups provided}
+\item{force_exhaustive}{\emph{boolean} indicating if elements that are not assigned
+to any of the intersecting groups should be gathered together in \code{.NA:.NA} group}
 }
 \value{
 \emph{GroupAssignment} object with intersected groups.
@@ -39,10 +41,12 @@ age_grouping <- GroupConditions(
   "to 20" ~ age < 20,
   "20 to 40" ~ age >= 20 & age <= 40,
   "40 to 60" ~ age >= 40 & age < 60,
+  force_exhaustive = TRUE,
   force_disjoint = FALSE
 )
 
-# intersect two distinct GroupAssignements with additional 'forcing' of conditions
+# intersect two distinct GroupAssignements
+
 intersected <- intersect_GroupAssignment(
   GroupAssignment(HEXACO_60, sex_grouping),
   GroupAssignment(HEXACO_60, age_grouping),
@@ -50,9 +54,8 @@ intersected <- intersect_GroupAssignment(
   force_disjoint = FALSE
 )
 
-# even though `age_grouping` didn't force exhaustiveness, it was handled in the
-# `intersected`
 summary(intersected)
+
 }
 \seealso{
 Other observation grouping functions: 

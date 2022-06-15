@@ -18,7 +18,7 @@ need to be the same as number of tables provided to either \code{...} or \code{.
 \itemize{
 \item \code{quan} - the quantile of x in the raw score distribution
 \item \code{Z} - normalized Z score for the x raw score
-\item name of the scale calculated in \code{StandardScale}s provided to \code{...} or
+\item name of the scale calculated in \emph{ScoreTables} provided to \code{...} or
 \code{.dots} argument
 }}
 
@@ -61,5 +61,8 @@ normalize_scores_df(data = head(HEXACO_60),
                     what = "sten")
 }
 \seealso{
-\code{\link[=normalize_score]{normalize_score()}}
+Other score-normalization functions: 
+\code{\link{normalize_score_grouped}()},
+\code{\link{normalize_score}()}
 }
+\concept{score-normalization functions}

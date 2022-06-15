@@ -1,4 +1,6 @@
-#' checks for formula in `GroupGonditions`
+#' checks for formula in `GroupGonditions` and returns the variable names used
+#' in the call
+#' @return *character* vector with variable names
 #' @noRd
 formula_check <- function(group_formula) {
   
@@ -6,11 +8,17 @@ formula_check <- function(group_formula) {
   
   if (isFALSE(is.character(lhs_val)) && length(lhs_val) != 1)
     stop("LHS of all grouping formulas need to be character string.")
+  if (strtrim(lhs_val, 1) == ".")
+    stop("User-defined group name can't begin with reserved symbol'.'")
+  if (grepl(lhs_val, pattern = ":"))
+    stop("User-defined group name can't contain reserveds symbol ':'")
   
   rhs_val <- rlang::f_rhs(group_formula)
   
   if (isFALSE(is.call(rhs_val)) && length(rhs_val) != 1)
     stop("RHS of all grouping formulas need to be a call to check assignment.")
+  
+  return(all.vars(rhs_val))
 }
 
 #' @title Conditions for observation grouping
@@ -37,9 +45,13 @@ GroupConditions <- function(..., force_disjoint = TRUE, force_exhaustive = FALSE
   
   formulas <- list(...)
   
-  invisible(lapply(formulas, formula_check))
+  formula_vars <- unique(sapply(formulas, formula_check))
+  
+  if (length(formula_vars) == 0)
+    stop("No variables are tested with specified conditions.")
   
   class(formulas) <- "GroupConditions"
+  attr(formulas, "formula_vars") <- formula_vars
   attr(formulas, "force_disjoint") <- isTRUE(force_disjoint)
   attr(formulas, "force_exhaustive") <- isTRUE(force_exhaustive)
   attr(formulas, "groups") <- sapply(formulas, rlang::f_lhs)
@@ -64,7 +76,8 @@ is.GroupConditions <- function(x) {
 print.GroupConditions <- function(x) {
   cat("<GroupConditions>\n")
   cat("For", length(unique(attr(x, "groups"))), "unique groups\n\n")
-  cat("Conditions:\n")
+  cat("Conditions ")
+  cat("[Tested vars: ", paste(attr(x, "formula_vars"), collapse = ", "), "]:\n", sep = "")
   for (i in seq_along(attr(x, "groups"))) {
     cat("Group: [")
     cat(attr(x, "groups")[i])
@@ -103,6 +116,10 @@ print.GroupConditions <- function(x) {
 #' @param skip_faulty *boolean* should the faulty `condition` be skipped? 
 #' If `FALSE` as in default, error will be produced. Faultiness of seemingly correct
 #' condition may be caused by variable names to not be present in the `data`.
+#' @param .all *boolean*. If `TRUE`, then additional group named `.all`
+#' will be created, which will contain all observations. Useful when object will be
+#' used for creation of [GroupedFrequencyTable()]
+#' @param ... Do not set - used internally
 #' 
 #' @family observation grouping functions
 #' @example examples/GroupAssignment.R
@@ -110,11 +127,13 @@ print.GroupConditions <- function(x) {
 #' @return *GroupAssignment* object
 
 GroupAssignment <- function(data, 
-                             conditions, 
-                             id,
-                             force_disjoint, 
-                             force_exhaustive,
-                             skip_faulty = FALSE) {
+                            conditions, 
+                            id,
+                            force_disjoint, 
+                            force_exhaustive,
+                            skip_faulty = FALSE,
+                            .all = FALSE,
+                            ...) {
   
   # browser()
   
@@ -123,6 +142,8 @@ GroupAssignment <- function(data,
     stop("Data provided should be in `data.frame` form.")
   if (!is.GroupConditions(conditions))
     stop("Object of class `GroupConditions` should be provided to `conditions` argument")
+  if (!all(attr(conditions, "formula_vars") %in% names(data)))
+    stop("Not all variables tested in provided GroupCondition are available in the data.")
   
   # mode 
   if (!missing(id)) {
@@ -155,8 +176,10 @@ GroupAssignment <- function(data,
     out_i[["group"]] <- rlang::f_lhs(form)
     
     # catch every problem with conditions
-    out_bool <- tryCatch(eval(rlang::f_rhs(form), envir = data),
-                         error = function(e)  e$message )
+    out_bool <- tryCatch(
+      eval(rlang::f_rhs(form), 
+           envir = data[, attr(conditions, "formula_vars"), drop = F]),
+    error = function(e)  e$message )
     
     if (!is.logical(out_bool) && !isTRUE(skip_faulty))
       stop(e)
@@ -187,11 +210,18 @@ GroupAssignment <- function(data,
 
   }
   
+  add <- list(...)
+  
   # if some were not assigned, create additional group
   if (length(unique(assigned_i)) != nrow(data)) {
-    if (isTRUE(force_exhaustive)) {
+    if (isTRUE(force_exhaustive) || isTRUE(add$na_as_all)) {
       
-      out_i <- list(group = ".NA")
+      out_i <- list()
+      
+      if (isTRUE(add$na_as_all))
+        out_i[["group"]] <- ".all"
+      else
+        out_i[["group"]] = ".NA"
       
       if (group_mode == "index")
         out_i[["els"]] <- which(!1:nrow(data) %in% assigned_i)
@@ -207,10 +237,23 @@ GroupAssignment <- function(data,
     }
   }
   
+  if (isTRUE(.all)) {
+    
+    out_i <- list(group = ".all")
+    if (group_mode == "index")
+      out_i[["els"]] <- 1:nrow(data)
+    else if (group_mode == "id")
+      out_i[["els"]] <- data[[id]]
+    
+    out <- c(out, list(out_i))
+    
+  }
+  
   # finalize
   attr(out, "mode") <- group_mode
   if (group_mode == "id")
     attr(out, "id_col") <- id
+  attr(out, "formula_vars") <- attr(conditions, "formula_vars")
   attr(out, "force_disjoint") <- isTRUE(force_disjoint)
   attr(out, "disjoint") <- are_disjoint
   attr(out, "force_exhaustive") <- isTRUE(force_exhaustive)
@@ -268,7 +311,8 @@ summary.GroupAssignment <- function(x) {
   cat("Exhaustiveness: ", summaries$exhaustive, 
       "; Forced: ", summaries$forced_exhaustive, "\n\n", sep = "")
   
-  cat("Assignment:\n")
+  cat("Assignment ")
+  cat("[Tested vars: ", paste(attr(x, "formula_vars"), collapse = ", "), "]:\n", sep = "")
   for (i in seq_along(summaries$groups)) {
     cat("Group: [")
     cat(names(summaries$groups)[i])
@@ -290,13 +334,20 @@ summary.GroupAssignment <- function(x) {
 #' forced in case when one observation would end in multiple intersections. 
 #' If `TRUE`, observation will remain only in the first intersection to which 
 #' it will be assigned. Default to `TRUE`.
-#' @param force_exhaustive *boolean* indicating if groups provided 
+#' @param force_exhaustive *boolean* indicating if elements that are not assigned
+#' to any of the intersecting groups should be gathered together in `.NA:.NA` group
+#' 
 #' @return *GroupAssignment* object with intersected groups.
 #' @family observation grouping functions
 #' @example examples/intersect_GroupAssignment.R
 #' @export
 
-intersect_GroupAssignment <- function(GA1, GA2, force_disjoint = TRUE, force_exhaustive = FALSE) {
+intersect_GroupAssignment <- function(
+    GA1, 
+    GA2, 
+    force_disjoint = TRUE, 
+    force_exhaustive = FALSE,
+    .all = FALSE) {
   
   if(any(!is.GroupAssignment(GA1), !is.GroupAssignment(GA2)))
     stop("Both 'GA1' and 'GA2' need to be of the 'GroupAssignment' class.")
@@ -313,6 +364,17 @@ intersect_GroupAssignment <- function(GA1, GA2, force_disjoint = TRUE, force_exh
     if (attr(GA1, "id_col") != attr(GA2, "id_col")) {
       stop("Name of default id column in both GroupAssignments need to be the same!")
     }
+  }
+  
+  # fix non-user defined group names
+  for (i in seq_along(GA1)) {
+    if (strtrim(GA1[[i]]$group, 1) == ".")
+      GA1[[i]]$group <- paste0(GA1[[i]]$group, 1)
+  }
+  
+  for (i in seq_along(GA2)) {
+    if (strtrim(GA2[[i]]$group, 1) == ".")
+      GA2[[i]]$group <- paste0(GA2[[i]]$group, 2)
   }
   
   # create intersected groups
@@ -359,7 +421,7 @@ intersect_GroupAssignment <- function(GA1, GA2, force_disjoint = TRUE, force_exh
   if (length(unique(assigned_i)) < max(c(attr(GA1, "total"), attr(GA2, "total")))) {
     if (isTRUE(force_exhaustive)) {
       
-      out_i <- list(group = ".NA")
+      out_i <- list(group = c(".NA", ".NA"))
       
       els1 <- unique(unlist(sapply(GA1, \(x) x$els)))
       els1 <- els1[!els1 %in% assigned_i]
@@ -378,10 +440,22 @@ intersect_GroupAssignment <- function(GA1, GA2, force_disjoint = TRUE, force_exh
     }
   }
   
+  # if (isTRUE(.all)) {
+  #   
+  #   out_i <- list(group = ".all:.all",
+  #                 els = unique(c(unlist(sapply(GA1, \(x) x$els)),
+  #                                unlist(sapply(GA2, \(x) x$els)))
+  #                              )
+  #                 )
+  #   out <- c(out, list(out_i))
+  #   
+  # }
+  
   # finalize
   attr(out, "mode") <- attr(GA1, "mode")
   if (attr(out, "mode") == "id")
     attr(out, "id_col") <- attr(GA1, "id_col")
+  attr(out, "formula_vars") <- unique(c(attr(GA1, "formula_vars"), attr(GA2, "formula_vars")))
   attr(out, "force_disjoint") <- isTRUE(force_disjoint)
   attr(out, "disjoint") <- are_disjoint
   attr(out, "force_exhaustive") <- isTRUE(force_exhaustive)

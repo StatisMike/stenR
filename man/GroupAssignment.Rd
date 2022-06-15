@@ -13,7 +13,9 @@ GroupAssignment(
   id,
   force_disjoint,
   force_exhaustive,
-  skip_faulty = FALSE
+  skip_faulty = FALSE,
+  .all = FALSE,
+  ...
 )
 
 is.GroupAssignment(x)
@@ -45,6 +47,12 @@ from \code{conditions} will be used}
 \item{skip_faulty}{\emph{boolean} should the faulty \code{condition} be skipped?
 If \code{FALSE} as in default, error will be produced. Faultiness of seemingly correct
 condition may be caused by variable names to not be present in the \code{data}.}
+
+\item{.all}{\emph{boolean}. If \code{TRUE}, then additional group named \code{.all}
+will be created, which will contain all observations. Useful when object will be
+used for creation of \code{\link[=GroupedFrequencyTable]{GroupedFrequencyTable()}}}
+
+\item{...}{Do not set - used internally}
 
 \item{x}{object}
 }
