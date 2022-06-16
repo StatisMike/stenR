@@ -2,6 +2,7 @@
 
 S3method(plot,FrequencyTable)
 S3method(plot,GroupedFrequencyTable)
+S3method(plot,GroupedScoreTable)
 S3method(plot,ScoreTable)
 S3method(plot,StandardScale)
 S3method(print,CombScaleSpec)

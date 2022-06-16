@@ -190,6 +190,7 @@ attach_scales <- function(st, scale) {
 #' @title Create GroupedScoreTable
 #' @param table *GroupedFrequencyTable* object
 #' @param scale a `StandardScale` object or list of multiple `StandardScale` objects
+#' @seealso plot.GroupedScoreTable
 #' @export
 
 GroupedScoreTable <- function(table,
@@ -208,4 +209,167 @@ GroupedScoreTable <- function(table,
   class(STs) <- "GroupedScoreTable"
   
   return(STs)
+}
+
+#' @title Gerenic plot of the GroupedScoreTable
+#' @description Generic plot using `ggplot2`. It plots ScoreTables for all 
+#' groups by default, or only chosen ones using when `group_names` argument is specified. 
+#' @param gst A `GroupedScoreTable` object
+#' @param scale_name if scores for multiple scales available, provide the name
+#' of the scale for plotting.
+#' @param group_names *character* vector specifying which groups should appear in the plots
+#' @param strict_names *boolean* If `TRUE`, then intersected groups are filtered
+#' using *strict* strategy: `group_names` need to be provided in form: `"group1:group2"`. If
+#' `FALSE`, then intersected groups will be taken into regard separately, so 
+#' eg. when `"group1"` is provided to `group_names`, all of: `"group1:group2"`, 
+#' `"group1:group3"`, `"group1:groupN"`  will be plotted. Defaults to `TRUE`
+#' @param ... named list of additional arguments passed to either [facet_wrap()] 
+#' when plotting *GroupedScoreTable* created on basis of one *GroupConditions* 
+#' or [facet_grid()] when it was created with two such objects. 
+#' @export
+plot.GroupedScoreTable <- function(
+    gst, 
+    scale_name = NULL,
+    group_names = NULL,
+    strict_names = TRUE,
+    ...
+) {
+  
+  if (!requireNamespace("ggplot2", quietly = T))
+    stop("Generic plotting of 'GroupedScoreTable' requires 'ggplot2' package installed")
+  
+  if (!is.null(group_names)) {
+    if (isTRUE(strict_names)){
+      if (!any(group_names %in% names(gst)))
+        stop("Not all names specified in 'group_names' specify group names")
+    } else {
+      all_names <- unique(strsplit(names(gst), split = ":"))
+      if (!any(group_names %in% all_names))
+        stop("Not all names specified in 'group_names' specify group names")
+    }
+  }
+  
+  scale_data <- list()
+  
+  plot_data <- lapply(seq_along(gst), \(i) {
+    
+    if (!is.null(group_names)) {
+      if (isTRUE(strict_names)) {
+        name_check <- names(gst)[i]
+        if (!name_check %in% group_names)
+          return(NULL)
+      } else {
+        name_check <- strsplit(names(gst)[i], split = ":")[[1]]
+        if (!any(name_check %in% group_names))
+          return(NULL)
+      } 
+    }
+    
+    name <- strsplit(names(gst)[i], split = ":")[[1]]
+    
+    st <- gst[[i]]
+    
+    sum_of_n <- sum(st$table$n)
+    
+    if (length(st$scale) == 1) {
+      scale <- st$scale[[1]]
+    } else {
+      if (is.null(scale_name) || length(scale_name) != 1 || 
+          !scale_name %in% names(st$scale))
+        stop("Provide one of the computed scale names to 'scale_name' argument.")
+      scale <- st$scale[sapply(st$scale, \(x) x$name == scale_name)][[1]]
+    }
+    
+    plot_data <- data.frame(
+      x = unique(st$table[[scale$name]]))
+    
+    plot_data$prop <- sapply(
+      plot_data$x,
+      \(x) sum(as.numeric(st$table[st$table[[scale$name]] == x, "n"]))/sum_of_n
+    )
+    
+    # during first group computations scale data is extracted
+    if (length(scale_data) == 0) {
+      scale_data[["min"]] <<- scale$min
+      scale_data[["max"]] <<- scale$max
+      scale_data[["SD1"]] <<- c(scale$M-scale$SD, scale$M+scale$SD) 
+      scale_data[["SD2"]] <<- c(scale$M-2*scale$SD, scale$M+2*scale$SD)
+    }
+    
+    plot_data$SD <- ifelse(
+      plot_data$x < scale_data$SD2[1] | plot_data$x > scale_data$SD2[2], ">SD2",
+      ifelse(plot_data$x < scale_data$SD1[1] | plot_data$x > scale_data$SD1[2], "SD1-SD2", "<SD1")
+    )
+    
+    plot_data$SD <- factor(plot_data$SD, levels = c("<SD1", "SD1-SD2", ">SD2"))
+    
+    if (length(name) == 1) {
+      plot_data$group1 <- name
+    } else if (length(name) == 2) {
+      plot_data$group1 <- name[1]
+      plot_data$group2 <- name[2]
+    }
+    
+    return(plot_data)
+    
+  })
+  
+  plot_data <- data.table::rbindlist(plot_data)
+  
+  if ("group2" %in% names(plot_data)) {
+    
+    plot_data$group1 <- factor(plot_data$group1, levels = c(".all1", attr(attr(gst, "conditions")[[1]], "groups")))
+    plot_data$group2 <- factor(plot_data$group2, levels = c(".all2", attr(attr(gst, "conditions")[[2]], "groups")))
+    
+    grp1_row <- length(unique(plot_data$group2)) < length(unique(plot_data$group1))
+    
+    plot <- ggplot2::ggplot(plot_data, ggplot2::aes(x = x, y = prop)) + 
+      ggplot2::geom_col(ggplot2::aes(fill = SD), alpha = 0.3, color = "black") + 
+      ggplot2::scale_fill_manual(name = "Distance from\nthe mean", values = c("green", "blue", "red")) +
+      ggplot2::theme_bw() +
+      ggplot2::scale_x_continuous(
+        name = scale_name, 
+        breaks = c(scale_data$min, scale_data$SD2[1], scale_data$SD1[1], 
+                   scale_data$M, scale_data$SD1[2], scale_data$SD2[2], scale_data$max))
+    
+    plot_args <- list(
+      rows = if (grp1_row) ggplot2::vars(group1) else ggplot2::vars(group2),
+      cols = if (grp1_row) ggplot2::vars(group2) else ggplot2::vars(group1)
+    )
+    
+    add_args <- list(...)
+    
+    plot <- plot +
+      do.call(ggplot2::facet_grid,
+              args = c(plot_args[!names(plot_args) %in% names(add_args)],
+                       add_args))
+    
+    return(plot)
+    
+  } else {
+    
+    plot_data$group1 <- factor(plot_data$group1, levels = c(".all", attr(attr(gst, "conditions"), "groups")))
+    
+    plot <- ggplot2::ggplot(plot_data, ggplot2::aes(x = x, y = prop)) + 
+      ggplot2::geom_col(ggplot2::aes(fill = SD), alpha = 0.3, color = "black") + 
+      ggplot2::scale_fill_manual(name = "Distance from\nthe mean", values = c("green", "blue", "red")) +
+      ggplot2::theme_bw() +
+      ggplot2::scale_x_continuous(
+        name = scale_name, 
+        breaks = c(scale_data$min, scale_data$SD2[1], scale_data$SD1[1], 
+                   scale_data$M, scale_data$SD1[2], scale_data$SD2[2], scale_data$max))
+    
+    plot_args <- list(
+      facets = ggplot2::vars(group1)
+    )
+    
+    add_args <- list(...)
+    
+    plot <- plot +
+      do.call(ggplot2::facet_wrap, args = c(plot_args[!names(plot_args) %in% names(add_args)],
+                                            add_args))
+    
+    return(plot)
+    
+  }
 }

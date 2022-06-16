@@ -14,3 +14,6 @@ GroupedScoreTable(table, scale)
 \description{
 Create GroupedScoreTable
 }
+\seealso{
+plot.GroupedScoreTable
+}

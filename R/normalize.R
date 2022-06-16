@@ -189,14 +189,14 @@ normalize_score_grouped <- function(
   } else if (!what %in% c("quan", "Z"))
     stop("'what' argument can be one of: 'quan', 'Z' or name of the scale in provided 'GroupedScoreTable' objects.")
   
-  # check if all conditions are true
+  # check if all conditions are the same
   conditions <- lapply(tables, attr, which = "conditions")
   cond_comb <- combn(conditions, 2)
   equal_comb <- all(sapply(1:ncol(cond_comb), \(x) test_comb[1, x] == test_comb[2, x]))
   if (!isTRUE(equal_comb))
     stop("All ", class(tables[[1]]), " objects need to be created on the basis of the same 'GroupConditions'.")
   
-  
+  # qualify users to correct group
   
   normalized <- lapply(1:length(vars), \(i) {
     

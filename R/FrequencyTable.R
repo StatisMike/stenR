@@ -327,10 +327,10 @@ plot.GroupedFrequencyTable <- function(
     stop("Generic plotting of 'GroupedFrequencyTable' requires 'ggplot2' package installed")
   
   if (!is.null(group_names)) {
-    if (isTRUE(strict_names))
+    if (isTRUE(strict_names)){
       if (!any(group_names %in% names(gft)))
         stop("Not all names specified in 'group_names' specify group names")
-    else {
+   } else {
       all_names <- unique(strsplit(names(gft), split = ":"))
       if (!any(group_names %in% all_names))
         stop("Not all names specified in 'group_names' specify group names")
@@ -376,7 +376,7 @@ plot.GroupedFrequencyTable <- function(
     plot_data$group1 <- factor(plot_data$group1, levels = c(".all1", attr(attr(gft, "conditions")[[1]], "groups")))
     plot_data$group2 <- factor(plot_data$group2, levels = c(".all2", attr(attr(gft, "conditions")[[2]], "groups")))
     
-    grp1_row <- length(unique(plot_data$group2)) > length(unique(plot_data$group1))
+    grp1_row <- length(unique(plot_data$group2)) < length(unique(plot_data$group1))
     
     plot <- 
       ggplot2::ggplot(data = plot_data, ggplot2::aes(x = score, y = n)) + 
