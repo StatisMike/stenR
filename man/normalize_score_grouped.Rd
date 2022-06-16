@@ -4,7 +4,15 @@
 \alias{normalize_score_grouped}
 \title{Normalize scores using Grouped table}
 \usage{
-normalize_score_grouped(data, vars, ..., what, retain = FALSE, .dots = list())
+normalize_score_grouped(
+  data,
+  vars,
+  ...,
+  what,
+  retain = FALSE,
+  group_col = NULL,
+  .dots = list()
+)
 }
 \arguments{
 \item{data}{\emph{data.frame} object containing raw scores}
@@ -13,7 +21,7 @@ normalize_score_grouped(data, vars, ..., what, retain = FALSE, .dots = list())
 need to be the same as number of tables provided to either \code{...} or \code{.dots}}
 
 \item{...}{\emph{GroupedFrequencyTable} or \emph{GroupedScoreTable} objects to be used
-for normalization}
+for normalization. They should be provided in the same order as \code{vars}}
 
 \item{what}{the values to get. One of either:
 \itemize{
@@ -25,6 +33,9 @@ for normalization}
 
 \item{retain}{either \emph{boolean}: \code{TRUE} if all columns in the \code{data} are to be
 retained, \code{FALSE} if none, or \emph{character vector} with names of columns to be retained}
+
+\item{group_col}{\emph{character} name of the column for name of the group each
+observation was qualified into. If left as default \code{NULL}, they won't be returned.}
 
 \item{.dots}{\emph{GroupedFrequencyTable} or \emph{GroupedScoreTable} objects provided
 as a list, instead of individually in \code{...}.}

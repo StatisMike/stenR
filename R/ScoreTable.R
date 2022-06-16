@@ -191,6 +191,8 @@ attach_scales <- function(st, scale) {
 #' @param table *GroupedFrequencyTable* object
 #' @param scale a `StandardScale` object or list of multiple `StandardScale` objects
 #' @seealso plot.GroupedScoreTable
+#' @return *GroupedScoreTable* object, which constist of named *list* of 
+#' *ScoreTable* objects and *GroupConditions* object used for grouping
 #' @export
 
 GroupedScoreTable <- function(table,
@@ -206,10 +208,14 @@ GroupedScoreTable <- function(table,
   }
   
   attr(STs, "conditions") <- attr(table, "conditions")
+  attr(STs, "scales") <- STs[[1]]$scale
   class(STs) <- "GroupedScoreTable"
   
   return(STs)
 }
+
+#' @param gst A `GroupedScoreTable` object
+#' 
 
 #' @title Gerenic plot of the GroupedScoreTable
 #' @description Generic plot using `ggplot2`. It plots ScoreTables for all 

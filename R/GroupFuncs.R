@@ -507,12 +507,18 @@ extract_observations <- function(
   # basic checks ####
   if (!is.data.frame(data))
     stop("Data provided should be in `data.frame` form.")
-  if (!is.character(group_names) || length(group_names) == 0)
-    stop("At least one name in 'group_names' need to be provided")
+  if (!is.null(group_names) && (!is.character(group_names) || length(group_names) == 0))
+    stop("Names in 'group_names' need to be provided in form of 'character' vector.")
   if (!extract_mode %in% c("list", "data.frame"))
     stop("Either 'list' or 'data.frame' need to be provided in 'extract_mode'.")
   if (!is.GroupAssignment(groups))
     stop("Object of class 'GroupAssignment' need to be provided to 'groups' argument")
+  
+  # if no name is provided, extract all groups with strict name strategy
+  if (is.null(group_names)) {
+    group_names <- sapply(groups, \(x) paste(x$group, collapse = ":"))
+    stric_names <- TRUE
+  }
   
   # preparation for group extraction ####
   ## strict names strategy

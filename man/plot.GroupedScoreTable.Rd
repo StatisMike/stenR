@@ -2,7 +2,7 @@
 % Please edit documentation in R/ScoreTable.R
 \name{plot.GroupedScoreTable}
 \alias{plot.GroupedScoreTable}
-\title{Gerenic plot of the GroupedFrequencyTable}
+\title{Gerenic plot of the GroupedScoreTable}
 \usage{
 \method{plot}{GroupedScoreTable}(gst, scale_name = NULL, group_names = NULL, strict_names = TRUE, ...)
 }
@@ -25,6 +25,6 @@ when plotting \emph{GroupedScoreTable} created on basis of one \emph{GroupCondit
 or \code{\link[=facet_grid]{facet_grid()}} when it was created with two such objects.}
 }
 \description{
-Generic plot using \code{ggplot2}. It plots FrequencyTables for all
+Generic plot using \code{ggplot2}. It plots ScoreTables for all
 groups by default, or only chosen ones using when \code{group_names} argument is specified.
 }

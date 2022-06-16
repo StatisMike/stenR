@@ -11,6 +11,10 @@ GroupedScoreTable(table, scale)
 
 \item{scale}{a \code{StandardScale} object or list of multiple \code{StandardScale} objects}
 }
+\value{
+\emph{GroupedScoreTable} object, which constist of named \emph{list} of
+\emph{ScoreTable} objects and \emph{GroupConditions} object used for grouping
+}
 \description{
 Create GroupedScoreTable
 }

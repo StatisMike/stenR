@@ -124,7 +124,7 @@ normalize_scores_df <- function(
   } else if (isFALSE(retain))
     out <- normalized
   else {
-    out <- dplyr::bind_cols(data[, retain],
+    out <- dplyr::bind_cols(data[, retain, drop = F],
                             normalized)
   }
   
@@ -140,7 +140,7 @@ normalize_scores_df <- function(
 #' @param vars *character vector* with names of columns to normalize. Length of vars
 #' need to be the same as number of tables provided to either `...` or `.dots`
 #' @param ... *GroupedFrequencyTable* or *GroupedScoreTable* objects to be used 
-#' for normalization
+#' for normalization. They should be provided in the same order as `vars`
 #' @param what the values to get. One of either:
 #' 
 #' - `quan` - the quantile of x in the raw score distribution
@@ -150,6 +150,8 @@ normalize_scores_df <- function(
 #' 
 #' @param retain either *boolean*: `TRUE` if all columns in the `data` are to be
 #' retained, `FALSE` if none, or *character vector* with names of columns to be retained
+#' @param group_col *character* name of the column for name of the group each
+#' observation was qualified into. If left as default `NULL`, they won't be returned.
 #' @param .dots *GroupedFrequencyTable* or *GroupedScoreTable* objects provided 
 #' as a list, instead of individually in `...`. 
 #' @export
@@ -162,6 +164,7 @@ normalize_score_grouped <- function(
     ...,
     what,
     retain = FALSE,
+    group_col = NULL,
     .dots = list()) {
   
   if (!is.data.frame(data))
@@ -172,6 +175,8 @@ normalize_score_grouped <- function(
     stop("All 'vars' need to be available in the 'data'.")
   if (!is.logical(retain) && !(is.character(retain) && all(retain %in% names(data))))
     stop("Bool value or character vector containing column names available in 'data' need to be provided to 'retain' argument.")
+  if (!is.null(group_col) && (!is.character(group_col) || length(group_col) != 1))
+    stop("One character value need to be passed to 'group_col'")
   
   tables <- list(...)
   if (length(tables) == 0 && length(.dots) > 0)
@@ -184,42 +189,91 @@ normalize_score_grouped <- function(
     stop("Number of provided tables and 'vars' to normalize need to be the same.")
   
   if (all(sapply(tables, \(x) class(x) == "GroupedScoreTable")) && !what %in% c("quan", "Z")) {
-    if (!all(sapply(tables, \(x) what %in% names(x$scale))))
+    if (!all(sapply(tables, \(x) what %in% names(attr(x, "scales")))))
       stop("Scale of the name provided in 'what' need to be available in all provided 'GroupedScoreTable' objects.")
   } else if (!what %in% c("quan", "Z"))
     stop("'what' argument can be one of: 'quan', 'Z' or name of the scale in provided 'GroupedScoreTable' objects.")
   
+  if (".temp_GroupAssignment_index" %in% names(data))
+    stop("Column name '.temp_GroupAssignment_index'")
+  
   # check if all conditions are the same
   conditions <- lapply(tables, attr, which = "conditions")
-  cond_comb <- combn(conditions, 2)
-  equal_comb <- all(sapply(1:ncol(cond_comb), \(x) test_comb[1, x] == test_comb[2, x]))
+  equal_comb <- all(sapply(conditions[-1], \(cond) identical(conditions[[1]], cond)))
   if (!isTRUE(equal_comb))
     stop("All ", class(tables[[1]]), " objects need to be created on the basis of the same 'GroupConditions'.")
+  # keep only one conditions
+  conditions <- conditions[[1]]
   
-  # qualify users to correct group
+  # add temporary index to return the data in correct order
+  data[[".temp_GroupAssignment_index"]] <- paste(1:nrow(data), "index", sep = "_")
   
-  normalized <- lapply(1:length(vars), \(i) {
-    
-    res <- data.frame(var = normalize_score(x = data[, vars[i]],
-                                            table = tables[[i]],
-                                            what = what))
-    names(res) <- vars[i]
-    return(res)
-  })
-  
-  normalized <- dplyr::bind_cols(normalized)
-  
-  if (isTRUE(retain)) {
-    data[, vars] <- normalized
-    out <- data
-  } else if (isFALSE(retain))
-    out <- normalized
-  else {
-    out <- dplyr::bind_cols(data[, retain],
-                            normalized)
+  # qualify observations to correct group
+  if (length(conditions) == 2) {
+    group_indices <- intersect_GroupAssignment(
+      GA1 = GroupAssignment(data = data,
+                            conditions = conditions[[1]],
+                            force_disjoint = T,
+                            force_exhaustive = T,
+                            id = ".temp_GroupAssignment_index",
+                            na_as_all = T),
+      GA2 = GroupAssignment(data = data,
+                            conditions = conditions[[2]],
+                            force_disjoint = T,
+                            force_exhaustive = T,
+                            id = ".temp_GroupAssignment_index",
+                            na_as_all = T))
+  } else {
+    group_indices <- GroupAssignment(
+      data = data,
+      conditions = conditions[[1]],
+      force_disjoint = T,
+      force_exhaustive = T,
+      id = ".temp_GroupAssignment_index",
+      na_as_all = T)
   }
   
-  return(out)
+  groups <- extract_observations(
+    data,
+    groups = group_indices,
+    id = ".temp_GroupAssignment_index"
+  )
   
+  normalized_all_groups <- lapply(seq_along(groups), \(i) {
+    
+    if (nrow(groups[[i]]) == 0)
+      return(NULL)
+    
+    group_name <- names(groups)[i]
+    
+    group_tables <- lapply(tables, \(tbl) {
+      tbl[[which(names(tbl) == group_name)]]
+    })
+    
+    normalized_ingroup <- normalize_scores_df(
+      data = groups[[i]],
+      vars = vars,
+      what = what,
+      retain = if (isTRUE(retain)) TRUE
+          else if (isFALSE(retain)) ".temp_GroupAssignment_index"
+             else c(".temp_GroupAssignment_index", retain),
+      .dots = group_tables
+    )
+    
+    return(normalized_ingroup)
+  })
+  
+  names(normalized_all_groups) <- names(groups)
+  
+  normalized_all_groups <- data.table::rbindlist(normalized_all_groups,
+                                                 use.names = T,
+                                                 idcol = group_col[1])
+  
+  normalized_all_groups <- normalized_all_groups[
+    order(normalized_all_groups[[".temp_GroupAssignment_index"]]), 
+    -which(names(normalized_all_groups) == ".temp_GroupAssignment_index")
+  ]
+  
+  return(normalized_all_groups)
   
 }
