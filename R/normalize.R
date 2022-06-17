@@ -132,7 +132,7 @@ normalize_scores_df <- function(
   
 }
 
-#' @title Normalize scores using Grouped table
+#' @title Normalize scores using GroupedFrequencyTables or GroupedScoreTables
 #' @description Normalize scores using either *GroupedFrequencyTable* or
 #' *GroupedScoreTable* for one or more variables. Given *data.frame* should also
 #' contain columns used in *GroupingConditions* attached to the table
@@ -155,10 +155,11 @@ normalize_scores_df <- function(
 #' @param .dots *GroupedFrequencyTable* or *GroupedScoreTable* objects provided 
 #' as a list, instead of individually in `...`. 
 #' @export
+#' @example /examples/normalize_scores_grouped.R
 #' @family score-normalization functions
 #' @return *data.frame* with normalized scores
 
-normalize_score_grouped <- function(
+normalize_scores_grouped <- function(
     data,
     vars,
     ...,
@@ -209,6 +210,7 @@ normalize_score_grouped <- function(
   data[[".temp_GroupAssignment_index"]] <- paste(1:nrow(data), "index", sep = "_")
   
   # qualify observations to correct group
+  # handle conditions to be intersected
   if (length(conditions) == 2) {
     group_indices <- intersect_GroupAssignment(
       GA1 = GroupAssignment(data = data,
@@ -223,6 +225,7 @@ normalize_score_grouped <- function(
                             force_exhaustive = T,
                             id = ".temp_GroupAssignment_index",
                             na_as_all = T))
+    # handle one condition only
   } else {
     group_indices <- GroupAssignment(
       data = data,

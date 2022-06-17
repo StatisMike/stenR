@@ -62,7 +62,7 @@ normalize_scores_df(data = head(HEXACO_60),
 }
 \seealso{
 Other score-normalization functions: 
-\code{\link{normalize_score_grouped}()},
+\code{\link{normalize_scores_grouped}()},
 \code{\link{normalize_score}()}
 }
 \concept{score-normalization functions}
