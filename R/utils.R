@@ -30,3 +30,12 @@
   bad_id_name = "Please provide valid column name containing ids."
 )
 
+FQ_incomplete_warning <- function()
+  warningCondition("There are missing score values between minimum and maximum scores. They have been filled automatically.",
+                   class = "IncompleteRangeWarning")
+GFQ_incomplete_warning <- function(groups) {
+  parsed_groups <- paste(groups, collapse = "', '")
+  warningCondition(message = paste0("There are missing score values between minimum and maximum scores for some groups:\n",
+                                    "'", parsed_groups, "'\n",
+                                    "They have been filled automatically."))
+}

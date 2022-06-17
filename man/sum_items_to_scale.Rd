@@ -4,7 +4,7 @@
 \alias{sum_items_to_scale}
 \title{Sum up discrete raw data}
 \usage{
-sum_items_to_scale(data, ..., retain = FALSE, .dots)
+sum_items_to_scale(data, ..., retain = FALSE, .dots = list())
 }
 \arguments{
 \item{data}{\code{data.frame} object containing numerical values of items data}

@@ -59,7 +59,7 @@ FrequencyTable <- function(data) {
   if(!(length(table$score) == last_score - first_score + 1)){
     
     #generate warning and update status correctly
-    warning("There are missing score values between minimum and maximum scores. They have been filled automatically.")
+    FQ_incomplete_warning()
     status <- list(range = "incomplete",
                    n = sum(table$n))
     
@@ -289,12 +289,18 @@ GroupedFrequencyTable <- function(data,
   for (group in indices) {
     
     if (length(group$els) > 0)
-      FTs[[paste(group$group, collapse = ":")]] <-
-      FrequencyTable(data[group$els, var])
+      suppressWarnings({
+        FTs[[paste(group$group, collapse = ":")]] <-
+          FrequencyTable(data[group$els, var])
+      }, classes = "IncompleteRangeWarning")
     
   }
   
-  # FTs[[".all:.all"]] <-FrequencyTable(data[[var]])
+  incompletes <- names(FTs)[sapply(FTs, \(ft) ft$status$range == "incomplete")]
+  
+  if (length(incompletes) > 0)
+    GFQ_incomplete_warning(incompletes)
+  
   attr(FTs, "conditions") <- conditions
   class(FTs) <- "GroupedFrequencyTable"
   

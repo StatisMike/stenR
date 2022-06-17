@@ -380,10 +380,10 @@ sum_items_to_scale <- function(
     data,
     ...,
     retain = FALSE,
-    .dots) {
+    .dots = list()) {
   
-  if (!missing(.dots)) 
-    ScaleSpacs <- .dots
+  if (length(.dots) != 0) 
+    ScaleSpecs <- .dots
   else
     ScaleSpecs <- list(...)
   
