@@ -8,8 +8,7 @@ intersect_GroupAssignment(
   GA1,
   GA2,
   force_disjoint = TRUE,
-  force_exhaustive = FALSE,
-  .all = FALSE
+  force_exhaustive = FALSE
 )
 }
 \arguments{

@@ -134,9 +134,7 @@ GroupAssignment <- function(data,
                             skip_faulty = FALSE,
                             .all = FALSE,
                             ...) {
-  
-  # browser()
-  
+
   # checks
   if (!is.data.frame(data))
     stop("Data provided should be in `data.frame` form.")
@@ -346,8 +344,7 @@ intersect_GroupAssignment <- function(
     GA1, 
     GA2, 
     force_disjoint = TRUE, 
-    force_exhaustive = FALSE,
-    .all = FALSE) {
+    force_exhaustive = FALSE) {
   
   if(any(!is.GroupAssignment(GA1), !is.GroupAssignment(GA2)))
     stop("Both 'GA1' and 'GA2' need to be of the 'GroupAssignment' class.")
@@ -440,17 +437,6 @@ intersect_GroupAssignment <- function(
     }
   }
   
-  # if (isTRUE(.all)) {
-  #   
-  #   out_i <- list(group = ".all:.all",
-  #                 els = unique(c(unlist(sapply(GA1, \(x) x$els)),
-  #                                unlist(sapply(GA2, \(x) x$els)))
-  #                              )
-  #                 )
-  #   out <- c(out, list(out_i))
-  #   
-  # }
-  
   # finalize
   attr(out, "mode") <- attr(GA1, "mode")
   if (attr(out, "mode") == "id")
@@ -493,6 +479,7 @@ intersect_GroupAssignment <- function(
 #'   - *data.frame* if `extract_mode = 'data.frame'` or if only one group is to be
 #'   returned and `simplify = TRUE`
 #' @family observation grouping functions 
+#' @example /examples/extract_observations.R
 #' @export
 
 extract_observations <- function(
