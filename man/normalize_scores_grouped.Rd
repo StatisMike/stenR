@@ -98,7 +98,7 @@ normalized_to_STEN <- normalize_scores_grouped(
   vars = "N",
   NEU_gst,
   what = "stanine",
-  retain = F,
+  retain = FALSE,
   group_col = "sex_age_group"
 )
 

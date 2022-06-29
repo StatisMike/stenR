@@ -1,13 +1,13 @@
 #### Create Group Conditions ####
 sex_grouping <- GroupConditions(
-  condition_category = "Sex",
+  conditions_category = "Sex",
   "M" ~ sex == "M",
   "F" ~ sex == "F",
   "O" ~ !sex %in% c("M", "F")
 )
 
 age_grouping <- GroupConditions(
-  condition_category = "Age",
+  conditions_category = "Age",
   "to 20" ~ age < 20,
   "20 to 40" ~ age >= 20 & age <= 40,
   "41 to 60" ~ age > 40 & age <= 60,
@@ -35,7 +35,7 @@ extracted <- extract_observations(
   groups = intersected,
   group_names = c("M"),
   extract_mode = "data.frame",
-  strict_names = F)
+  strict_names = FALSE)
 
 # only groups created from "M" group were extracted
 # groups without observations were dropped

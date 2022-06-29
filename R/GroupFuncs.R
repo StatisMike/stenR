@@ -243,8 +243,7 @@ GroupAssignment <- function(data,
       out <- c(out, list(out_i))
     } else {
       exhaustive <- FALSE
-      warning("Some observations were not assigned on provided condition.",
-              " Set the `force_exhaustive` to `TRUE` to gather them in `.NA` group.")
+      warning(GA_exhaustive_warning)
     }
   }
   

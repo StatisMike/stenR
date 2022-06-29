@@ -214,9 +214,6 @@ GroupedScoreTable <- function(table,
   return(STs)
 }
 
-#' @param gst A `GroupedScoreTable` object
-#' 
-
 #' @title Gerenic plot of the GroupedScoreTable
 #' @description Generic plot using `ggplot2`. It plots ScoreTables for all 
 #' groups by default, or only chosen ones using when `group_names` argument is specified. 
@@ -249,7 +246,7 @@ plot.GroupedScoreTable <- function(
       if (!any(group_names %in% names(gst)))
         stop("Not all names specified in 'group_names' specify group names")
     } else {
-      all_names <- unique(strsplit(names(gst), split = ":"))
+      all_names <- unique(unlist(strsplit(names(gst), split = ":")))
       if (!any(group_names %in% all_names))
         stop("Not all names specified in 'group_names' specify group names")
     }
@@ -354,7 +351,7 @@ plot.GroupedScoreTable <- function(
     
   } else {
     
-    plot_data$group1 <- factor(plot_data$group1, levels = c(".all", attr(attr(gst, "conditions"), "groups")))
+    plot_data$group1 <- factor(plot_data$group1, levels = c(".all", attr(attr(gst, "conditions")[[1]], "groups")))
     
     plot <- ggplot2::ggplot(plot_data, ggplot2::aes(x = x, y = prop)) + 
       ggplot2::geom_col(ggplot2::aes(fill = SD), alpha = 0.3, color = "black") + 

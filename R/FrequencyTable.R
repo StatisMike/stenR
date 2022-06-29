@@ -59,7 +59,7 @@ FrequencyTable <- function(data) {
   if(!(length(table$score) == last_score - first_score + 1)){
     
     #generate warning and update status correctly
-    FQ_incomplete_warning()
+    warning(FQ_incomplete_warning)
     status <- list(range = "incomplete",
                    n = sum(table$n))
     
@@ -255,35 +255,42 @@ GroupedFrequencyTable <- function(data,
   
   if (!is.data.frame(data))
     stop("Object of class 'data.frame' need to be provided to 'data' argument.")
-  if (!is.GroupConditions(conditions) &&
-      !(is.list(conditions) && all(sapply(conditions, is.GroupConditions))))
-    stop("Objects of class 'GroupConditions' or list of such objects need to be provided to 'condition' argument.")
-  if (!is.GroupConditions(conditions) && length(conditions) > 2)
-    stop("Up to two 'GroupConditions' can be provided.")
   if (!is.character(var) || length(var) != 1 || !var %in% names(data))
     stop("Name of one variable present in the 'data' needs to be passed to the 'var' argument.")
   
-  if (!is.GroupConditions(conditions)) {
+  if (is.GroupConditions(conditions))
+    conditions <- list(conditions)
+  if (!all(sapply(conditions, is.GroupConditions)))
+    stop("Object of class 'GroupConditions' or list of such objects need to be provided to 'conditions' argument.")
+  if (length(conditions) > 2)
+    stop("Up to two 'GroupConditions' can be provided.")
+  
+  if (length(conditions) == 2) {
     
-    indices <- intersect_GroupAssignment(
-      GA1 = GroupAssignment(data, conditions = conditions[[1]],
-                            force_exhaustive = FALSE,
-                            force_disjoint = force_disjoint,
-                            .all = TRUE),
-      GA2 = GroupAssignment(data, conditions = conditions[[2]],
-                            force_exhaustive = FALSE,
-                            force_disjoint = force_disjoint,
-                            .all = TRUE),
-      force_disjoint = force_disjoint,
-      force_exhaustive = FALSE
-      
+    suppressWarnings(
+      indices <- intersect_GroupAssignment(
+        GA1 = GroupAssignment(data, conditions = conditions[[1]],
+                              force_exhaustive = FALSE,
+                              force_disjoint = force_disjoint,
+                              .all = TRUE),
+        GA2 = GroupAssignment(data, conditions = conditions[[2]],
+                              force_exhaustive = FALSE,
+                              force_disjoint = force_disjoint,
+                              .all = TRUE),
+        force_disjoint = force_disjoint,
+        force_exhaustive = FALSE),
+      class = "NonExhaustiveWarning"
     )
+    
   } else 
-    indices <- GroupAssignment(data = data,
-                               conditions = conditions,
-                               force_exhaustive = FALSE,
-                               force_disjoint = force_disjoint,
-                               .all = TRUE)
+    suppressWarnings(
+      indices <- GroupAssignment(data = data,
+                                 conditions = conditions[[1]],
+                                 force_exhaustive = FALSE,
+                                 force_disjoint = force_disjoint,
+                                 .all = TRUE),
+      class = "NonExhaustiveWarning")
+
   
   FTs <- list()
   
@@ -294,13 +301,12 @@ GroupedFrequencyTable <- function(data,
         FTs[[paste(group$group, collapse = ":")]] <-
           FrequencyTable(data[group$els, var])
       }, classes = "IncompleteRangeWarning")
-    
   }
   
   incompletes <- names(FTs)[sapply(FTs, \(ft) ft$status$range == "incomplete")]
   
   if (length(incompletes) > 0)
-    GFQ_incomplete_warning(incompletes)
+    warning(GFQ_incomplete_warning(incompletes))
   
   attr(FTs, "conditions") <- conditions
   class(FTs) <- "GroupedFrequencyTable"
@@ -338,7 +344,7 @@ plot.GroupedFrequencyTable <- function(
       if (!any(group_names %in% names(gft)))
         stop("Not all names specified in 'group_names' specify group names")
    } else {
-      all_names <- unique(strsplit(names(gft), split = ":"))
+      all_names <- unique(unlist(strsplit(names(gft), split = ":")))
       if (!any(group_names %in% all_names))
         stop("Not all names specified in 'group_names' specify group names")
     }
@@ -409,7 +415,7 @@ plot.GroupedFrequencyTable <- function(
     
   } else {
     
-    plot_data$group1 <- factor(plot_data$group1, levels = c(".all", attr(attr(gft, "conditions"), "groups")))
+    plot_data$group1 <- factor(plot_data$group1, levels = c(".all", attr(attr(gft, "conditions")[[1]], "groups")))
     
     plot <- 
       ggplot2::ggplot(data = plot_data, ggplot2::aes(x = score, y = n)) + 

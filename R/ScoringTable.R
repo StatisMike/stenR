@@ -196,7 +196,8 @@ to_ScoringTable.GroupedScoreTable <- function(
   out <- Reduce(\(x, y) dplyr::full_join(x, y, by = scale), tables)
   out <- out[order(out[[1]]), ]
   
-  class(out) <- c("ScoringTable", class(out))
+  attr(out, "grouped") <- TRUE
+  class(out) <- c("ScoringTable", "data.frame")
   attr(out, "conditions") <- attr(table, "conditions")
   return(out)
   
@@ -208,6 +209,25 @@ is.ScoringTable <- function(x) {
   inherits(x, "ScoringTable")
   
 }
+
+#' Conditions to data.frame
+#' @param cond list of *GroupConditions*
+#' @keywords internal
+#' 
+cond_to_df <- function(cond) {
+  
+  cond_ls <- lapply(cond, \(x) {
+    
+    data.frame(
+      category = attr(x, "cond_category"),
+      group = attr(x, "groups"),
+      conditions = attr(x, "conditions")
+    )
+    
+  })
+  cond_df <- dplyr::bind_rows(cond_ls)
+  return(cond_df)
+} 
 
 #' @title Export ScoringTable
 #' @description After creation of *ScoringTable* it can be handy to export it
@@ -260,9 +280,10 @@ export_ScoringTable <- function(table,
                )
                
              })
-           cond_df <- dplyr::bind_rows(cond_ls)
-           write.csv(cond_df, conditions_file, row.names = F)
-           }
+             cond_df <- dplyr::bind_rows(cond_ls)
+             write.csv(cond_df, conditions_file, row.names = F)
+           } else if (!is.null(attr(table, "conditions"))) 
+             message("Exported ScoringTable based on GroupedScoreTable without exporting conditions.")
          },
          json = {
            out <- list(ScoringTable = table)
@@ -270,8 +291,8 @@ export_ScoringTable <- function(table,
              
              out[["GroupConditions"]] <- 
                lapply(cond, \(x) 
-                 setNames(as.list(attr(x, "conditions")), 
-                          nm = attr(x, "groups")))
+                      setNames(as.list(attr(x, "conditions")), 
+                               nm = attr(x, "groups")))
              
              names(out[["GroupConditions"]]) <- sapply(cond, \(x) attr(x, "cond_category"))
            }
@@ -302,37 +323,75 @@ import_ScoringTable <- function(
   
   method <- match.arg(method)
   
-  switch(method,
-         
-         csv = {
-           st_read <- read.table(source_file)
-           st_df <- st_read[-1, ]
-           names(st_df = as.character(st_read[1, ]))
-           out <- list(st = st_df)
-           
-           
-         },
-         json = {
-           
-           st_read <- jsonlite::read_json(source_file, simplifyVector = F)
-           st_df <- st_read[["ScoringTable"]]
-           st_df <- as.data.frame(dplyr::bind_rows(st_df))
-           
-           
-           if (!is.null(st_read[["GroupConditions"]])) {
-             gc_df <- lapply(st_read[["GroupConditions"]], \(cond) {
-               data.frame(group = names(cond), condition = unlist(cond), row.names = NULL)
-             })
-             
-             out <- list(st_df = st_df,
-                         gc_df = dplyr::bind_rows(gc_df, .id = "category"))
-             
-           } else {
-             
-             out <- list(ScoringTable = st_df)
-             
-           }
-         })
+  out <- switch(method,
+                
+                csv = {
+                  st_read <- read.table(source_file, sep = ",")
+                  st_df <- st_read[-1, ]
+                  names(st_df) <- as.character(st_read[1, ])
+                  rownames(st_df) <- NULL
+                  out <- list(st = st_df)
+                  
+                  if (ncol(st_df) > 2) {
+                    
+                    # priority: handle conditions provided
+                    if (!missing(conditions)) {
+                      if (is.GroupConditions(conditions))
+                        conditions <- list(conditions)
+                      gc_df <- cond_to_df(conditions)
+                      
+                    } else if (!missing(cond_file)) {
+                      gc_df <- read.csv(cond_file)
+                    } else {
+                      stop("When importing ScoringTable with groups, provide either 'cond_file' or 'conditions' arguments")
+                    }
+                    out[["gc"]] <- gc_df
+                  }
+                  
+                  out
+                },
+                
+                json = {
+                  
+                  st_read <- jsonlite::read_json(source_file, simplifyVector = T)
+                  st_df <- st_read[["ScoringTable"]]
+                  st_df <- as.data.frame(dplyr::bind_rows(st_df))
+                  
+                  
+                  if (!is.null(st_read[["GroupConditions"]]) && ncol(st_read[["ScoringTable"]]) > 2) {
+                    gc_df <- lapply(st_read[["GroupConditions"]], \(cond) {
+                      data.frame(group = names(cond), condition = unlist(cond), row.names = NULL)
+                    })
+                    
+                    out <- list(st = st_df,
+                                gc = dplyr::bind_rows(gc_df, .id = "category"))
+                    
+                  } else if (ncol(st_read[["ScoringTable"]]) == 2){
+                    
+                    out <- list(st = st_df)
+                    
+                  }
+                  
+                  # if conditions are provided, overwrite them
+                  if (!missing(conditions) && ncol(st_read[["ScoringTable"]]) > 2) {
+                    if (is.GroupConditions(conditions))
+                      conditions <- list(conditions)
+                    out[["gc"]] <- cond_to_df(conditions)
+                    
+                  }
+                  
+                  out
+                })
+  
+  st_out <- out[["st"]]
+  if (!is.null(out[["gc"]])) {
+    attr(st_out, "grouped") <- TRUE
+    attr(st_out, "conditions") <- verify_GC_for_ST(out[["st"]], out[["gc"]])
+  } else
+    attr(st_out, "grouped") <- FALSE
+  
+  class(st_out) <- c("ScoringTable", class(st_out))
+  return(st_out)
   
 }
 
@@ -389,7 +448,7 @@ verify_GC_for_ST <- function(st_df, gc_df) {
   
   out <- lapply(groups, \(x) {
     
-    conds <- paste0("'", x$groups[!grepl(x = x$groups, pattern = "^.")], 
+    conds <- paste0("'", x$groups[!grepl(x = x$groups, pattern = "^\\.")], 
                     "' ~ ", x$conditions)
     conds <- lapply(conds, as.formula)
     
