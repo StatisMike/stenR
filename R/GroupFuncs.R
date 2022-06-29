@@ -11,7 +11,7 @@ formula_check <- function(group_formula) {
   if (strtrim(lhs_val, 1) == ".")
     stop("User-defined group name can't begin with reserved symbol'.'")
   if (grepl(lhs_val, pattern = ":"))
-    stop("User-defined group name can't contain reserveds symbol ':'")
+    stop("User-defined group name can't contain reserved symbol ':'")
   
   rhs_val <- rlang::f_rhs(group_formula)
   
@@ -26,6 +26,8 @@ formula_check <- function(group_formula) {
 #' object, holding the basis of observation grouping. Objects of this class
 #' can be provided to complex functions to automatically group observations
 #' accordingly.
+#' @param conditions_category *chracter* value describing character of the group 
+#' conditions. Mainly informative.
 #' @param ... *formulas* that will be used to determine group
 #' to which the observation should be assigned to. LHS should contain name of the
 #' group, and RHS: condition which can return `TRUE` or `FALSE`
@@ -37,13 +39,22 @@ formula_check <- function(group_formula) {
 #' be forced in case when there are observations that don't pass any of the provided
 #' conditions. If `TRUE`, then they will be assigned to `.NA` group. Defaults
 #' to `FALSE`
+#' @param .dots *formulas* in form of a *list*
 #' @return *GroupConditions* object
 #' @example examples/GroupConditions.R
 #' @export
 
-GroupConditions <- function(..., force_disjoint = TRUE, force_exhaustive = FALSE) {
+GroupConditions <- function(
+    conditions_category, 
+    ..., 
+    force_disjoint = TRUE, 
+    force_exhaustive = FALSE,
+    .dots = list()) {
   
-  formulas <- list(...)
+  if (length(.dots) > 0) 
+    formulas <- .dots
+  else
+    formulas <- list(...)
   
   formula_vars <- unique(sapply(formulas, formula_check))
   
@@ -51,6 +62,7 @@ GroupConditions <- function(..., force_disjoint = TRUE, force_exhaustive = FALSE
     stop("No variables are tested with specified conditions.")
   
   class(formulas) <- "GroupConditions"
+  attr(formulas, "cond_category") <- conditions_category
   attr(formulas, "formula_vars") <- formula_vars
   attr(formulas, "force_disjoint") <- isTRUE(force_disjoint)
   attr(formulas, "force_exhaustive") <- isTRUE(force_exhaustive)
@@ -75,6 +87,7 @@ is.GroupConditions <- function(x) {
 
 print.GroupConditions <- function(x) {
   cat("<GroupConditions>\n")
+  cat("Conditions category:", attr(x, "cond_category"), "\n")
   cat("For", length(unique(attr(x, "groups"))), "unique groups\n\n")
   cat("Conditions ")
   cat("[Tested vars: ", paste(attr(x, "formula_vars"), collapse = ", "), "]:\n", sep = "")

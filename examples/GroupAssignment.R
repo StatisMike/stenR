@@ -1,4 +1,5 @@
 age_grouping <- GroupConditions(
+  conditions_category = "Age",
   "to 20" ~ age < 20,
   "20 to 40" ~ age >= 20 & age <= 40,
   "40 to 60" ~ age >= 40 & age < 60

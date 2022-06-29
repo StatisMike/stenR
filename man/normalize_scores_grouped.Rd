@@ -51,6 +51,7 @@ contain columns used in \emph{GroupingConditions} attached to the table
 \examples{
 #### create GroupConditions for calculating tables ####
 age_grouping <- GroupConditions(
+  conditions_category = "Age",
   "below 18" ~ age < 18,
   "18-22" ~ age >= 18 & age <= 22,
   "23-26" ~ age >= 23 & age <= 26,
@@ -60,6 +61,7 @@ age_grouping <- GroupConditions(
   "above 60" ~ age > 60
 )
 sex_grouping <- GroupConditions(
+  conditions_category = "Sex",
   "Male" ~ sex == "M",
   "Female" ~ sex == "F"
 )

@@ -6,13 +6,22 @@
 \alias{print.GroupConditions}
 \title{Conditions for observation grouping}
 \usage{
-GroupConditions(..., force_disjoint = TRUE, force_exhaustive = FALSE)
+GroupConditions(
+  conditions_category,
+  ...,
+  force_disjoint = TRUE,
+  force_exhaustive = FALSE,
+  .dots = list()
+)
 
 is.GroupConditions(x)
 
 \method{print}{GroupConditions}(x)
 }
 \arguments{
+\item{conditions_category}{\emph{chracter} value describing character of the group
+conditions. Mainly informative.}
+
 \item{...}{\emph{formulas} that will be used to determine group
 to which the observation should be assigned to. LHS should contain name of the
 group, and RHS: condition which can return \code{TRUE} or \code{FALSE}}
@@ -26,6 +35,8 @@ the group the observation will be assigned to.}
 be forced in case when there are observations that don't pass any of the provided
 conditions. If \code{TRUE}, then they will be assigned to \code{.NA} group. Defaults
 to \code{FALSE}}
+
+\item{.dots}{\emph{formulas} in form of a \emph{list}}
 
 \item{x}{object}
 }
@@ -42,6 +53,7 @@ accordingly.
 # create GroupConditions with formula-style conditions per each group
 
 sex_grouping <- GroupConditions(
+  conditions_category = "Sex",
   "M" ~ sex == "M",
   "F" ~ sex == "F",
   "O" ~ !sex \%in\% c("M", "F")
@@ -52,6 +64,7 @@ print(sex_grouping)
 # with forced disjoint (default `TRUE`) and exhaustiveness (default `FALSE`)
 
 age_grouping <- GroupConditions(
+  conditions_category = "Age",
   "to 20" ~ age < 20,
   "20 to 40" ~ age >= 20 & age <= 40,
   "40 to 60" ~ age >= 40 & age < 60,

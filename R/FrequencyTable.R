@@ -255,15 +255,15 @@ GroupedFrequencyTable <- function(data,
   
   if (!is.data.frame(data))
     stop("Object of class 'data.frame' need to be provided to 'data' argument.")
-  if (any(!is.GroupConditions(conditions)) &&
+  if (!is.GroupConditions(conditions) &&
       !(is.list(conditions) && all(sapply(conditions, is.GroupConditions))))
     stop("Objects of class 'GroupConditions' or list of such objects need to be provided to 'condition' argument.")
-  if (length(conditions) > 2)
+  if (!is.GroupConditions(conditions) && length(conditions) > 2)
     stop("Up to two 'GroupConditions' can be provided.")
   if (!is.character(var) || length(var) != 1 || !var %in% names(data))
     stop("Name of one variable present in the 'data' needs to be passed to the 'var' argument.")
   
-  if (length(conditions) == 2) {
+  if (!is.GroupConditions(conditions)) {
     
     indices <- intersect_GroupAssignment(
       GA1 = GroupAssignment(data, conditions = conditions[[1]],
@@ -282,7 +282,8 @@ GroupedFrequencyTable <- function(data,
     indices <- GroupAssignment(data = data,
                                conditions = conditions,
                                force_exhaustive = FALSE,
-                               force_disjoint = force_disjoint)
+                               force_disjoint = force_disjoint,
+                               .all = TRUE)
   
   FTs <- list()
   
