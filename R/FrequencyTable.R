@@ -59,7 +59,7 @@ FrequencyTable <- function(data) {
   if(!(length(table$score) == last_score - first_score + 1)){
     
     #generate warning and update status correctly
-    warning(FQ_incomplete_warning)
+    message(FQ_incomplete_message)
     status <- list(range = "incomplete",
                    n = sum(table$n))
     
@@ -243,6 +243,10 @@ SimFrequencyTable <- function(
 #' @param force_disjoint *boolean*. It is recommended to keep it as default
 #' `FALSE`, unless the sample size is very big and it is completely mandatory
 #' to have the groups disjointed.
+#' @param .all *boolean* indicating if `.all` or `.all1` and `.all2` groups
+#' should be generated. If they are not generated, all score normalization
+#' procedures will fail if the observation can't be assigned to any of the
+#' provided conditions, leaving it's score as `NA`. Defaults to `TRUE`
 #' @details `force_exhaustive` will always be checked as `FALSE` during the
 #' calculations. It is mandatory for validity of the created *FrequencyTables*
 #' @seealso plot.GroupedFrequencyTable
@@ -251,7 +255,8 @@ SimFrequencyTable <- function(
 GroupedFrequencyTable <- function(data,
                                   conditions,
                                   var,
-                                  force_disjoint = FALSE) {
+                                  force_disjoint = FALSE,
+                                  .all = TRUE) {
   
   if (!is.data.frame(data))
     stop("Object of class 'data.frame' need to be provided to 'data' argument.")
@@ -272,11 +277,11 @@ GroupedFrequencyTable <- function(data,
         GA1 = GroupAssignment(data, conditions = conditions[[1]],
                               force_exhaustive = FALSE,
                               force_disjoint = force_disjoint,
-                              .all = TRUE),
+                              .all = isTRUE(.all)),
         GA2 = GroupAssignment(data, conditions = conditions[[2]],
                               force_exhaustive = FALSE,
                               force_disjoint = force_disjoint,
-                              .all = TRUE),
+                              .all = isTRUE(.all)),
         force_disjoint = force_disjoint,
         force_exhaustive = FALSE),
       class = "NonExhaustiveWarning"
@@ -288,7 +293,7 @@ GroupedFrequencyTable <- function(data,
                                  conditions = conditions[[1]],
                                  force_exhaustive = FALSE,
                                  force_disjoint = force_disjoint,
-                                 .all = TRUE),
+                                 .all = isTRUE(.all)),
       class = "NonExhaustiveWarning")
 
   
@@ -297,10 +302,10 @@ GroupedFrequencyTable <- function(data,
   for (group in indices) {
     
     if (length(group$els) > 0)
-      suppressWarnings({
+      suppressMessages({
         FTs[[paste(group$group, collapse = ":")]] <-
           FrequencyTable(data[group$els, var])
-      }, classes = "IncompleteRangeWarning")
+      }, classes = "IncompleteRangeMessage")
   }
   
   incompletes <- names(FTs)[sapply(FTs, \(ft) ft$status$range == "incomplete")]
@@ -308,6 +313,7 @@ GroupedFrequencyTable <- function(data,
   if (length(incompletes) > 0)
     warning(GFQ_incomplete_warning(incompletes))
   
+  attr(FTS, "all") <- isTRUE(.all)
   attr(FTs, "conditions") <- conditions
   class(FTs) <- "GroupedFrequencyTable"
   
@@ -386,8 +392,10 @@ plot.GroupedFrequencyTable <- function(
   
   if ("group2" %in% names(plot_data)) {
     
-    plot_data$group1 <- factor(plot_data$group1, levels = c(".all1", attr(attr(gft, "conditions")[[1]], "groups")))
-    plot_data$group2 <- factor(plot_data$group2, levels = c(".all2", attr(attr(gft, "conditions")[[2]], "groups")))
+    plot_data$group1 <- factor(plot_data$group1, 
+                               levels = c(if (attr(gft, "all")) ".all1", attr(attr(gft, "conditions")[[1]], "groups")))
+    plot_data$group2 <- factor(plot_data$group2, 
+                               levels = c(if (attr(gft, "all")) ".all2", attr(attr(gft, "conditions")[[2]], "groups")))
     
     grp1_row <- length(unique(plot_data$group2)) < length(unique(plot_data$group1))
     
@@ -415,7 +423,8 @@ plot.GroupedFrequencyTable <- function(
     
   } else {
     
-    plot_data$group1 <- factor(plot_data$group1, levels = c(".all", attr(attr(gft, "conditions")[[1]], "groups")))
+    plot_data$group1 <- factor(plot_data$group1, 
+                               levels = c(if (attr(gft, "all")) ".all", attr(attr(gft, "conditions")[[1]], "groups")))
     
     plot <- 
       ggplot2::ggplot(data = plot_data, ggplot2::aes(x = score, y = n)) + 

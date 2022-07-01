@@ -1,33 +1,5 @@
-#' Internal function for picking up the individual value from ScoringTable
-#' @param x raw score
-#' @param col_raw Column of raw scores from ScoringTable
-#' @param col_score COlumn of StandardScale score from ScoringTable
-#' @keywords internal
 
-check_score_between <- function(x, col_raw, col_score) {
-  
-  if (length(x) != 1)
-    stop("'x' argument need to be one raw score value.")
-  
-  if (is.na(x))
-    return(as.numeric(NA))
-  
-  x <- as.numeric(x)
-  
-  splitscore <- strsplit(col_raw, split = "-")
-  splitscore <- lapply(splitscore, as.numeric)
-  score_n <- which(sapply(splitscore, \(score) x %in% score[1]:score[2]))
-  
-  if (length(score_n) < 1) {
-    if (x < min(unlist(splitscore)))
-      score_n <- 1
-    else  if (x > max(unlist(splitscore)))
-      score_n <- length(splitscore)
-  }
-  
-  return(col_score[score_n])
-  
-}
+
 
 
 #' @title Pivot wide ScoringTable csv into longer
@@ -403,6 +375,8 @@ import_ScoringTable <- function(
 #' @keywords internal
 
 verify_GC_for_ST <- function(st_df, gc_df) {
+  
+  browser()
   
   group_cols <- names(st_df)[-1]
   

@@ -103,3 +103,10 @@ for (ST in list(NEO_N_ST, NEO_N_1gST, NEO_N_2gST)) {
 }
 
 
+###  import scoretable created by hand  ###
+
+SLCS_ST <- import_ScoringTable(
+  "../stenR_scoringTable.csv",
+  "csv",
+  conditions = list(sex_grouping_sh, ageNstu_grouping)
+)

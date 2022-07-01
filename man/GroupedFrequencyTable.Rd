@@ -6,7 +6,13 @@
 \alias{summary.GroupedFrequencyTable}
 \title{Create GroupedFrequencyTable}
 \usage{
-GroupedFrequencyTable(data, conditions, var, force_disjoint = FALSE)
+GroupedFrequencyTable(
+  data,
+  conditions,
+  var,
+  force_disjoint = FALSE,
+  .all = TRUE
+)
 
 \method{print}{GroupedFrequencyTable}(gft)
 
@@ -25,6 +31,11 @@ then intersection of groups will be made.}
 \item{force_disjoint}{\emph{boolean}. It is recommended to keep it as default
 \code{FALSE}, unless the sample size is very big and it is completely mandatory
 to have the groups disjointed.}
+
+\item{.all}{\emph{boolean} indicating if \code{.all} or \code{.all1} and \code{.all2} groups
+should be generated. If they are not generated, all score normalization
+procedures will fail if the observation can't be assigned to any of the
+provided conditions, leaving it's score as \code{NA}. Defaults to \code{TRUE}}
 
 \item{gft}{A \code{GroupedFrequencyTable} object}
 }

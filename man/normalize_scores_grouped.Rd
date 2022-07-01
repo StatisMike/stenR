@@ -108,6 +108,7 @@ head(normalized_to_STEN)
 \seealso{
 Other score-normalization functions: 
 \code{\link{normalize_scores_df}()},
+\code{\link{normalize_scores_scoring}()},
 \code{\link{normalize_score}()}
 }
 \concept{score-normalization functions}

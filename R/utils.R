@@ -30,18 +30,45 @@
   bad_id_name = "Please provide valid column name containing ids."
 )
 
-FQ_incomplete_warning <- 
-  warningCondition("There are missing score values between minimum and maximum scores. They have been filled automatically.",
-                   class = "IncompleteRangeWarning")
+FQ_incomplete_message <- 
+  structure(list(message = "There are missing score values between minimum and maximum scores. They have been filled automatically.",
+                 call = NULL), class = c("IncompleteRangeMessage", "condition"))
 
-GFQ_incomplete_warning <- function(groups) {
+GFQ_incomplete_message <- function(groups) {
   parsed_groups <- paste(groups, collapse = "', '")
-  warningCondition(message = paste0("There are missing score values between minimum and maximum scores for some groups:\n",
-                                    "'", parsed_groups, "'\n",
-                                    "They have been filled automatically."),
-                   class = "IncompleteRangeWarning")
+  structure(list(message = paste0("There are missing score values between minimum and maximum scores for some groups:\n",
+                                    "'", parsed_groups, "'. They have been filled automatically."),
+                 call = NULL), class = c("IncompleteRangeMessage", "condition"))
 }
 
 GA_exhaustive_warning <- 
   warningCondition(message = "Some observations were not assigned on provided condition. Set the `force_exhaustive` to `TRUE` to gather them in `.NA` group.",
                    class = "NonExhaustiveWarning")
+
+
+
+#' @title Mockup NA table
+#' @description Creates mockup table if none is available for given group. Used in
+#' [normalize_scores_grouped()]. All results passed through it will have their values
+#' "normalized" into `NA`
+#' @param table Table to mockup
+#' @keywords internal
+
+mockNAtable <- function(table) {
+  
+  mockup <- data.frame(
+    score = table$table[["score"]]
+  )
+  
+  for(col in names(table$table)[-1:-2])
+    mockup[[col]] <- NA
+  
+  out <- list(table = mockup)
+  
+  if ("scale" %in% names(table))
+    out[["scale"]] <- table[["scale"]]
+  
+  class(out) <- class(table)
+  return(out)
+  
+}

@@ -40,6 +40,7 @@ normalize_score(HEXACO_60$HEX_H[1:5], st, what = "stanine")
 \seealso{
 Other score-normalization functions: 
 \code{\link{normalize_scores_df}()},
-\code{\link{normalize_scores_grouped}()}
+\code{\link{normalize_scores_grouped}()},
+\code{\link{normalize_scores_scoring}()}
 }
 \concept{score-normalization functions}
