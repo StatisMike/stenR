@@ -58,11 +58,6 @@ FrequencyTable <- function(data) {
   # if there are any, there is a need to add missing values
   if(!(length(table$score) == last_score - first_score + 1)){
     
-    #generate warning and update status correctly
-    message(FQ_incomplete_message)
-    status <- list(range = "incomplete",
-                   n = sum(table$n))
-    
     # generate table with all score values
     complete_table <- data.frame(score = first_score:last_score)
     complete_table$score <- as.character(complete_table$score)
@@ -77,8 +72,16 @@ FrequencyTable <- function(data) {
       }
     }
     table <- complete_table
+    
+    #generate warning and update status correctly
+    status <- list(range = "incomplete",
+                   incompletes = table[which(table$n == 0), "score"],
+                   n = sum(table$n))
+    FQ_incomplete_message(status$incompletes, nrow(table))
+    
   } else {
     status <- list(range = "complete",
+                   incompletes = NULL,
                    n = sum(table$n))
   }
   
@@ -308,12 +311,18 @@ GroupedFrequencyTable <- function(data,
       }, classes = "IncompleteRangeMessage")
   }
   
-  incompletes <- names(FTs)[sapply(FTs, \(ft) ft$status$range == "incomplete")]
+  inc_groups <- names(FTs)[sapply(FTs, \(ft) ft$status$range == "incomplete")]
+  inc_vals <- lapply(FTs[sapply(FTs, \(ft) ft$status$range == "incomplete")],
+                     \(x) x$status$incompletes)
+  inc_totals <- sapply(FTs[sapply(FTs, \(ft) ft$status$range == "incomplete")],
+                       \(x) nrow(x$table))
   
-  if (length(incompletes) > 0)
-    warning(GFQ_incomplete_warning(incompletes))
+  if (length(inc_groups) > 0)
+    GFQ_incomplete_message(inc_groups,
+                           inc_vals,
+                           inc_totals)
   
-  attr(FTS, "all") <- isTRUE(.all)
+  attr(FTs, "all") <- isTRUE(.all)
   attr(FTs, "conditions") <- conditions
   class(FTs) <- "GroupedFrequencyTable"
   

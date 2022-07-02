@@ -30,20 +30,34 @@
   bad_id_name = "Please provide valid column name containing ids."
 )
 
-FQ_incomplete_message <- 
-  structure(list(message = "There are missing score values between minimum and maximum scores. They have been filled automatically.",
-                 call = NULL), class = c("IncompleteRangeMessage", "condition"))
-
-GFQ_incomplete_message <- function(groups) {
-  parsed_groups <- paste(groups, collapse = "', '")
-  structure(list(message = paste0("There are missing score values between minimum and maximum scores for some groups:\n",
-                                    "'", parsed_groups, "'. They have been filled automatically."),
-                 call = NULL), class = c("IncompleteRangeMessage", "condition"))
+FQ_incomplete_message <- function(incompletes, total) {
+  
+  cli::cli_inform(
+    message = c("i" = "There are missing raw score values between minimum and maximum raw scores. They have been filled automatically.",
+                " " = "No. missing: {length(incompletes)}/{total} [{round(length(incompletes)/total*100, 2)}%]"),
+    class = "IncompleteRangeMessage"
+  )  
 }
+    
+  
 
-GA_exhaustive_warning <- 
-  warningCondition(message = "Some observations were not assigned on provided condition. Set the `force_exhaustive` to `TRUE` to gather them in `.NA` group.",
-                   class = "NonExhaustiveWarning")
+GFQ_incomplete_message <- function(groups, incompletes, total) {
+  incompletes <- sapply(incompletes, length)
+  percentages <- sapply(seq_along(groups), \(i) paste0(round(incompletes[i]/total[i]*100, 2), "%"))
+  
+  cli::cli_inform(
+    message = c("i" = "There are missing raw score values between minimum and maximum raw scores for some groups. They have been filled automatically.",
+                setNames(nm = rep("*", length = length(groups)),
+                         object = sapply(seq_along(groups), 
+                                         \(i) paste0("{.field {groups[", i, "]}} No. missing: {incompletes[", i,"]}/{total[", i, "]}; {percentages[", i, "]}")))),
+    class = c("IncompleteRangeMessage")
+  )
+}
+  
+
+GA_exhaustive_warning <- function()
+  cli::cli_warn(c("!" = "Some observations were not assigned on provided condition. Set the {.code force_exhaustive = TRUE} to gather them in {.code .NA} group."),
+                class = "NonExhaustiveWarning")
 
 
 

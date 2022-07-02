@@ -243,7 +243,7 @@ GroupAssignment <- function(data,
       out <- c(out, list(out_i))
     } else {
       exhaustive <- FALSE
-      warning(GA_exhaustive_warning)
+      GA_exhaustive_warning()
     }
   }
   
@@ -444,8 +444,7 @@ intersect_GroupAssignment <- function(
       out <- c(out, list(out_i))
     } else {
       exhaustive <- FALSE
-      warning("Some observations were not assigned on provided condition.",
-              " Set the `force_exhaustive` to `TRUE` to gather them in `.NA` group.")
+      GA_exhaustive_warning()
     }
   }
   

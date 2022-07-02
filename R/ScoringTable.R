@@ -1,6 +1,4 @@
-
-
-
+#### INTERNAL, UNUSED ####
 
 #' @title Pivot wide ScoringTable csv into longer
 #' @description Pivot wide ScoringTable into longer table with raw scores 
@@ -88,6 +86,8 @@ create_st <- function(short_st,
   
   return(out_score)
 }
+
+#### EXPORTED ####
 
 #' @title Create ScoringTable
 #' @description ScoringTable is a simple version of *ScoreTable* or *GroupedScoreTable*,
@@ -375,8 +375,6 @@ import_ScoringTable <- function(
 #' @keywords internal
 
 verify_GC_for_ST <- function(st_df, gc_df) {
-  
-  browser()
   
   group_cols <- names(st_df)[-1]
   

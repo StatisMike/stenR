@@ -120,15 +120,9 @@ normalize_scores_df <- function(
   
   normalized <- dplyr::bind_cols(normalized)
   
-  if (isTRUE(retain)) {
-    data[, vars] <- normalized
-    out <- data
-  } else if (isFALSE(retain))
-    out <- normalized
-  else {
-    out <- dplyr::bind_cols(data[, retain, drop = F],
-                            normalized)
-  }
+  out <- handle_retain(data = data,
+                       output = normalized,
+                       retain = retain)
   
   return(out)
   
@@ -254,9 +248,11 @@ normalize_scores_grouped <- function(
     -which(names(normalized_all_groups) == ".temp_GroupAssignment_index")
   ]
   
-  ## TODO: retain!
+  out <- handle_retain(data = data,
+                       output = normalized_all_groups,
+                       retain = retain)
   
-  return(normalized_all_groups)
+  return(out)
   
 }
 
@@ -299,20 +295,14 @@ normalize_scores_scoring <- function(
     stop("One character value need to be passed to 'group_col'")
   
   tables <- list(...)
-  if (length(tables) == 0 && length(.dots) > 0)
+  if (length(.dots) > 0)
     tables <- .dots
   
-  if (!all(sapply(tables, \(x) class(x) %in% c("GroupedFrequencyTable", "GroupedScoreTable"))))
-    stop("All objects provided to '...' or '.dots' need to be of class 'GroupedFrequencyTable' or 'GroupedScoreTable'")
+  if (!all(sapply(tables, is.ScoringTable)))
+    stop("All objects provided to '...' or '.dots' need to be of class 'ScoringTable'")
   
   if (length(vars) != length(tables))
     stop("Number of provided tables and 'vars' to normalize need to be the same.")
-  
-  if (all(sapply(tables, \(x) class(x) == "GroupedScoreTable")) && !what %in% c("quan", "Z")) {
-    if (!all(sapply(tables, \(x) what %in% names(attr(x, "scales")))))
-      stop("Scale of the name provided in 'what' need to be available in all provided 'GroupedScoreTable' objects.")
-  } else if (!what %in% c("quan", "Z"))
-    stop("'what' argument can be one of: 'quan', 'Z' or name of the scale in provided 'GroupedScoreTable' objects.")
   
   if (".temp_GroupAssignment_index" %in% names(data))
     stop("Column name '.temp_GroupAssignment_index' is reserved for internal operations.")
@@ -320,7 +310,7 @@ normalize_scores_scoring <- function(
   # check if all conditions are the same
   conditions <- lapply(tables, attr, which = "conditions")
   
-  if (!all(sapply(lapply(list(NEO_N_ST, NEO_N_ST), attr, which = "conditions"), \(x) is.null(x)))) {
+  if (!all(sapply(lapply(tables, attr, which = "conditions"), \(x) is.null(x)))) {
     equal_comb <- all(sapply(conditions[-1], \(cond) identical(conditions[[1]], cond)))
     if (!isTRUE(equal_comb))
       stop("All ", class(tables[[1]]), " objects need to be created on the basis of the same 'GroupConditions'.")
@@ -339,8 +329,8 @@ normalize_scores_scoring <- function(
         sapply(data[[val_name]], \(x) 
                check_score_between(
                  x = x,
-                 col_raw = tables[[i_v]],
-                 col_score = tables[[i_v]][[2]]))
+                 col_raw = tables[[i_v]][[2]],
+                 col_score = tables[[i_v]][[1]]))
       
       out <- data.frame(var = out_var)
       names(out) <- val_name
@@ -351,8 +341,6 @@ normalize_scores_scoring <- function(
 
   } else {
     
-    # add temporary index to return the data in correct order
-    data[[".temp_GroupAssignment_index"]] <- paste(1:nrow(data), "index", sep = "_")
     groups <- qualify_to_groups(
       data = data,
       conditions = conditions
@@ -373,11 +361,11 @@ normalize_scores_scoring <- function(
           out_var <- rep(as.numeric(NA))
         else
           out_var <- 
-          sapply(groups[[i]][[val_name]], \(x) 
+          sapply(groups[[i_g]][[val_name]], \(x) 
                  check_score_between(
                    x = x,
-                   col_raw = tables[[i_v]],
-                   col_score = tables[[i_v]][[col_n]]))
+                   col_raw = tables[[i_v]][[col_n]],
+                   col_score = tables[[i_v]][[1]]))
         
         out <- data.frame(var = out_var)
         names(out) <- val_name
@@ -386,7 +374,7 @@ normalize_scores_scoring <- function(
       
       binded <- 
         dplyr::bind_cols(
-          c(list(groups[[i]][, ".temp_GroupAssignment_index", drop = FALSE]),
+          c(list(groups[[i_g]][, ".temp_GroupAssignment_index", drop = FALSE]),
             group_variables)
         )
       
@@ -403,9 +391,16 @@ normalize_scores_scoring <- function(
     out_data <- out_data[order(out_data[[".temp_GroupAssignment_index"]]), 
                          -which(names(out_data) == ".temp_GroupAssignment_index")]
     
-  } 
+  }
   
-  ## TODO: retain!
+  out_data <- handle_retain(data = data,
+                            output = out_data,
+                            retain = retain)
+  
+  rownames(out_data) <- NULL
+  
+  return(out_data)
+  
 
 }
 
@@ -420,6 +415,9 @@ normalize_scores_scoring <- function(
 
 qualify_to_groups <- function(data,
                               conditions) {
+  
+  # add temporary index to return the data in correct order
+  data[[".temp_GroupAssignment_index"]] <- paste(1:nrow(data), "index", sep = "_")
   
   # qualify observations to correct group
   # handle conditions to be intersected
@@ -489,4 +487,28 @@ check_score_between <- function(x, col_raw, col_score) {
   
   return(col_score[score_n])
   
+}
+
+#' Handle retain columns
+#' @description Internal function that handles *retain* columns in non-base
+#' normalize_scores functions
+#' @param data input data
+#' @param output output data.frame
+#' @param retain retain value
+#' @keywords internal
+
+handle_retain <- function(data, output, retain) {
+  
+  if (isFALSE(retain))
+    out <- output
+  else if (isTRUE(retain)) {
+    data[, names(output)] <- output
+    out <- data
+  } else {
+    data[, names(output)] <- output
+    out <- data[, c(retain, names(output))]
+  }
+     
+  return(out)
+
 }

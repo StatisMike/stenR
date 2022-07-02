@@ -65,6 +65,14 @@ plots_2_grouped <- list(ft = plot(NEO_N_2gft),
                         st = plot(NEO_N_2gst, "sten"),
                         st_filt = plot(NEO_N_2gst, "sten", strict_names = FALSE, group_names = "Female"))
 
+##        normalize using ScoreTables      ##
+
+normalize_scores_scoring(
+  data = IPIP_NEO_300,
+  vars = "N",
+  NEO_N_ST
+)
+
 ####  export & import back ScoringTables  ####
 ST_csv <- tempfile(fileext = ".csv")
 GC_csv <- tempfile(fileext = ".csv")
