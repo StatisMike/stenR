@@ -67,10 +67,19 @@ plots_2_grouped <- list(ft = plot(NEO_N_2gft),
 
 ##        normalize using ScoreTables      ##
 
-normalize_scores_scoring(
+retained <- normalize_scores_scoring(
   data = IPIP_NEO_300,
   vars = "N",
-  NEO_N_ST
+  NEO_N_ST,
+  retain = T
+)
+
+retained_1g <- normalize_scores_scoring(
+  data = IPIP_NEO_300,
+  vars = "N",
+  NEO_N_1gST,
+  retain = T,
+  group_col = "group"
 )
 
 ####  export & import back ScoringTables  ####
@@ -118,3 +127,40 @@ SLCS_ST <- import_ScoringTable(
   "csv",
   conditions = list(sex_grouping_sh, ageNstu_grouping)
 )
+
+## We have our raw data with "age" column and `Neuroiticism` saved as `N`
+IPIP_NEO_300 |> head()
+
+## regular csv ScoringTable for `Neuroticism` variable in various age groups
+# (.all column is available in all `stenR` created tables by default)
+readLines(ST_csv) |> writeLines()
+
+## to import ScoringTable from csv we needed to create the grouping conditions
+age_grouping <- GroupConditions(
+  conditions_category = "Age",
+  "below 18" ~ age < 18,
+  "18-22" ~ age >= 18 & age <= 22,
+  "23-26" ~ age >= 23 & age <= 26,
+  "27-32" ~ age >= 27 & age <= 32,
+  "33-40" ~ age >= 33 & age <= 40,
+  "40-60" ~ age >= 40 & age <= 60,
+  "above 60" ~ age > 60
+)
+
+## now, we can safely import
+ST_imported <- import_ScoringTable(
+  source_file = ST_csv,
+  method = "csv",
+  conditions = age_grouping
+)
+
+## and normalize!
+normalized <- normalize_scores_scoring(
+  data = IPIP_NEO_300,
+  vars = "N",
+  ST_imported,
+  retain = T,
+  group_col = "group"
+)
+
+head(normalized)

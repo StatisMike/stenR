@@ -278,12 +278,12 @@ export_ScoringTable <- function(table,
 #' into R object. Source file can be either an output of [export_ScoreTable()]
 #' function, or created by hand - though it needs to be created following the
 #' correct format.
-#' @param source_file File to import the *ScoringTable* from
+#' @param source_file Path to the file to import the *ScoringTable* from
 #' @param method Method for import, either `csv` or `json`
 #' @param cond_file File to import the *GroupConditions* from, if using `csv` method
 #' @param conditions If no conditions file is provided (when using `csv` method)
 #' or the existing conditions (when using `json` method) are to be overwritten,
-#' provide *GroupCondition* object or list of two of them here.
+#' provide *GroupCondition* object or list of up to two of them here.
 #' @return ScoringTable object
 #' @export
 

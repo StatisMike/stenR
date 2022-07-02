@@ -12,7 +12,7 @@ import_ScoringTable(
 )
 }
 \arguments{
-\item{source_file}{File to import the \emph{ScoringTable} from}
+\item{source_file}{Path to the file to import the \emph{ScoringTable} from}
 
 \item{method}{Method for import, either \code{csv} or \code{json}}
 
@@ -20,7 +20,7 @@ import_ScoringTable(
 
 \item{conditions}{If no conditions file is provided (when using \code{csv} method)
 or the existing conditions (when using \code{json} method) are to be overwritten,
-provide \emph{GroupCondition} object or list of two of them here.}
+provide \emph{GroupCondition} object or list of up to two of them here.}
 }
 \value{
 ScoringTable object

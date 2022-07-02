@@ -245,7 +245,8 @@ normalize_scores_grouped <- function(
   
   normalized_all_groups <- normalized_all_groups[
     order(normalized_all_groups[[".temp_GroupAssignment_index"]]), 
-    -which(names(normalized_all_groups) == ".temp_GroupAssignment_index")
+    -which(names(normalized_all_groups) == ".temp_GroupAssignment_index"),
+    drop = FALSE
   ]
   
   out <- handle_retain(data = data,
@@ -354,6 +355,7 @@ normalize_scores_scoring <- function(
       group_name <- names(groups)[i_g]
       
       group_variables <- lapply(seq_along(vars), \(i_v) {
+        
         val_name = vars[i_v]
         col_n <- which(names(tables[[i_v]]) == group_name)
         # safety measure if there are groups without their table
@@ -389,7 +391,8 @@ normalize_scores_scoring <- function(
       as.data.frame()
     
     out_data <- out_data[order(out_data[[".temp_GroupAssignment_index"]]), 
-                         -which(names(out_data) == ".temp_GroupAssignment_index")]
+                         -which(names(out_data) == ".temp_GroupAssignment_index"),
+                         drop = FALSE]
     
   }
   
@@ -400,7 +403,6 @@ normalize_scores_scoring <- function(
   rownames(out_data) <- NULL
   
   return(out_data)
-  
 
 }
 
@@ -415,9 +417,8 @@ normalize_scores_scoring <- function(
 
 qualify_to_groups <- function(data,
                               conditions) {
-  
   # add temporary index to return the data in correct order
-  data[[".temp_GroupAssignment_index"]] <- paste(1:nrow(data), "index", sep = "_")
+  data[[".temp_GroupAssignment_index"]] <- 1:nrow(data)
   
   # qualify observations to correct group
   # handle conditions to be intersected
