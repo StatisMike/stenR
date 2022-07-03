@@ -14,16 +14,16 @@ GroupedFrequencyTable(
   .all = TRUE
 )
 
-\method{print}{GroupedFrequencyTable}(gft)
+\method{print}{GroupedFrequencyTable}(x, ...)
 
-\method{summary}{GroupedFrequencyTable}(gft)
+\method{summary}{GroupedFrequencyTable}(object, ...)
 }
 \arguments{
 \item{data}{source \emph{data.frame}}
 
 \item{conditions}{up to two \emph{GroupConditions} objects. These objects will be
 passed along during creation of higher-level objects and used when
-\code{\link[=normalize_score_grouped]{normalize_score_grouped()}} will be called. If two objects are provided,
+\code{\link[=normalize_scores_grouped]{normalize_scores_grouped()}} will be called. If two objects are provided,
 then intersection of groups will be made.}
 
 \item{var}{name of variable to compute \emph{GroupedFrequencyTable} for}
@@ -37,7 +37,11 @@ should be generated. If they are not generated, all score normalization
 procedures will fail if the observation can't be assigned to any of the
 provided conditions, leaving it's score as \code{NA}. Defaults to \code{TRUE}}
 
-\item{gft}{A \code{GroupedFrequencyTable} object}
+\item{x}{A \code{GroupedFrequencyTable} object}
+
+\item{...}{further arguments passed to or from other methods.}
+
+\item{object}{A \code{GroupedFrequencyTable} object}
 }
 \description{
 Using \code{\link[=GroupConditions]{GroupConditions()}} object and source \emph{data.frame} compute

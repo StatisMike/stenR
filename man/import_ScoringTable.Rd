@@ -27,7 +27,7 @@ ScoringTable object
 }
 \description{
 ScoringTable can be imported from \code{csv} or \code{json} file
-into R object. Source file can be either an output of \code{\link[=export_ScoreTable]{export_ScoreTable()}}
+into R object. Source file can be either an output of \code{\link[=export_ScoringTable]{export_ScoringTable()}}
 function, or created by hand - though it needs to be created following the
 correct format.
 }

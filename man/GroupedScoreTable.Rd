@@ -7,13 +7,13 @@
 GroupedScoreTable(table, scale)
 }
 \arguments{
-\item{table}{\emph{GroupedFrequencyTable} object}
+\item{table}{\code{GroupedFrequencyTable} object}
 
 \item{scale}{a \code{StandardScale} object or list of multiple \code{StandardScale} objects}
 }
 \value{
-\emph{GroupedScoreTable} object, which constist of named \emph{list} of
-\emph{ScoreTable} objects and \emph{GroupConditions} object used for grouping
+\code{GroupedScoreTable} object, which consists of named \code{list} of
+\code{ScoreTable} objects and \code{GroupConditions} object used for grouping
 }
 \description{
 Create GroupedScoreTable

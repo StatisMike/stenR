@@ -2,13 +2,13 @@
 #'
 #' @description Creates a table to calculate scores in specified standardized 
 #' scale for each discrete raw score. Uses normalization provided by 
-#' \code{\link{FrequencyTable}} and scale definition created with 
-#' \code{\link{StandardScale}}.
+#' [FrequencyTable()] and scale definition created with 
+#' [StandardScale()].
 #'
 #' After creation it can be used to normalize and standardize raw scores with
-#' \code{\link{normalize_score}}.
+#' [normalize_score()] or [normalize_scores_df()].
 #' 
-#' `plot.ScoreTable` method requires `ggplot2` package to be installed.
+#' [plot.ScoreTable()] method requires `ggplot2` package to be installed.
 #' 
 #' @param ft a `FrequencyTable` object
 #' @param scale a `StandardScale` object or list of multiple `StandardScale` objects
@@ -63,48 +63,50 @@ ScoreTable <- function(ft,
   
 }
 
-#' @param st A `ScoreTable` object
+#' @param x A `ScoreTable` object
 #' @param max numeric or NULL, specifying the maximal number of entries to be 
 #' printed. By default, when NULL, \code{\link{getOption}("max.print")} used.
+#' @param ... further arguments passed to or from other methods
 #' @rdname ScoreTable
 #' @export
-print.ScoreTable <- function(st, max = NULL) {
+print.ScoreTable <- function(x, max = NULL, ...) {
   
-  cat(sep = "", "<ScoreTable> computed on: ", st$status$n, " observations\n")
+  cat(sep = "", "<ScoreTable> computed on: ", x$status$n, " observations\n")
   cat("\n")
-  print(st$table, max = max, row.names = F)
+  print(x$table, max = max, row.names = F)
   cat("\n\n")
   cat(sep = "", "Used StandardScales:\n") 
-  invisible(lapply(st$scale, print))
+  invisible(lapply(x$scale, print))
   cat("\n")
   
-  invisible(st)
+  invisible(x)
 }
 
-#' @param st a `ScoreTable` object
+#' @param x a `ScoreTable` object
 #' @param scale_name if scores for multiple scales available, provide the name
 #' of the scale for plotting.
+#' @param ... further arguments passed to or from other methods
 #' @rdname ScoreTable
 #' @export
-plot.ScoreTable <- function(st, scale_name = NULL) {
+plot.ScoreTable <- function(x, scale_name = NULL, ...) {
 
-  sum_of_n <- sum(st$table$n)
+  sum_of_n <- sum(x$table$n)
   
-  if (length(st$scale) == 1) {
-    scale <- st$scale[[1]]
+  if (length(x$scale) == 1) {
+    scale <- x$scale[[1]]
   } else {
     if (is.null(scale_name) || length(scale_name) != 1 || 
-        !scale_name %in% names(st$scale))
+        !scale_name %in% names(x$scale))
       stop("Provide one of the computed scale names to 'scale_name' argument.")
-    scale <- st$scale[sapply(st$scale, \(x) x$name == scale_name)][[1]]
+    scale <- x$scale[sapply(x$scale, \(y) y$name == scale_name)][[1]]
   }
   
   plot_data <- data.frame(
-    x = unique(st$table[[scale$name]]))
+    x = unique(x$table[[scale$name]]))
   
   plot_data$prop <- sapply(
       plot_data$x,
-      \(x) sum(as.numeric(st$table[st$table[[scale$name]] == x, "n"]))/sum_of_n
+      \(y) sum(as.numeric(x$table[x$table[[scale$name]] == y, "n"]))/sum_of_n
     )
   
   SD1 <- c(scale$M-scale$SD, scale$M+scale$SD)
@@ -119,7 +121,7 @@ plot.ScoreTable <- function(st, scale_name = NULL) {
 
   ggplot2::ggplot(plot_data, ggplot2::aes(x = x, y = prop)) + 
     ggplot2::geom_col(ggplot2::aes(fill = SD), alpha = 0.3, color = "black") + 
-    ggplot2::stat_function(fun = dnorm, args = c(scale$M, scale$SD), color = "black") +
+    ggplot2::stat_function(fun = stats::dnorm, args = c(scale$M, scale$SD), color = "black") +
     ggplot2::scale_fill_manual(name = "Distance from\nthe mean", values = c("green", "blue", "red")) +
     ggplot2::theme_bw() +
     ggplot2::scale_x_continuous(
@@ -130,69 +132,69 @@ plot.ScoreTable <- function(st, scale_name = NULL) {
 }
 
 #' Revert the ScoreTable back to FrequencyTable object.
-#' @param st ScoreTable object
+#' @param x a *ScoreTable* object
 #' @example examples/strip_ScoreTable.R
 #' @export
-strip_ScoreTable <- function(st) {
+strip_ScoreTable <- function(x) {
   
-  if (!"ScoreTable" %in% class(st))
-    stop("Object of class 'ScoreTable' needs to be provided to 'st' argument")
+  if (!"ScoreTable" %in% class(x))
+    stop("Object of class 'ScoreTable' needs to be provided to 'x' argument")
   
   ft <- list(
-    table = st$table[, c("score", "n", "freq", "quan", "Z")],
-    status = st$status)
+    table = x$table[, c("score", "n", "freq", "quan", "Z")],
+    status = x$status)
   
   class(ft) <- c("FrequencyTable",
-                 class(st)[!class(st) %in% "ScoreTable"])
+                 class(x)[!class(x) %in% "ScoreTable"])
   
   return(ft)
   
 }
 
-#' Attach additional `StandardScale` to already created `ScoreTable`
-#' @param st A `ScoreTable` object
-#' @param scale a `StandardScale` object or list of multiple `StandardScale` objects
+#' Attach additional StandardScale to already created ScoreTable
+#' @param x A *ScoreTable* object
+#' @param scale a *StandardScale* object or list of multiple *StandardScale* objects
 #' @example examples/attach_scales.R
 #' @export
-attach_scales <- function(st, scale) {
+attach_scales <- function(x, scale) {
   
-  if (!"ScoreTable" %in% class(st))
-    stop("Object of class 'ScoreTable' needs to be provided to 'st' argument")
+  if (!"ScoreTable" %in% class(x))
+    stop("Object of class 'ScoreTable' needs to be provided to 'x' argument")
   if (!class(scale) %in% c("StandardScale", "list"))
     stop("Object of class 'StandardScale' or list of such objects needs to be provided to 'scale' argument")
   if (class(scale) == "StandardScale") {
     scales <- list(scale)
   } else if (class(scale) == "list") {
-    areScales <- all(sapply(scale, \(x) class(x) == "StandardScale"))
+    areScales <- all(sapply(scale, \(y) class(y) == "StandardScale"))
     if (!isTRUE(areScales)) 
       stop("List provided to 'scale' argument should contain only StandardScale objects")
     scales <- scale
   }
   
   for (scale in scales) {
-    val <- round(st$table$Z * scale$SD + scale$M)
-    st$table[[scale$name]] <- 
+    val <- round(x$table$Z * scale$SD + scale$M)
+    x$table[[scale$name]] <- 
       ifelse(val < scale$min, scale$min,
              ifelse(val > scale$max, scale$max, val))
-    st$scale[[scale$name]] <- scale
+    x$scale[[scale$name]] <- scale
   }
   
-  output <- list(table = st$table,
-                 status = st$status,
-                 scale = st$scale)
+  output <- list(table = x$table,
+                 status = x$status,
+                 scale = x$scale)
   
-  class(output) <- c("ScoreTable", if("Simulated" %in% class(st)) "Simulated")
+  class(output) <- c("ScoreTable", if("Simulated" %in% class(x)) "Simulated")
   return(output)
   
 }
 
 
 #' @title Create GroupedScoreTable
-#' @param table *GroupedFrequencyTable* object
+#' @param table `GroupedFrequencyTable` object
 #' @param scale a `StandardScale` object or list of multiple `StandardScale` objects
 #' @seealso plot.GroupedScoreTable
-#' @return *GroupedScoreTable* object, which constist of named *list* of 
-#' *ScoreTable* objects and *GroupConditions* object used for grouping
+#' @return `GroupedScoreTable` object, which consists of named `list` of 
+#' `ScoreTable` objects and `GroupConditions` object used for grouping
 #' @export
 
 GroupedScoreTable <- function(table,
@@ -217,7 +219,7 @@ GroupedScoreTable <- function(table,
 #' @title Gerenic plot of the GroupedScoreTable
 #' @description Generic plot using `ggplot2`. It plots ScoreTables for all 
 #' groups by default, or only chosen ones using when `group_names` argument is specified. 
-#' @param gst A `GroupedScoreTable` object
+#' @param x A `GroupedScoreTable` object
 #' @param scale_name if scores for multiple scales available, provide the name
 #' of the scale for plotting.
 #' @param group_names *character* vector specifying which groups should appear in the plots
@@ -226,12 +228,12 @@ GroupedScoreTable <- function(table,
 #' `FALSE`, then intersected groups will be taken into regard separately, so 
 #' eg. when `"group1"` is provided to `group_names`, all of: `"group1:group2"`, 
 #' `"group1:group3"`, `"group1:groupN"`  will be plotted. Defaults to `TRUE`
-#' @param ... named list of additional arguments passed to either [facet_wrap()] 
-#' when plotting *GroupedScoreTable* created on basis of one *GroupConditions* 
-#' or [facet_grid()] when it was created with two such objects. 
+#' @param ... named list of additional arguments passed to either [ggplot2::facet_wrap()] 
+#' when plotting `GroupedScoreTable` created on basis of one `GroupConditions` 
+#' or [ggplot2::facet_grid()] when it was created with two such objects. 
 #' @export
 plot.GroupedScoreTable <- function(
-    gst, 
+    x, 
     scale_name = NULL,
     group_names = NULL,
     strict_names = TRUE,
@@ -243,10 +245,10 @@ plot.GroupedScoreTable <- function(
   
   if (!is.null(group_names)) {
     if (isTRUE(strict_names)){
-      if (!any(group_names %in% names(gst)))
+      if (!any(group_names %in% names(x)))
         stop("Not all names specified in 'group_names' specify group names")
     } else {
-      all_names <- unique(unlist(strsplit(names(gst), split = ":")))
+      all_names <- unique(unlist(strsplit(names(x), split = ":")))
       if (!any(group_names %in% all_names))
         stop("Not all names specified in 'group_names' specify group names")
     }
@@ -254,23 +256,23 @@ plot.GroupedScoreTable <- function(
   
   scale_data <- list()
   
-  plot_data <- lapply(seq_along(gst), \(i) {
+  plot_data <- lapply(seq_along(x), \(i) {
     
     if (!is.null(group_names)) {
       if (isTRUE(strict_names)) {
-        name_check <- names(gst)[i]
+        name_check <- names(x)[i]
         if (!name_check %in% group_names)
           return(NULL)
       } else {
-        name_check <- strsplit(names(gst)[i], split = ":")[[1]]
+        name_check <- strsplit(names(x)[i], split = ":")[[1]]
         if (!any(name_check %in% group_names))
           return(NULL)
       } 
     }
     
-    name <- strsplit(names(gst)[i], split = ":")[[1]]
+    name <- strsplit(names(x)[i], split = ":")[[1]]
     
-    st <- gst[[i]]
+    st <- x[[i]]
     
     sum_of_n <- sum(st$table$n)
     
@@ -288,7 +290,7 @@ plot.GroupedScoreTable <- function(
     
     plot_data$prop <- sapply(
       plot_data$x,
-      \(x) sum(as.numeric(st$table[st$table[[scale$name]] == x, "n"]))/sum_of_n
+      \(y) sum(as.numeric(st$table[st$table[[scale$name]] == y, "n"]))/sum_of_n
     )
     
     # during first group computations scale data is extracted
@@ -321,8 +323,8 @@ plot.GroupedScoreTable <- function(
   
   if ("group2" %in% names(plot_data)) {
     
-    plot_data$group1 <- factor(plot_data$group1, levels = c(".all1", attr(attr(gst, "conditions")[[1]], "groups")))
-    plot_data$group2 <- factor(plot_data$group2, levels = c(".all2", attr(attr(gst, "conditions")[[2]], "groups")))
+    plot_data$group1 <- factor(plot_data$group1, levels = c(".all1", attr(attr(x, "conditions")[[1]], "groups")))
+    plot_data$group2 <- factor(plot_data$group2, levels = c(".all2", attr(attr(x, "conditions")[[2]], "groups")))
     
     grp1_row <- length(unique(plot_data$group2)) < length(unique(plot_data$group1))
     
@@ -351,7 +353,7 @@ plot.GroupedScoreTable <- function(
     
   } else {
     
-    plot_data$group1 <- factor(plot_data$group1, levels = c(".all", attr(attr(gst, "conditions")[[1]], "groups")))
+    plot_data$group1 <- factor(plot_data$group1, levels = c(".all", attr(attr(x, "conditions")[[1]], "groups")))
     
     plot <- ggplot2::ggplot(plot_data, ggplot2::aes(x = x, y = prop)) + 
       ggplot2::geom_col(ggplot2::aes(fill = SD), alpha = 0.3, color = "black") + 

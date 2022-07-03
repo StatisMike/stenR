@@ -9,21 +9,25 @@
 \usage{
 FrequencyTable(data)
 
-\method{print}{FrequencyTable}(ft, max = NULL, print_table = FALSE)
+\method{print}{FrequencyTable}(x, max = NULL, print_table = FALSE, ...)
 
-\method{plot}{FrequencyTable}(ft)
+\method{plot}{FrequencyTable}(x, ...)
 
-\method{summary}{FrequencyTable}(ft)
+\method{summary}{FrequencyTable}(object, ...)
 }
 \arguments{
 \item{data}{vector of raw scores. Double values are coerced to integer}
 
-\item{ft}{A \code{FrequencyTable} object}
+\item{x}{A \code{FrequencyTable} object}
 
 \item{max}{numeric or NULL, specifying the maximal number of entries to be
 printed. By default, when NULL, \code{\link{getOption}("max.print")} used.}
 
 \item{print_table}{\emph{boolean} if true, then the \code{table} object is printed also.}
+
+\item{...}{further arguments passed to or from other methods.}
+
+\item{object}{A \code{FrequencyTable} object}
 }
 \value{
 FrequencyTable object. Consists of:

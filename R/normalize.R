@@ -216,9 +216,9 @@ normalize_scores_grouped <- function(
     group_name <- names(groups)[i]
     
     group_tables <- lapply(tables, \(tbl) {
-      tbl_ns <- which(names(tbl) == group_name)
+      tbl_n <- which(names(tbl) == group_name)
       # safety measure if there are groups without their table
-      if (length(tbl_ns) == 0)
+      if (length(tbl_n) == 0)
         mockNAtable(tbl[[1]])
       else
         tbl[[tbl_n]]
@@ -409,7 +409,7 @@ normalize_scores_scoring <- function(
 #### INTERNAL ####
 
 #' @title Qualify observations to groups for normalization
-#' @description Function used internally in [normalize_scores_groups()] and
+#' @description Function used internally in [normalize_scores_grouped()] and
 #' [normalize_scores_scoring()]
 #' @param data Data with observations to group by
 #' @param conditions GroupConditions passed to normalization function

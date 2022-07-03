@@ -12,7 +12,7 @@ qualify_to_groups(data, conditions)
 \item{conditions}{GroupConditions passed to normalization function}
 }
 \description{
-Function used internally in \code{\link[=normalize_scores_groups]{normalize_scores_groups()}} and
+Function used internally in \code{\link[=normalize_scores_grouped]{normalize_scores_grouped()}} and
 \code{\link[=normalize_scores_scoring]{normalize_scores_scoring()}}
 }
 \keyword{internal}

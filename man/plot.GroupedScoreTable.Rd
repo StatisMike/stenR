@@ -4,10 +4,10 @@
 \alias{plot.GroupedScoreTable}
 \title{Gerenic plot of the GroupedScoreTable}
 \usage{
-\method{plot}{GroupedScoreTable}(gst, scale_name = NULL, group_names = NULL, strict_names = TRUE, ...)
+\method{plot}{GroupedScoreTable}(x, scale_name = NULL, group_names = NULL, strict_names = TRUE, ...)
 }
 \arguments{
-\item{gst}{A \code{GroupedScoreTable} object}
+\item{x}{A \code{GroupedScoreTable} object}
 
 \item{scale_name}{if scores for multiple scales available, provide the name
 of the scale for plotting.}
@@ -20,9 +20,9 @@ using \emph{strict} strategy: \code{group_names} need to be provided in form: \c
 eg. when \code{"group1"} is provided to \code{group_names}, all of: \code{"group1:group2"},
 \code{"group1:group3"}, \code{"group1:groupN"}  will be plotted. Defaults to \code{TRUE}}
 
-\item{...}{named list of additional arguments passed to either \code{\link[=facet_wrap]{facet_wrap()}}
-when plotting \emph{GroupedScoreTable} created on basis of one \emph{GroupConditions}
-or \code{\link[=facet_grid]{facet_grid()}} when it was created with two such objects.}
+\item{...}{named list of additional arguments passed to either \code{\link[ggplot2:facet_wrap]{ggplot2::facet_wrap()}}
+when plotting \code{GroupedScoreTable} created on basis of one \code{GroupConditions}
+or \code{\link[ggplot2:facet_grid]{ggplot2::facet_grid()}} when it was created with two such objects.}
 }
 \description{
 Generic plot using \code{ggplot2}. It plots ScoreTables for all

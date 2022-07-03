@@ -4,6 +4,7 @@
 \alias{GroupConditions}
 \alias{is.GroupConditions}
 \alias{print.GroupConditions}
+\alias{as.data.frame.GroupConditions}
 \title{Conditions for observation grouping}
 \usage{
 GroupConditions(
@@ -16,15 +17,15 @@ GroupConditions(
 
 is.GroupConditions(x)
 
-\method{print}{GroupConditions}(x)
+\method{print}{GroupConditions}(x, ...)
+
+\method{as.data.frame}{GroupConditions}(x, ...)
 }
 \arguments{
 \item{conditions_category}{\emph{chracter} value describing character of the group
 conditions. Mainly informative.}
 
-\item{...}{\emph{formulas} that will be used to determine group
-to which the observation should be assigned to. LHS should contain name of the
-group, and RHS: condition which can return \code{TRUE} or \code{FALSE}}
+\item{...}{additional arguments to be passed to or from methods.}
 
 \item{force_disjoint}{\emph{boolean} indicating if the condition formulas by default
 should be handled with \code{force_disjoint} strategy. By default \code{TRUE}.
@@ -38,7 +39,7 @@ to \code{FALSE}}
 
 \item{.dots}{\emph{formulas} in form of a \emph{list}}
 
-\item{x}{object}
+\item{x}{\code{GroupConditions} object}
 }
 \value{
 \emph{GroupConditions} object

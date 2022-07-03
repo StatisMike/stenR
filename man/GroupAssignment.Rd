@@ -20,9 +20,9 @@ GroupAssignment(
 
 is.GroupAssignment(x)
 
-\method{print}{GroupAssignment}(x)
+\method{print}{GroupAssignment}(x, ...)
 
-\method{summary}{GroupAssignment}(x)
+\method{summary}{GroupAssignment}(object, ...)
 }
 \arguments{
 \item{data}{data.frame containing observations}
@@ -52,12 +52,16 @@ condition may be caused by variable names to not be present in the \code{data}.}
 will be created, which will contain all observations. Useful when object will be
 used for creation of \code{\link[=GroupedFrequencyTable]{GroupedFrequencyTable()}}}
 
-\item{...}{Do not set - used internally}
+\item{...}{additional arguments to be passed to or from method}
 
 \item{x}{object}
+
+\item{object}{\code{GroupAssignment} object}
 }
 \value{
 \emph{GroupAssignment} object
+
+list of summaries invisibly
 }
 \description{
 Using \emph{GroupConditions} object, assign observations to one

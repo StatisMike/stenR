@@ -74,7 +74,7 @@ items_summing <- function(spec, data, warn_env) {
           na_val <- round(mean(as.numeric(items_to_process[, !items_with_NAs])))
         
         if (spec$na_strategy == "median")
-          na_val <- round(median(as.numeric(items_to_process[, !items_with_NAs])))
+          na_val <- round(stats::median(as.numeric(items_to_process[, !items_with_NAs])))
         
         # input NA value in chosen strategy
         items_to_process[, items_with_NAs] <- na_val
@@ -142,7 +142,7 @@ items_summing <- function(spec, data, warn_env) {
 #' @details 
 #' 
 #' ## NA imputation
-#' it specifies how `NA` values should be treated during [sum_items_to_scales()]
+#' it specifies how `NA` values should be treated during [sum_items_to_scale()]
 #' function run.
 #' **asis** strategy is literal: the values specified in `na_value` or `na_value_custom` 
 #' will be used without any changes.
@@ -225,37 +225,39 @@ ScaleSpec <- function(
 }
 
 #' @rdname ScaleSpec
-#' @param spec *ScaleSpec* object
+#' @param x a *ScaleSpec* object
+#' @param ... further arguments passed to or from other methods.
 #' @export
-print.ScaleSpec <- function(spec) {
+print.ScaleSpec <- function(x, ...) {
   
-  cat(sep = "", "<ScaleSpec>: '", spec$name, "'\n")
-  cat(sep = "", "No. items: ", length(spec$item_names))
-  if (length(spec$reverse) > 0) 
-    cat(sep = "", " (", length(spec$reverse), " reversed)")
-  cat("\nNA imputation method:", spec$na_strategy, "\n")
-  cat("NA literal value:", spec$na_value, "\n")
+  cat(sep = "", "<ScaleSpec>: '", x$name, "'\n")
+  cat(sep = "", "No. items: ", length(x$item_names))
+  if (length(x$reverse) > 0) 
+    cat(sep = "", " (", length(x$reverse), " reversed)")
+  cat("\nNA imputation method:", x$na_strategy, "\n")
+  cat("NA literal value:", x$na_value, "\n")
   
 }
 
 #' @rdname ScaleSpec
-#' @param spec *ScaleSpec* object
+#' @param object a *ScaleSpec* object
+#' @param ... further arguments passed to or from other methods.
 #' @export
-summary.ScaleSpec <- function(spec) {
+summary.ScaleSpec <- function(object, ...) {
   
-  cat(sep = "", "<ScaleSpec>: '", spec$name, "'\n")
+  cat(sep = "", "<ScaleSpec>: '", object$name, "'\n")
   
-  cat(sep = "", "min: ", spec$min, "; ", "max: ", spec$max, "\n")
+  cat(sep = "", "min: ", object$min, "; ", "max: ", object$max, "\n")
   
-  cat("NA imputation method:", spec$na_strategy, "\n")
-  cat("NA literal value:", spec$na_value, "\n\n")
+  cat("NA imputation method:", object$na_strategy, "\n")
+  cat("NA literal value:", object$na_value, "\n\n")
   
   cat("Items:\n")
-  invisible(lapply(spec$item_names, \(item) {
+  invisible(lapply(object$item_names, \(item) {
     
     cat(item)
-    if (item %in% spec$reverse) cat(" <reversed>")
-    if (item %in% names(spec$custom_na)) cat(" <custom NA>: ", spec$custom_na[item])
+    if (item %in% object$reverse) cat(" <reversed>")
+    if (item %in% names(object$custom_na)) cat(" <custom NA>: ", spec$custom_na[item])
     cat("\n")
     
   }))
@@ -266,7 +268,7 @@ summary.ScaleSpec <- function(spec) {
 
 #' @title Combined Scale Specification
 #' @description
-#' Combine multiple *ScaleSpec* objects into one in regards of [sum_items_to_scales()]
+#' Combine multiple *ScaleSpec* objects into one in regards of [sum_items_to_scale()]
 #' function. Useful when one scale of factor contains items of different possible
 #' values or if there is hierarchy of scale or factors.
 #' 
@@ -326,30 +328,32 @@ CombScaleSpec <- function(name, ..., reverse = character(0)) {
 } 
 
 #' @rdname CombScaleSpec
-#' @param spec *CombScaleSpec* object
+#' @param x a *CombScaleSpec* object
+#' @param ... further arguments passed to or from other methods.
 #' @export
-print.CombScaleSpec <- function(spec) {
+print.CombScaleSpec <- function(x, ...) {
   
-  cat(sep = "", "<CombScaleSpec>: '", spec$name, "'\n")
-  cat(sep = "", "No. items total: ", length(spec$item_names), "\n\n")
+  cat(sep = "", "<CombScaleSpec>: '", x$name, "'\n")
+  cat(sep = "", "No. items total: ", length(x$item_names), "\n\n")
   cat("Underlying objects:\n")
-  invisible(lapply(spec$ScaleSpecs, \(x) {
-    cat(sep = "", "<", class(x), ">: ", x$name)
-    if (x$name %in% spec$reverse) cat(" <reversed>")
+  invisible(lapply(x$ScaleSpecs, \(y) {
+    cat(sep = "", "<", class(y), ">: ", x$name)
+    if (y$name %in% x$reverse) cat(" <reversed>")
     cat("\n")
   }))
   
 }
 
 #' @rdname CombScaleSpec
-#' @param spec *CombScaleSpec* object
+#' @param object a *CombScaleSpec* object
+#' @param ... further arguments passed to or from other methods.
 #' @export
-summary.CombScaleSpec <- function(spec) {
+summary.CombScaleSpec <- function(object, ...) {
   
-  cat(sep = "", "<CombScaleSpec>: '", spec$name, "'\n")
-  cat(sep = "", "No. items total: ", length(spec$item_names), "\n\n")
+  cat(sep = "", "<CombScaleSpec>: '", object$name, "'\n")
+  cat(sep = "", "No. items total: ", length(object$item_names), "\n\n")
   cat("Underlying objects:\n")
-  invisible(lapply(spec$ScaleSpecs, \(x) {
+  invisible(lapply(object$ScaleSpecs, \(x) {
     cat("- ")
     print(x)
     cat("\n")

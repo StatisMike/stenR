@@ -8,9 +8,9 @@
 \usage{
 StandardScale(name, M, SD, min, max)
 
-\method{print}{StandardScale}(object)
+\method{print}{StandardScale}(x, ...)
 
-\method{plot}{StandardScale}(scale, n = 1000)
+\method{plot}{StandardScale}(x, n = 1000, ...)
 }
 \arguments{
 \item{name}{Name of the scale}
@@ -23,9 +23,9 @@ StandardScale(name, M, SD, min, max)
 
 \item{max}{Maximal value the scale takes}
 
-\item{object}{an object for which a summary is desired.}
+\item{x}{a \code{StandardScale} object}
 
-\item{scale}{StandardScale object}
+\item{...}{further arguments passed to or from other methods.}
 
 \item{n}{Number of points the plot generates. The higher the number, the more
 detailed are the plots. Default to 1000 for nicely detailed plot.}

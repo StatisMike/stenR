@@ -83,9 +83,10 @@ is.GroupConditions <- function(x) {
 
 #' @rdname GroupConditions
 #' @param x object
+#' @param ... additional arguments to be passed to or from method
 #' @export
 
-print.GroupConditions <- function(x) {
+print.GroupConditions <- function(x, ...) {
   cat("<GroupConditions>\n")
   cat("Conditions category:", attr(x, "cond_category"), "\n")
   cat("For", length(unique(attr(x, "groups"))), "unique groups\n\n")
@@ -105,6 +106,21 @@ print.GroupConditions <- function(x) {
   cat(attr(x, "force_exhaustive"))
   cat("\n")
 }
+
+#' @rdname GroupConditions
+#' @param x `GroupConditions` object
+#' @param ... additional arguments to be passed to or from methods.
+#' @export
+#' 
+as.data.frame.GroupConditions <- function(x, ...) {
+  
+  data.frame(
+    category = attr(x, "cond_category"),
+    group = attr(x, "groups"),
+    conditions = attr(x, "conditions")
+  )
+
+} 
 
 #' @title Assign to groups based on GroupConditions
 #' @description Using *GroupConditions* object, assign observations to one
@@ -193,7 +209,7 @@ GroupAssignment <- function(data,
     error = function(e)  e$message )
     
     if (!is.logical(out_bool) && !isTRUE(skip_faulty))
-      stop(e)
+      stop(out_bool)
     if (!is.logical(out_bool) && isTRUE(skip_faulty))
       return(numeric(0))
     
@@ -283,9 +299,10 @@ is.GroupAssignment <- function(x) {
 
 #' @rdname GroupAssignment
 #' @param x object
+#' @param ... additional arguments to be passed to or from method
 #' @export
 
-print.GroupAssignment <- function(x) {
+print.GroupAssignment <- function(x, ...) {
   cat("<GroupAssignment>\n")
   cat("Total assigned:", attr(x, "total"), "\n")
   cat("Mode:", attr(x, "mode"), "\n")
@@ -293,22 +310,24 @@ print.GroupAssignment <- function(x) {
 }
 
 #' @rdname GroupAssignment
-#' @param x object
+#' @param object `GroupAssignment` object
+#' @param ... additional arguments to be passed to or from method
+#' @return list of summaries invisibly
 #' @export
 
-summary.GroupAssignment <- function(x) {
+summary.GroupAssignment <- function(object, ...) {
   
   summaries <- list(
-    mode = attr(x, "mode"),
-    id_col = attr(x, "id_col"),
-    total = attr(x, "total"),
-    disjoint = attr(x, "disjoint"),
-    forced_disjoint = attr(x, "force_disjoint"),
-    exhaustive = attr(x, "exhaustive"),
-    forced_exhaustive = attr(x, "force_exhaustive"),
-    groups = setNames(
-      nm = sapply(x, \(y) paste(y$group, collapse=":")),
-      object = sapply(x, \(y) length(y$els)))
+    mode = attr(object, "mode"),
+    id_col = attr(object, "id_col"),
+    total = attr(object, "total"),
+    disjoint = attr(object, "disjoint"),
+    forced_disjoint = attr(object, "force_disjoint"),
+    exhaustive = attr(object, "exhaustive"),
+    forced_exhaustive = attr(object, "force_exhaustive"),
+    groups = stats::setNames(
+      nm = sapply(object, \(x) paste(x$group, collapse=":")),
+      object = sapply(object, \(x) length(x$els)))
   )
   cat("<GroupAssignment>\n")
   cat("Status:\n")
@@ -322,7 +341,7 @@ summary.GroupAssignment <- function(x) {
       "; Forced: ", summaries$forced_exhaustive, "\n\n", sep = "")
   
   cat("Assignment ")
-  cat("[Tested vars: ", paste(attr(x, "formula_vars"), collapse = ", "), "]:\n", sep = "")
+  cat("[Tested vars: ", paste(attr(object, "formula_vars"), collapse = ", "), "]:\n", sep = "")
   for (i in seq_along(summaries$groups)) {
     cat("Group: [")
     cat(names(summaries$groups)[i])

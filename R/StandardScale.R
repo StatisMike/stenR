@@ -50,13 +50,14 @@ StandardScale <- function(
   
 }
 
-#' @param object an object for which a summary is desired.
+#' @param x a `StandardScale` object.
+#' @param ... further arguments passed to or from other methods.
 #' @rdname StandardScale
 #' @export
-print.StandardScale <- function(object) {
+print.StandardScale <- function(x, ...) {
   
-  cat("<StandardScale>: '", object$name, "'\n", sep = "")
-  cat("( M: ", object$M, "; SD: ", object$SD, "; min: ", object$min, "; max: ", object$max, " )", sep = "")
+  cat("<StandardScale>: '", x$name, "'\n", sep = "")
+  cat("( M: ", x$M, "; SD: ", x$SD, "; min: ", x$min, "; max: ", x$max, " )", sep = "")
   cat("\n")
   
 }
@@ -91,45 +92,46 @@ TETRONIC <- StandardScale(name = "tetronic", M = 10, SD = 4, min = 0, max = 20)
 #' @export
 WECHSLER_IQ <- StandardScale(name = "wechslerIQ", M = 100, SD = 15, min = 40, max = 160)
 
-#' @param scale StandardScale object
+#' @param x a `StandardScale` object
 #' @param n Number of points the plot generates. The higher the number, the more
 #' detailed are the plots. Default to 1000 for nicely detailed plot.
+#' @param ... further arguments passed to or from other methods.
 #' @rdname StandardScale
 #' @export
-plot.StandardScale <- function(scale, n = 1000) {
+plot.StandardScale <- function(x, n = 1000, ...) {
   
   if (!requireNamespace("ggplot2", quietly = T))
     stop("Generic plotting of 'StandardScore' requires 'ggplot2' package installed")
   
-  data_points = data.frame(score = seq(from = scale$min, to = scale$max, by = 1))
+  data_points = data.frame(score = seq(from = x$min, to = x$max, by = 1))
   
-  SD1 <- c(scale$M-scale$SD, scale$M+scale$SD)
-  SD2 <- c(scale$M-2*scale$SD, scale$M+2*scale$SD)
+  SD1 <- c(x$M-x$SD, x$M+x$SD)
+  SD2 <- c(x$M-2*x$SD, x$M+2*x$SD)
   
   func1SD <- function(x) {
-    y <- dnorm(x, scale$M, scale$SD)
+    y <- stats::dnorm(x, x$M, x$SD)
     y[x < SD1[1] | x > SD1[2]] <- NA
     return(y)
   }
-  func2SD <- function(x){
-    y <- dnorm(x, scale$M, scale$SD)
+  func2SD <- function(x) {
+    y <- stats::dnorm(x, x$M, x$SD)
     y[(x > SD1[1] & x < SD1[2]) | x < SD2[1] | x > SD2[2]] <- NA
     return(y)
   }
-  func3SD <- function(x){
-    y <- dnorm(x, scale$M, scale$SD)
+  func3SD <- function(x) {
+    y <- stats::dnorm(x, x$M, x$SD)
     y[x > SD2[1] & x < SD2[2]] <- NA
     return(y)
   }
   
   ggplot2::ggplot(data_points, 
                   ggplot2::aes(x = score)) + 
-    ggplot2::stat_function(fun = dnorm, args = c(scale$M, scale$SD), n = n) +
+    ggplot2::stat_function(fun = stats::dnorm, args = c(x$M, x$SD), n = n) +
     ggplot2::stat_function(fun = func1SD, geom = "area", ggplot2::aes(fill = factor("<1SD", levels = c("<1SD", "1SD-2SD", ">2SD"))), alpha = 0.3, n = n) +
     ggplot2::stat_function(fun = func2SD, geom = "area", ggplot2::aes(fill = factor("1SD-2SD", levels = c("<1SD", "1SD-2SD", ">2SD"))), alpha = 0.3, n = n) +
     ggplot2::stat_function(fun = func3SD, geom = "area", ggplot2::aes(fill = factor(">2SD", levels = c("<1SD", "1SD-2SD", ">2SD"))), alpha = 0.3, n = n) +
-    ggplot2::scale_x_continuous(breaks = c(scale$min, SD2[1], SD1[1], scale$M, SD1[2], SD2[2], scale$max)) +
-    ggplot2::geom_vline(xintercept = scale$M) +
+    ggplot2::scale_x_continuous(breaks = c(x$min, SD2[1], SD1[1], x$M, SD1[2], SD2[2], x$max)) +
+    ggplot2::geom_vline(xintercept = x$M) +
     ggplot2::geom_vline(xintercept = SD1, color = "green") +
     ggplot2::geom_vline(xintercept = SD2, color = "blue") +
     ggplot2::theme_bw() +

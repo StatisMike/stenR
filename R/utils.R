@@ -1,3 +1,8 @@
+#### GLOBAL VARIABLES ####
+
+utils::globalVariables(c("SD", "group1", "group2", "n", "prop", "score", "sds", "spec"))
+
+
 # all .warnings for functions
 
 .warnings <- list(
@@ -46,10 +51,11 @@ GFQ_incomplete_message <- function(groups, incompletes, total) {
   percentages <- sapply(seq_along(groups), \(i) paste0(round(incompletes[i]/total[i]*100, 2), "%"))
   
   cli::cli_inform(
-    message = c("i" = "There are missing raw score values between minimum and maximum raw scores for some groups. They have been filled automatically.",
-                setNames(nm = rep("*", length = length(groups)),
-                         object = sapply(seq_along(groups), 
-                                         \(i) paste0("{.field {groups[", i, "]}} No. missing: {incompletes[", i,"]}/{total[", i, "]}; {percentages[", i, "]}")))),
+    message = c(
+      "i" = "There are missing raw score values between minimum and maximum raw scores for some groups. They have been filled automatically.",
+      stats::setNames(nm = rep("*", length = length(groups)),
+                      object = sapply(seq_along(groups), 
+                                      \(i) paste0("{.field {groups[", i, "]}} No. missing: {incompletes[", i,"]}/{total[", i, "]}; {percentages[", i, "]}")))),
     class = c("IncompleteRangeMessage")
   )
 }

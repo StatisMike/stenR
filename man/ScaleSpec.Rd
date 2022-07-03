@@ -17,9 +17,9 @@ ScaleSpec(
   na_value_custom
 )
 
-\method{print}{ScaleSpec}(spec)
+\method{print}{ScaleSpec}(x, ...)
 
-\method{summary}{ScaleSpec}(spec)
+\method{summary}{ScaleSpec}(object, ...)
 }
 \arguments{
 \item{name}{character with name of the scale/factor}
@@ -45,7 +45,11 @@ Defaults to \code{as.integer(NA)}.}
 specific values in place of \code{NA}s, provide a named integer vector there. Names
 should be the names of the questons.}
 
-\item{spec}{\emph{ScaleSpec} object}
+\item{x}{a \emph{ScaleSpec} object}
+
+\item{...}{further arguments passed to or from other methods.}
+
+\item{object}{a \emph{ScaleSpec} object}
 }
 \value{
 object of \emph{ScaleSpec} class
@@ -59,7 +63,7 @@ To be used with \code{\link[=sum_items_to_scale]{sum_items_to_scale()}} function
 \details{
 \subsection{NA imputation}{
 
-it specifies how \code{NA} values should be treated during \code{\link[=sum_items_to_scales]{sum_items_to_scales()}}
+it specifies how \code{NA} values should be treated during \code{\link[=sum_items_to_scale]{sum_items_to_scale()}}
 function run.
 \strong{asis} strategy is literal: the values specified in \code{na_value} or \code{na_value_custom}
 will be used without any changes.

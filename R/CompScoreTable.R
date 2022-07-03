@@ -265,10 +265,12 @@ CompScoreTable <- R6::R6Class(
     calculate_ft = function(data, var = NULL) {
       
       if (!is.null(var)) 
-        suppressWarnings(private$tables[[var]] <- FrequencyTable(data))
+        suppressMessages(private$tables[[var]] <- FrequencyTable(data),
+                         class = "IncompleteRangeMessage")
       else 
         for (v in names(private$tables))
-          suppressWarnings(private$tables[[v]] <- FrequencyTable(data))
+          suppressMessages(private$tables[[v]] <- FrequencyTable(data),
+                           class = "IncompleteRangeMessage")
       
       private$calculate_st(var = var)  
         
@@ -283,7 +285,8 @@ CompScoreTable <- R6::R6Class(
       vals <- rep(private$tables[[var]]$table$score, 
                   private$tables[[var]]$table$n)
       
-      suppressWarnings(private$tables[[var]] <- FrequencyTable(c(data, vals)))
+      suppressMessages(private$tables[[var]] <- FrequencyTable(c(data, vals)),
+                       class = "IncompleteRangeMessage")
       private$calculate_st(var = var)
       
     }
@@ -291,16 +294,16 @@ CompScoreTable <- R6::R6Class(
 )
 
 #' @export
-summary.CompScoreTable <- function(x) {
+summary.CompScoreTable <- function(object, ...) {
   
   cat("<CompScoreTable> object\n\n")
   
   summaries <- list()
   
-  if (length(x$.__enclos_env__$private$tables) > 0) {
+  if (length(object$.__enclos_env__$private$tables) > 0) {
     
     table_class <- 
-      unique(unlist(sapply(x$.__enclos_env__$private$tables, \(t) class(t))))
+      unique(unlist(sapply(object$.__enclos_env__$private$tables, \(t) class(t))))
     
     table_class <-
       table_class[table_class != "Simulated"]
@@ -308,9 +311,9 @@ summary.CompScoreTable <- function(x) {
     cat("Attached <", table_class, "s>:\n", sep = "")
     summaries[["tables"]] <- 
       data.frame(
-        variable = names(x$.__enclos_env__$private$tables),
-        n = sapply(x$.__enclos_env__$private$tables, \(t) t$status$n),
-        range = sapply(x$.__enclos_env__$private$tables, \(t) t$status$range))
+        variable = names(object$.__enclos_env__$private$tables),
+        n = sapply(object$.__enclos_env__$private$tables, \(t) t$status$n),
+        range = sapply(object$.__enclos_env__$private$tables, \(t) t$status$range))
     rownames(summaries[["tables"]]) <- NULL
     print(summaries[["tables"]], row.names = F)
   } else {
@@ -319,16 +322,16 @@ summary.CompScoreTable <- function(x) {
   
   if(length(summaries) == 1) cat("\n")
   
-  if (length(x$.__enclos_env__$private$attached_scales) > 0){
+  if (length(object$.__enclos_env__$private$attached_scales) > 0){
     
     cat("Attached <StandardScales>:\n")
     summaries[["scales"]] <-
       data.frame(
-        name = names(x$.__enclos_env__$private$attached_scales),
-        M = sapply(x$.__enclos_env__$private$attached_scales, \(s) s$M),
-        SD = sapply(x$.__enclos_env__$private$attached_scales, \(s) s$SD),
-        min = sapply(x$.__enclos_env__$private$attached_scales, \(s) s$min),
-        max = sapply(x$.__enclos_env__$private$attached_scales, \(s) s$max)
+        name = names(object$.__enclos_env__$private$attached_scales),
+        M = sapply(object$.__enclos_env__$private$attached_scales, \(s) s$M),
+        SD = sapply(object$.__enclos_env__$private$attached_scales, \(s) s$SD),
+        min = sapply(object$.__enclos_env__$private$attached_scales, \(s) s$min),
+        maobject = sapply(object$.__enclos_env__$private$attached_scales, \(s) s$max)
       )
     rownames(summaries[["scales"]]) <- NULL
     print(summaries[["scales"]], row.names = F)

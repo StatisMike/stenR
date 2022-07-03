@@ -13,10 +13,11 @@ to_ScoringTable(table, ...)
   scale = NULL,
   min_raw = NULL,
   max_raw = NULL,
-  score_colname = "Score"
+  score_colname = "Score",
+  ...
 )
 
-\method{to_ScoringTable}{GroupedScoreTable}(table, scale = NULL, min_raw = NULL, max_raw = NULL)
+\method{to_ScoringTable}{GroupedScoreTable}(table, scale = NULL, min_raw = NULL, max_raw = NULL, ...)
 }
 \arguments{
 \item{table}{\emph{ScoreTable} or \emph{GroupedScoreTable} object}

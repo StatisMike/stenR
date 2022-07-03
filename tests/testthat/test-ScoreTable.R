@@ -3,8 +3,9 @@ st <- NULL
 test_that("ScoreTable is can be contructed", {
   
   # incomplete warning
-  expect_warning(
-    st <<- ScoreTable(FrequencyTable(HEXACO_60$HEX_H), STEN)
+  expect_message(
+    st <<- ScoreTable(FrequencyTable(HEXACO_60$HEX_H), STEN),
+    class = "IncompleteRangeMessage"
   )
 
   expect_s3_class(st, "ScoreTable")

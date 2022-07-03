@@ -120,7 +120,7 @@ to_ScoringTable <- function(table, ...) {
 #' @export
 
 to_ScoringTable.ScoreTable <- function(
-    table, scale = NULL, min_raw = NULL, max_raw = NULL, score_colname = "Score") {
+    table, scale = NULL, min_raw = NULL, max_raw = NULL, score_colname = "Score", ...) {
   
   if (is.null(scale) && length(table$scales) != 1)
     stop("If 'ScoreTable' have multiple scales attached, provide 'scale' argument.")
@@ -155,7 +155,7 @@ to_ScoringTable.ScoreTable <- function(
 #' @export
 
 to_ScoringTable.GroupedScoreTable <- function(
-    table, scale = NULL, min_raw = NULL, max_raw = NULL) {
+    table, scale = NULL, min_raw = NULL, max_raw = NULL, ...) {
   
   tables <- mapply(to_ScoringTable, 
                    table = table, 
@@ -174,32 +174,6 @@ to_ScoringTable.GroupedScoreTable <- function(
   return(out)
   
 }
-
-#' @export
-is.ScoringTable <- function(x) {
-  
-  inherits(x, "ScoringTable")
-  
-}
-
-#' Conditions to data.frame
-#' @param cond list of *GroupConditions*
-#' @keywords internal
-#' 
-cond_to_df <- function(cond) {
-  
-  cond_ls <- lapply(cond, \(x) {
-    
-    data.frame(
-      category = attr(x, "cond_category"),
-      group = attr(x, "groups"),
-      conditions = attr(x, "conditions")
-    )
-    
-  })
-  cond_df <- dplyr::bind_rows(cond_ls)
-  return(cond_df)
-} 
 
 #' @title Export ScoringTable
 #' @description After creation of *ScoringTable* it can be handy to export it
@@ -241,19 +215,11 @@ export_ScoringTable <- function(table,
   
   switch(method,
          csv = {
-           write.csv(table, file = out_file, row.names = F)
+           utils::write.csv(table, file = out_file, row.names = F)
            if (!is.null(cond) && !missing(conditions_file)) {
-             cond_ls <- lapply(cond, \(x) {
-               
-               data.frame(
-                 category = attr(x, "cond_category"),
-                 group = attr(x, "groups"),
-                 conditions = attr(x, "conditions")
-               )
-               
-             })
+             cond_ls <- lapply(cond, as.data.frame.GroupConditions)
              cond_df <- dplyr::bind_rows(cond_ls)
-             write.csv(cond_df, conditions_file, row.names = F)
+             utils::write.csv(cond_df, conditions_file, row.names = F)
            } else if (!is.null(attr(table, "conditions"))) 
              message("Exported ScoringTable based on GroupedScoreTable without exporting conditions.")
          },
@@ -263,7 +229,7 @@ export_ScoringTable <- function(table,
              
              out[["GroupConditions"]] <- 
                lapply(cond, \(x) 
-                      setNames(as.list(attr(x, "conditions")), 
+                      stats::setNames(as.list(attr(x, "conditions")), 
                                nm = attr(x, "groups")))
              
              names(out[["GroupConditions"]]) <- sapply(cond, \(x) attr(x, "cond_category"))
@@ -275,7 +241,7 @@ export_ScoringTable <- function(table,
 
 #' @title Import ScoringTable
 #' @description ScoringTable can be imported from `csv` or `json` file
-#' into R object. Source file can be either an output of [export_ScoreTable()]
+#' into R object. Source file can be either an output of [export_ScoringTable()]
 #' function, or created by hand - though it needs to be created following the
 #' correct format.
 #' @param source_file Path to the file to import the *ScoringTable* from
@@ -298,7 +264,7 @@ import_ScoringTable <- function(
   out <- switch(method,
                 
                 csv = {
-                  st_read <- read.table(source_file, sep = ",")
+                  st_read <- utils::read.table(source_file, sep = ",")
                   st_df <- st_read[-1, ]
                   names(st_df) <- as.character(st_read[1, ])
                   rownames(st_df) <- NULL
@@ -310,10 +276,11 @@ import_ScoringTable <- function(
                     if (!missing(conditions)) {
                       if (is.GroupConditions(conditions))
                         conditions <- list(conditions)
-                      gc_df <- cond_to_df(conditions)
+                      gc_df <-  dplyr::bind_rows(
+                        lapply(conditions, as.data.frame.GroupConditions))
                       
                     } else if (!missing(cond_file)) {
-                      gc_df <- read.csv(cond_file)
+                      gc_df <- utils::read.csv(cond_file)
                     } else {
                       stop("When importing ScoringTable with groups, provide either 'cond_file' or 'conditions' arguments")
                     }
@@ -348,7 +315,8 @@ import_ScoringTable <- function(
                   if (!missing(conditions) && ncol(st_read[["ScoringTable"]]) > 2) {
                     if (is.GroupConditions(conditions))
                       conditions <- list(conditions)
-                    out[["gc"]] <- cond_to_df(conditions)
+                    out[["gc"]] <- dplyr::bind_rows(
+                      lapply(conditions, as.data.frame.GroupConditions))
                     
                   }
                   
@@ -422,7 +390,7 @@ verify_GC_for_ST <- function(st_df, gc_df) {
     
     conds <- paste0("'", x$groups[!grepl(x = x$groups, pattern = "^\\.")], 
                     "' ~ ", x$conditions)
-    conds <- lapply(conds, as.formula)
+    conds <- lapply(conds, stats::as.formula)
     
     GroupConditions(conditions_category = x$category,
                     .dots = conds)

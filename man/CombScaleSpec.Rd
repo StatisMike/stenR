@@ -8,25 +8,27 @@
 \usage{
 CombScaleSpec(name, ..., reverse = character(0))
 
-\method{print}{CombScaleSpec}(spec)
+\method{print}{CombScaleSpec}(x, ...)
 
-\method{summary}{CombScaleSpec}(spec)
+\method{summary}{CombScaleSpec}(object, ...)
 }
 \arguments{
 \item{name}{Name of the combined scale or factor}
 
-\item{...}{\emph{ScaleSpec} or other \emph{CombScaleSpec} objects}
+\item{...}{further arguments passed to or from other methods.}
 
 \item{reverse}{character vector containing names of the underlying subscales
 of factors that need to be reversed}
 
-\item{spec}{\emph{CombScaleSpec} object}
+\item{x}{a \emph{CombScaleSpec} object}
+
+\item{object}{a \emph{CombScaleSpec} object}
 }
 \value{
 \emph{CombScaleSpec} object
 }
 \description{
-Combine multiple \emph{ScaleSpec} objects into one in regards of \code{\link[=sum_items_to_scales]{sum_items_to_scales()}}
+Combine multiple \emph{ScaleSpec} objects into one in regards of \code{\link[=sum_items_to_scale]{sum_items_to_scale()}}
 function. Useful when one scale of factor contains items of different possible
 values or if there is hierarchy of scale or factors.
 

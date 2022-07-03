@@ -10,7 +10,8 @@ A data frame with 103 rows and 19 variables
 \item{user_id}{identity anonimized with 'ids::adjective_animal'}
 \item{sex}{sex of the participant ('M'ale, 'F'emale or 'O'ther)}
 \item{age}{age of the participant (15--68)}
-\item{SLCS_1 to SLCS_16}{Score for each of measure items. (1--5)}
+\item{SLCS_1, SLCS_2, SLCS_3, SLCS_4, SLCS_5, SLCS_6, SLCS_7, SLCS_8, SLCS_9, SLCS_10,
+SLCS_11, SLCS_12, SLCS_13, SLCS_14, SLCS_15, SLCS_16}{Score for each of measure items. (1--5)}
 }
 }
 \usage{

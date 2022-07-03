@@ -4,10 +4,10 @@
 \alias{plot.GroupedFrequencyTable}
 \title{Gerenic plot of the GroupedFrequencyTable}
 \usage{
-\method{plot}{GroupedFrequencyTable}(gft, group_names = NULL, strict_names = TRUE, ...)
+\method{plot}{GroupedFrequencyTable}(x, group_names = NULL, strict_names = TRUE, ...)
 }
 \arguments{
-\item{gft}{A \code{GroupedFrequencyTable} object}
+\item{x}{A \code{GroupedFrequencyTable} object}
 
 \item{group_names}{\emph{character} vector specifying which groups should appear in the plots}
 
@@ -17,9 +17,9 @@ using \emph{strict} strategy: \code{group_names} need to be provided in form: \c
 eg. when \code{"group1"} is provided to \code{group_names}, all of: \code{"group1:group2"},
 \code{"group1:group3"}, \code{"group1:groupN"}  will be plotted. Defaults to \code{TRUE}}
 
-\item{...}{named list of additional arguments passed to either \code{\link[=facet_wrap]{facet_wrap()}}
+\item{...}{named list of additional arguments passed to either \code{\link[ggplot2:facet_wrap]{ggplot2::facet_wrap()}}
 when plotting \emph{GroupedFrequencyTable} created on basis of one \emph{GroupConditions}
-or \code{\link[=facet_grid]{facet_grid()}} when it was created with two such objects.}
+or \code{\link[ggplot2:facet_grid]{ggplot2::facet_grid()}} when it was created with two such objects.}
 }
 \description{
 Generic plot using \code{ggplot2}. It plots FrequencyTables for all

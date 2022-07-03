@@ -3,8 +3,9 @@ ft_sim <- NULL
 
 test_that("FrequencyTable can be constructed from raw values", {
   
-  expect_warning(
-    ft <<- FrequencyTable(HEXACO_60$HEX_H)  
+  expect_message(
+    ft <<- FrequencyTable(HEXACO_60$HEX_H),
+    class = "IncompleteRangeMessage"
   )
   
   expect_s3_class(
