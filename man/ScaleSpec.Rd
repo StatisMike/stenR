@@ -45,14 +45,16 @@ Defaults to \code{as.integer(NA)}.}
 specific values in place of \code{NA}s, provide a named integer vector there. Names
 should be the names of the questons.}
 
-\item{x}{a \emph{ScaleSpec} object}
+\item{x}{a \code{ScaleSpec} object}
 
 \item{...}{further arguments passed to or from other methods.}
 
-\item{object}{a \emph{ScaleSpec} object}
+\item{object}{a \code{ScaleSpec} object}
 }
 \value{
-object of \emph{ScaleSpec} class
+object of \code{ScaleSpec} class
+
+data.frame of item names, if they are reversed, and custom NA value if available, invisibly
 }
 \description{
 Object containing scale or factor specification data. It describes

@@ -107,11 +107,11 @@ summed <- sum_items_to_scale(
 
 test_that("NAs without NA handling are retained", {
   expect_equal(sum(is.na(summed$reg)), 2)
-  })
+})
 
 test_that("NAs with regular and custom NA handling works correctly", {
   expect_gt(sum(summed$reg_NA, na.rm = T), sum(summed$custom_NA))
-  })
+})
 
 test_that("CombScaleSpec works as intended", {
   
@@ -144,7 +144,7 @@ test_that("Only retained colums are of original class", {
                1)
 })
 
-  
+
 test_that("All scales that are to be calculated are present in the final data", {
   expect_equal(sum(sapply(names(summed), \(x) is.numeric(summed[[x]]))),
                10)

@@ -18,21 +18,21 @@ CombScaleSpec(name, ..., reverse = character(0))
 \item{...}{further arguments passed to or from other methods.}
 
 \item{reverse}{character vector containing names of the underlying subscales
-of factors that need to be reversed}
+or factors that need to be reversed}
 
 \item{x}{a \emph{CombScaleSpec} object}
 
 \item{object}{a \emph{CombScaleSpec} object}
 }
 \value{
-\emph{CombScaleSpec} object
+\code{CombScaleSpec} object
 }
 \description{
-Combine multiple \emph{ScaleSpec} objects into one in regards of \code{\link[=sum_items_to_scale]{sum_items_to_scale()}}
+Combine multiple \code{ScaleSpec} objects into one in regards of \code{\link[=sum_items_to_scale]{sum_items_to_scale()}}
 function. Useful when one scale of factor contains items of different possible
 values or if there is hierarchy of scale or factors.
 
-Also allows combining \emph{CombScaleSpec} object, if the factor structure have deeper
+Also allows combining \code{CombScaleSpec} object if the factor structure have deeper
 hierarchy.
 }
 \examples{

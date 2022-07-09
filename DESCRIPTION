@@ -22,18 +22,18 @@ Imports:
     cli,
     data.table,
     dplyr,
-    jsonlite,
     moments,
     rlang,
     R6,
     stats
 Suggests: 
+    covr,
     ggplot2,
+    jsonlite,
     knitr,
     rmarkdown,
     SimMultiCorrData,
-    testthat (>= 3.0.0),
-    covr
+    testthat (>= 3.0.0)
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 URL: https://statismike.github.io/stenR/
