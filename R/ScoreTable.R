@@ -33,10 +33,10 @@ ScoreTable <- function(ft,
     stop("Object of class 'FrequencyTable' needs to be provided to 'ft' argument")
   if (!class(scale) %in% c("StandardScale", "list"))
     stop("Object of class 'StandardScale' or list of such objects needs to be provided to 'scale' argument")
-  if (class(scale) == "StandardScale") {
+  if (is.StandardScale(scale)) {
     scales <- list(scale)
-  } else if (class(scale) == "list") {
-    areScales <- all(sapply(scale, \(x) class(x) == "StandardScale"))
+  } else {
+    areScales <- all(sapply(scale, is.StandardScale))
     if (!isTRUE(areScales)) 
       stop("List provided to 'scale' argument should contain only StandardScale objects")
     scales <- scale
@@ -162,10 +162,10 @@ attach_scales <- function(x, scale) {
     stop("Object of class 'ScoreTable' needs to be provided to 'x' argument")
   if (!class(scale) %in% c("StandardScale", "list"))
     stop("Object of class 'StandardScale' or list of such objects needs to be provided to 'scale' argument")
-  if (class(scale) == "StandardScale") {
+  if (is.StandardScale(scale)) {
     scales <- list(scale)
-  } else if (class(scale) == "list") {
-    areScales <- all(sapply(scale, \(y) class(y) == "StandardScale"))
+  } else {
+    areScales <- all(sapply(scale, is.StandardScale))
     if (!isTRUE(areScales)) 
       stop("List provided to 'scale' argument should contain only StandardScale objects")
     scales <- scale

@@ -150,28 +150,3 @@ test_that("All scales that are to be calculated are present in the final data", 
                10)
 })
 
-test_that("Printing methods work", {
-  
-  expect_output(print(scale_median_func),
-                regexp = "<ScaleSpec>")
-  
-  expect_output(print(comb_func),
-                regexp = "<CombScaleSpec>")
-  
-  expect_output(print(rec_rev),
-                regexp = "<CombScaleSpec>.*<CombScaleSpec>.*<reversed>")
-})
-
-test_that("Summary methods work", {
-  
-  expect_output(summary(scale_median_func),
-                regexp = "<ScaleSpec>")
-  
-  expect_output(summary(comb_func),
-                regexp = "<CombScaleSpec>")
-  
-  expect_output(summary(rec_rev),
-                regexp = "<CombScaleSpec>.*<ScaleSpec>")
-})
-
-

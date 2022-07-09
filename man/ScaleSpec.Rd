@@ -31,8 +31,8 @@ scale/factor consists of.}
 answer to the item can be scored as.}
 
 \item{reverse}{character vector containing names of the items that need to be
-reversed during scale/factor summing. Reversed using the default \code{min} and
-\code{max} values.}
+reversed during scale/factor summing. Reversed using the default \code{"min"} and
+\code{"max"} values.}
 
 \item{na_strategy}{character vector specifying which strategy should be taken
 during filling of \code{NA}. Defaults to \code{"asis"} and, other options are \code{"mean"},

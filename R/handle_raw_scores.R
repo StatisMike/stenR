@@ -129,8 +129,8 @@ items_summing <- function(spec, data, warn_env) {
 #' @param min,max integer containing the default minimal/maximal value that the
 #' answer to the item can be scored as. 
 #' @param reverse character vector containing names of the items that need to be
-#' reversed during scale/factor summing. Reversed using the default `min` and
-#' `max` values.
+#' reversed during scale/factor summing. Reversed using the default `"min"` and
+#' `"max"` values.
 #' @param na_strategy character vector specifying which strategy should be taken
 #' during filling of `NA`. Defaults to `"asis"` and, other options are `"mean"`, 
 #' `"median"` and `"mode"`. Strategies are explained in the details section. 
@@ -161,6 +161,7 @@ items_summing <- function(spec, data, warn_env) {
 #' @example man/examples/ScaleSpec.R
 #' @family item preprocessing functions
 #' @rdname ScaleSpec
+#' @importFrom cli cli_abort
 #' @export
 #' 
 ScaleSpec <- function(
@@ -173,15 +174,17 @@ ScaleSpec <- function(
     na_value = as.integer(NA),
     na_value_custom) {
   
-  if (!na_strategy[1] %in% c("asis", "mean", "median", "mode"))
-    stop("The 'na_strategy' needs to be one of 'asis', 'mean', 'median' or 'mode'")
+  na_strategy <- match.arg(na_strategy)
   
   if (min >= max)
-    stop("'min' needs to be lesser than 'max'")
+    cli_abort("{.var min} needs to be smaller than {.var max}",
+              class = cli_class$error$WrongMinMax)
   if (min < 0 || max < 0)
-    stop("Only non-negative 'min' and 'max' values are supported.")
+    cli_abort("Only non-negative {.var min} and {.var max} are supported.",
+              class = cli_class$error$WrongMinMax)
   if (!is.character(reverse))
-    stop("Character vector should be specified for 'reverse' argument.")
+    cli_abort("For {.var reverse} argument a character vector should be specified.",
+              class = cli_class$error$Type)
   
   out <- list(
     name = name,
@@ -189,7 +192,7 @@ ScaleSpec <- function(
     min = min,
     max = max,
     reverse = character(0),
-    na_strategy = na_strategy[1],
+    na_strategy = na_strategy,
     na_value = na_value)
   
   class(out) <- "ScaleSpec"
@@ -201,21 +204,21 @@ ScaleSpec <- function(
     rev_missing <- out[["reverse"]][!out[["reverse"]] %in% out[["item_names"]]]
     
     if (length(rev_missing) > 0)
-      stop(paste0("There are some item names specified in `reverse` that are missing from the `item_names`:\n",
-                  "'", paste(rev_missing, sep = "', '"), "'."))
-    
+      cli_abort("There are some item names specified in {.var reverse} that are missing from {.var item_names}: {.val {rev_missing}}.",
+                class = cli_class$error$NoValidVars)
   }
   
   if (!missing(na_value_custom)) {
     if (any(sapply(names(na_value_custom), \(x) is.null(x))) || !is.numeric(na_value_custom))
-      stop("Integer vector assigned to the `na_value_custom` should be named.")
+      cli_abort("Character vector provided to {.var na_value_custom} needs to be named.",
+                 class = cli_class$error$Class)
     
     na_value_names_missing <- names(na_value_custom)
     na_value_names_missing <- na_value_names_missing[!na_value_names_missing %in% item_names]
     
     if (length(na_value_names_missing) > 0)
-      stop(paste0("There are some item names specified in `na_value_custom` that are missing from the `item_names`:\n",
-                  "'", paste(na_value_names_missing, sep = "', '"), "'."))
+      cli_abort("There are some item names specified in {.var na_value_custom} that are missing from {.var item_names}: {.val {na_value_names_missing}}.",
+                class = cli_class$error$NoValidVars)
     
     out[["na_value_custom"]] <- na_value_custom
   }
@@ -227,15 +230,17 @@ ScaleSpec <- function(
 #' @rdname ScaleSpec
 #' @param x a *ScaleSpec* object
 #' @param ... further arguments passed to or from other methods.
+#' @importFrom cli cli cli_text
 #' @export
 print.ScaleSpec <- function(x, ...) {
   
-  cat(sep = "", "<ScaleSpec>: '", x$name, "'\n")
-  cat(sep = "", "No. items: ", length(x$item_names))
-  if (length(x$reverse) > 0) 
-    cat(sep = "", " (", length(x$reverse), " reversed)")
-  cat("\nNA imputation method:", x$na_strategy, "\n")
-  cat("NA literal value:", x$na_value, "\n")
+  cli({
+    cli_text("{.cls ScaleSpec}: {x$name}}")
+    cli_text(paste0("{.field No. items}: {.val {length(x$item_names)}}"),
+             if (length(x$reverse) > 0) " [{.val {length(x$reverse)}} reversed]")
+    cli_text("{.field NA imputation method}: {.val {x$na_strategy}}")
+    cli_text("{.field NA literal value}: {.val {x$na_value}}")
+  })
   
 }
 
@@ -292,7 +297,7 @@ CombScaleSpec <- function(name, ..., reverse = character(0)) {
   
   class(out) <- "CombScaleSpec"
   
-  if (any(sapply(out$ScaleSpecs, \(x) !class(x) %in% c("ScaleSpec", "CombScaleSpec"))))
+  if (any(sapply(out$ScaleSpecs, \(x) !is.ScaleSpec(x) && !is.CombScaleSpec(x))))
     stop("Objects of class 'ScaleSpec' or 'CombScaleSpec' need to be provided in '...' argument.")
   if (!is.character(reverse))
     stop("Character vector need to be provided to 'reverse' argument.")
@@ -306,18 +311,18 @@ CombScaleSpec <- function(name, ..., reverse = character(0)) {
   out[["item_names"]] <- unlist(out[["item_names"]])
   
   out[["min"]] <- sapply(out$ScaleSpecs, \(spec) {
-    if (class(spec) == "ScaleSpec")
+    if (is.ScaleSpec(spec))
       spec$min * length(spec$item_names)
-    else if (class(spec) == "CombScaleSpec")
+    else if (is.CombScaleSpec(spec))
       spec$min
   })
   
   out[["min"]] <- sum(out[["min"]])
   
   out[["max"]] <- sapply(out$ScaleSpecs, \(spec) {
-    if (class(spec) == "ScaleSpec")
+    if (is.ScaleSpec(spec))
       spec$max * length(spec$item_names)
-    else if (class(spec) == "CombScaleSpec")
+    else if (is.CombScaleSpec(spec))
       spec$max
   })
   

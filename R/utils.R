@@ -22,7 +22,8 @@ cli_class <- list(
     TooManyConditions = "TooManyConditionsError",
     WrongGroup = "WrongGroupError",
     WrongFormula = "WrongFormulaError",
-    WrongIdVal = "WrongIdValError"
+    WrongIdVal = "WrongIdValError",
+    WrongMinMax = "WrongMinMax"
   ),
   warning = list(
     Type = "TypeWarning",
