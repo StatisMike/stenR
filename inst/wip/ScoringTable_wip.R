@@ -102,13 +102,13 @@ for (ST in list(NEO_N_ST, NEO_N_1gST, NEO_N_2gST)) {
   )
   
   imported_csv <- import_ScoringTable(
-    source_file = ST_csv,
+    source = ST_csv,
     method = "csv",
     cond_file = GC_csv
   )
   
   imported_json <- import_ScoringTable(
-    source_file = ST_json,
+    source = ST_json,
     method = "json"
   )
   

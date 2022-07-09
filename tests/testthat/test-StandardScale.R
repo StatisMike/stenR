@@ -32,29 +32,6 @@ test_that("StandardScale can be constructed", {
   expect_s3_class(short_scale, "StandardScale")
 })
 
-test_that("StandardScale prints correctly", {
-  
-  expect_output(
-    print(wide_scale),
-    regexp = paste0(
-      "^.*StandardScale.*'", wide_scale_args$name, 
-      ".*M.*", wide_scale_args$M, 
-      ".*SD.*", wide_scale_args$SD, 
-      ".*min.*", wide_scale_args$min, 
-      ".*max.*", wide_scale_args$max, ".*\\)$"
-  ))
-  
-  expect_output(
-    print(short_scale),
-    regexp = paste0(
-      "^.*StandardScale.*'", short_scale_args$name, 
-      ".*M.*", short_scale_args$M, 
-      ".*SD.*", short_scale_args$SD, 
-      ".*min.*", short_scale_args$min, 
-      ".*max.*", short_scale_args$max, ".*\\)$"
-    ))
-})
-
 test_that("StandardScale plots correctly", {
   
   expect_s3_class(

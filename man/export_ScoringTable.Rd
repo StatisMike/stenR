@@ -7,31 +7,35 @@
 export_ScoringTable(
   table,
   out_file,
-  method = c("csv", "json"),
+  method = c("csv", "json", "object"),
   conditions_file
 )
 }
 \arguments{
-\item{table}{A \emph{ScoringTable} object to export}
+\item{table}{A \code{ScoringTable} object to export}
 
-\item{out_file}{Output file}
+\item{out_file}{Output file. Ignored if \code{method = "object"}}
 
-\item{method}{Method for export, either \code{csv} or \code{json}}
+\item{method}{Method for export, either \code{"csv"}, \code{"json"} or \code{"object"}}
 
-\item{conditions_file}{Output file for \emph{GroupConditions}. Necessary only
-if \code{method = csv}.}
+\item{conditions_file}{Output file for \code{GroupConditions}. Used only
+if \code{method = csv} and \code{table} created with \code{GroupedScoreTable}.}
+}
+\value{
+list containing \code{ScoringTable} \code{tibble} and \code{GroupConditions} if
+\code{method = "object"}. \code{NULL} for other methods
 }
 \description{
-After creation of \emph{ScoringTable} it can be handy to export it
+After creation of \code{ScoringTable} it can be handy to export it
 into universally recognized and readable format. Two formats are currently
-supported: \code{csv} and \code{json}. They can be imported back into \emph{ScoringTable}
-using \code{import_ScoreTable} function.
+supported: \emph{csv} and \emph{json}. They can be imported back into \code{ScoringTable}
+using \code{\link[=import_ScoringTable]{import_ScoringTable()}} function.
 \itemize{
-\item \code{csv} format is more universally readable - it can be opened, edited
-and altered (eg. before publication) in any spreadsheet manager. In case of
-\emph{ScoringTable} created from \emph{GroupedScoreTable}, \emph{GroupConditions} can
-be exported to another \code{csv} file, creating two different files.
-\item \code{json} format can be more obtuse, but it allows export of both
-\emph{ScoringTable} itself and \emph{GroupConditions} in the same \code{json} file.
+\item \emph{csv} format is universally readable - it can be opened, edited
+and altered (eg. before publication) in any spreadsheet editor. In case of
+\code{ScoringTable} created from \code{GroupedScoreTable}, \code{GroupConditions} can
+be exported to another \emph{csv} file, creating two different files.
+\item \emph{json} format can be more obtuse, but it allows export of both
+\code{ScoringTable} itself and \code{GroupConditions} in the same \emph{json} file.
 }
 }

@@ -20,31 +20,31 @@ to_ScoringTable(table, ...)
 \method{to_ScoringTable}{GroupedScoreTable}(table, scale = NULL, min_raw = NULL, max_raw = NULL, ...)
 }
 \arguments{
-\item{table}{\emph{ScoreTable} or \emph{GroupedScoreTable} object}
+\item{table}{\code{ScoreTable} or \code{GroupedScoreTable} object}
 
 \item{...}{additional arguments}
 
-\item{scale}{\emph{character} name of the scale attached in \code{table}. If only one
+\item{scale}{name of the scale attached in \code{table}. If only one
 scale is attached, it can be left as default \code{NULL}}
 
-\item{min_raw}{\emph{numeric} absolute minimum score that can be received. If left
+\item{min_raw}{absolute minimum score that can be received. If left
 as default \code{NULL}, the minimum available in the data will be used.}
 
-\item{max_raw}{\emph{numeric} absolute maximum score that can be received. If left
+\item{max_raw}{absolute maximum score that can be received. If left
 as default \code{NULL}, the maximum available in the data will be used.}
 
 \item{score_colname}{Name of the column containing the raw scores}
 }
 \value{
-\emph{ScoringTable}
+\code{ScoringTable} object
 }
 \description{
-ScoringTable is a simple version of \emph{ScoreTable} or \emph{GroupedScoreTable},
-that don't include the \emph{FrequencyTable} internally. It can be easily
+ScoringTable is a simple version of \code{\link[=ScoreTable]{ScoreTable()}} or \code{\link[=GroupedScoreTable]{GroupedScoreTable()}},
+that don't include the \code{FrequencyTable} internally. It can be easily
 saved to \code{csv} or \code{json} using \code{\link[=export_ScoringTable]{export_ScoringTable()}} and loaded from these
-files using \code{import_ScoringTable}.
+files using \code{\link[=import_ScoringTable]{import_ScoringTable()}}.
 
-When using \emph{GroupedScoreTable}, the columns will be named the same as the
-name of group. If it was created using two \emph{GroupCondition} object, the names
+When using \code{GroupedScoreTable}, the columns will be named the same as the
+name of group. If it was created using two \code{GroupCondition} object, the names
 of columns will be names of the groups seperated by \code{:}
 }

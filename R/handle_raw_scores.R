@@ -8,19 +8,19 @@
 
 items_summing <- function(spec, data, warn_env) {
   
- if (class(spec) == "CombScaleSpec") {
+ if (is.CombScaleSpec(spec)) {
     
     comb_scale <- lapply(spec$ScaleSpecs, \(single_spec) {
       
       single_scale <- items_summing(single_spec, data, warn_env)
       
-      if (single_spec$name %in% spec$reverse && class(single_spec) == "ScaleSpec") {
+      if (single_spec$name %in% spec$reverse && is.ScaleSpec(single_spec)) {
         single_scale <- 
           (single_spec$min * length(single_spec$item_names) + 
              single_spec$max * length(single_spec$item_names)) - single_scale
       }
       
-      if (single_spec$name %in% spec$reverse && class(single_spec) == "CombScaleSpec") {
+      if (single_spec$name %in% spec$reverse && is.CombScaleSpec(single_spec)) {
         single_scale <- single_spec$min + single_spec$max - single_scale
       }
       
@@ -158,7 +158,7 @@ items_summing <- function(spec, data, warn_env) {
 #' - literal `NA`s imputation  
 #' 
 #' @return object of *ScaleSpec* class
-#' @example examples/ScaleSpec.R
+#' @example man/examples/ScaleSpec.R
 #' @family item preprocessing functions
 #' @rdname ScaleSpec
 #' @export
@@ -281,7 +281,7 @@ summary.ScaleSpec <- function(object, ...) {
 #' of factors that need to be reversed
 #' @family item preprocessing functions
 #' @return *CombScaleSpec* object
-#' @example examples/CombScaleSpec.R
+#' @example man/examples/CombScaleSpec.R
 #' @rdname CombScaleSpec
 #' @export
 CombScaleSpec <- function(name, ..., reverse = character(0)) {
@@ -377,7 +377,7 @@ summary.CombScaleSpec <- function(object, ...) {
 #' @param .dots *ScaleSpec* objects provided as a list, instead of individually
 #' in `...`. 
 #' @return object of class *data.frame*
-#' @example examples/sum_items_to_scale.R
+#' @example man/examples/sum_items_to_scale.R
 #' @family item preprocessing functions
 #' @export
 sum_items_to_scale <- function(

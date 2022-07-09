@@ -13,7 +13,7 @@
 #' - `Z` - normalized Z score for the x raw score
 #' - name of the scale calculated in *ScoreTable* provided to `table` argument 
 #' 
-#' @example examples/normalize_score.R
+#' @example man/examples/normalize_score.R
 #' @return Numeric vector with values specified in `what` argument
 #' @family score-normalization functions
 #' 
@@ -70,7 +70,7 @@ normalize_score <- function(
 #' retained, `FALSE` if none, or *character vector* with names of columns to be retained
 #' @param .dots *ScoreTable* or *FrequencyTable* objects provided as a list, 
 #' instead of individually in `...`. 
-#' @example examples/normalize_scores_df.R
+#' @example man/examples/normalize_scores_df.R
 #' @export
 #' @family score-normalization functions
 #' @return *data.frame* with normalized scores
@@ -151,7 +151,7 @@ normalize_scores_df <- function(
 #' @param .dots *GroupedFrequencyTable* or *GroupedScoreTable* objects provided 
 #' as a list, instead of individually in `...`. 
 #' @export
-#' @example /examples/normalize_scores_grouped.R
+#' @example man/examples/normalize_scores_grouped.R
 #' @family score-normalization functions
 #' @return *data.frame* with normalized scores
 

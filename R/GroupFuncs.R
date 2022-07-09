@@ -1,22 +1,29 @@
 #' checks for formula in `GroupGonditions` and returns the variable names used
 #' in the call
 #' @return *character* vector with variable names
+#' @importFrom cli cli_abort
 #' @noRd
 formula_check <- function(group_formula) {
   
   lhs_val <- rlang::f_lhs(group_formula)
   
   if (isFALSE(is.character(lhs_val)) && length(lhs_val) != 1)
-    stop("LHS of all grouping formulas need to be character string.")
+    cli_abort("{.strong LHS} of all grouping formulas need to be {.emph character}",
+              class = cli_class$error$WrongFormula)
+  
   if (strtrim(lhs_val, 1) == ".")
-    stop("User-defined group name can't begin with reserved symbol'.'")
+    cli_abort("User-defined group name can't begin with reserved symbol {.strong {.val .}}",
+              class = cli_class$error$WrongFormula)
+  
   if (grepl(lhs_val, pattern = ":"))
-    stop("User-defined group name can't contain reserved symbol ':'")
+    cli_abort("User-defined group name can't constain reserved symbol {.strong {.val .}}",
+              class = cli_class$error$WrongFormula)
   
   rhs_val <- rlang::f_rhs(group_formula)
   
   if (isFALSE(is.call(rhs_val)) && length(rhs_val) != 1)
-    stop("RHS of all grouping formulas need to be a call to check assignment.")
+    cli_abort("{.strong RHS of all grouping formulas need to be a call to check assignment.}",
+              class = cli_class$error$WrongFormula)
   
   return(all.vars(rhs_val))
 }
@@ -41,7 +48,8 @@ formula_check <- function(group_formula) {
 #' to `FALSE`
 #' @param .dots *formulas* in form of a *list*
 #' @return *GroupConditions* object
-#' @example examples/GroupConditions.R
+#' @example man/examples/GroupConditions.R
+#' @importFrom cli cli_abort
 #' @export
 
 GroupConditions <- function(
@@ -59,7 +67,8 @@ GroupConditions <- function(
   formula_vars <- unique(sapply(formulas, formula_check))
   
   if (length(formula_vars) == 0)
-    stop("No variables are tested with specified conditions.")
+    cli_abort("No variables are tested with specified conditions.",
+              class = cli_class$error$WrongFormula)
   
   class(formulas) <- "GroupConditions"
   attr(formulas, "cond_category") <- conditions_category
@@ -75,36 +84,20 @@ GroupConditions <- function(
 
 #' @rdname GroupConditions
 #' @param x object
-#' @export
-
-is.GroupConditions <- function(x) {
-  inherits(x, "GroupConditions")
-}
-
-#' @rdname GroupConditions
-#' @param x object
 #' @param ... additional arguments to be passed to or from method
+#' @importFrom cli cli cli_text cli_li
 #' @export
 
 print.GroupConditions <- function(x, ...) {
-  cat("<GroupConditions>\n")
-  cat("Conditions category:", attr(x, "cond_category"), "\n")
-  cat("For", length(unique(attr(x, "groups"))), "unique groups\n\n")
-  cat("Conditions ")
-  cat("[Tested vars: ", paste(attr(x, "formula_vars"), collapse = ", "), "]:\n", sep = "")
-  for (i in seq_along(attr(x, "groups"))) {
-    cat("Group: [")
-    cat(attr(x, "groups")[i])
-    cat("] IF: [")
-    cat(attr(x, "conditions")[i])
-    cat("]\n")
-  }
-  cat("\nForced disjointedness by default: ")
-  cat(attr(x, "force_disjoint"))
-  cat("\n")
-  cat("Forced exhaustiveness by default: ")
-  cat(attr(x, "force_exhaustive"))
-  cat("\n")
+  cli::cli({
+    cli_text("{.cls GroupConditions}")
+    cli_text("Conditions category: {.strong {attr(x, 'cond_category')}}")
+    cli_text("Tested variables: {.val {attr(x, 'formula_vars')}}")
+    cli_text("{.strong {.val {length(unique(attr(x, 'groups')))}} Groups}:")
+    cli_li(paste0("{.field ", attr(x, "groups"), "} IF: {.emph ", attr(x, "conditions"), "}"))
+    cli_text("{.strong Forced disjointedness} by default: {.val {attr(x, 'force_disjoint')}}")
+    cli_text("{.strong Forced exhaustiveness} by default: {.val {attr(x, 'force_exhaustive')}}")
+    })
 }
 
 #' @rdname GroupConditions
@@ -151,7 +144,8 @@ as.data.frame.GroupConditions <- function(x, ...) {
 #' @param ... Do not set - used internally
 #' 
 #' @family observation grouping functions
-#' @example examples/GroupAssignment.R
+#' @example man/examples/GroupAssignment.R
+#' @importFrom cli cli_abort
 #' @export
 #' @return *GroupAssignment* object
 
@@ -166,18 +160,23 @@ GroupAssignment <- function(data,
 
   # checks
   if (!is.data.frame(data))
-    stop("Data provided should be in `data.frame` form.")
+    cli_abort("Data provided should be a {.cls data.frame}.",
+              class = cli_class$error$Class)
   if (!is.GroupConditions(conditions))
-    stop("Object of class `GroupConditions` should be provided to `conditions` argument")
+    cli_abort("{.cls GroupConditions} object should be provided to {.var conditions} argument.",
+              class = cli_class$error$Class)
   if (!all(attr(conditions, "formula_vars") %in% names(data)))
-    stop("Not all variables tested in provided GroupCondition are available in the data.")
+    cli_abort("Not all variables tested in provided {.cls GroupConditions} are available in the {.val data}.",
+              class = cli_class$error$NoConditionsVars)
   
   # mode 
   if (!missing(id)) {
     if (!is.character(id) || length(id) != 1 || !id %in% names(data))
-      stop ("`id` should be a name of one column in the `data`")
+      cli_abort("Value provided to {.var id} argument: {.val {id}} should be name of one column in the {.var data}",
+                class = cli_class$error$WrongIdVal)
     if (nrow(data) != length(unique(data[[id]])))
-      stop ("`id` values are not unique")
+      cli_abort("Values of {.code {data}[[{id}]]} are not unique.",
+                class = cli_class$error$WrongIdVal)
     group_mode <- "id"
   } else {
     group_mode <- "index"
@@ -292,27 +291,31 @@ GroupAssignment <- function(data,
 
 #' @rdname GroupAssignment
 #' @param x object
-
-is.GroupAssignment <- function(x) {
-  inherits(x, "GroupAssignment")
-}
-
-#' @rdname GroupAssignment
-#' @param x object
 #' @param ... additional arguments to be passed to or from method
+#' @importFrom cli cli cli_text
 #' @export
 
 print.GroupAssignment <- function(x, ...) {
-  cat("<GroupAssignment>\n")
-  cat("Total assigned:", attr(x, "total"), "\n")
-  cat("Mode:", attr(x, "mode"), "\n")
-  cat("Groups: '", paste(sapply(x, \(y) paste(y$group, collapse = ":")), collapse = "', '"), "'\n", sep = "")
+  
+  groups <- sapply(x, \(y) paste(y$group, collapse = ":"))
+  
+  cli({
+    if (is.intersected(x))
+      cli_text("{.strong intersected} {.cls GroupAssignment}")
+    else
+      cli_text("{.cls GroupAssignment}")
+    cli_text("Total assigned: {.val {attr(x, 'total')}}")
+    cli_text("Mode: {.val {attr(x, 'mode')}}")
+    cli_text("{.field Groups}:")
+    cli_text("{.val {groups}}")
+  })
 }
 
 #' @rdname GroupAssignment
 #' @param object `GroupAssignment` object
 #' @param ... additional arguments to be passed to or from method
-#' @return list of summaries invisibly
+#' @return list of summaries, invisibly
+#' @importFrom cli cli cli_inform cli_li cli_text
 #' @export
 
 summary.GroupAssignment <- function(object, ...) {
@@ -329,28 +332,23 @@ summary.GroupAssignment <- function(object, ...) {
       nm = sapply(object, \(x) paste(x$group, collapse=":")),
       object = sapply(object, \(x) length(x$els)))
   )
-  cat("<GroupAssignment>\n")
-  cat("Status:\n")
-  cat("Mode: ", summaries$mode, sep = "",
-      if (summaries$mode == "id") 
-        paste("; default ID column:", summaries$id_col), "\n")
-  cat("Total assigned:", summaries$total, "\n")
-  cat("Disjointedness: ", summaries$disjoint, 
-      "; Forced: ", summaries$forced_disjoint, "\n", sep = "")
-  cat("Exhaustiveness: ", summaries$exhaustive, 
-      "; Forced: ", summaries$forced_exhaustive, "\n\n", sep = "")
   
-  cat("Assignment ")
-  cat("[Tested vars: ", paste(attr(object, "formula_vars"), collapse = ", "), "]:\n", sep = "")
-  for (i in seq_along(summaries$groups)) {
-    cat("Group: [")
-    cat(names(summaries$groups)[i])
-    cat("] number of obs: [")
-    cat(summaries$groups[i])
-    cat("]\n")
-  }
-  
-  
+  cli({
+    if (is.intersected(object))
+      cli_text("{.strong intersected} {.cls GroupAssignment}")
+    else
+      cli_text("{.cls GroupAssignment}")
+    cli_text("{.strong Status}")
+    cli_li(paste0("{.field Mode}: {.strong {summaries$mode}}",
+                    if (summaries$mode == "id") " [default ID: {.var {summaries$id_col}}]"))
+    cli_li("{.field Total assigned}: {.val {summaries$total}}")
+    cli_li("{.field Disjointedness}: {.val {summaries$disjoint}}; {.strong Forced}: {.val {summaries$forced_disjoint}}")
+    cli_li("{.field Exhaustiveness}: {.val {summaries$exhaustive}}; {.strong Forced}: {.val {summaries$forced_exhaustive}}")
+    cli_text("{.strong Assignment} [{.emph tested vars:} {.var {attr(object, 'formula_vars')}}]")
+    for (i in seq_along(summaries$groups)) 
+      cli_li("Group: {.strong {names(summaries$groups[i])}} [obs: {.val {summaries$groups[i]}}]")
+  })
+
   return(invisible(summaries))
   
 }
@@ -368,7 +366,8 @@ summary.GroupAssignment <- function(object, ...) {
 #' 
 #' @return *GroupAssignment* object with intersected groups.
 #' @family observation grouping functions
-#' @example examples/intersect_GroupAssignment.R
+#' @importFrom cli cli_abort
+#' @example man/examples/intersect_GroupAssignment.R
 #' @export
 
 intersect_GroupAssignment <- function(
@@ -378,19 +377,23 @@ intersect_GroupAssignment <- function(
     force_exhaustive = FALSE) {
   
   if(any(!is.GroupAssignment(GA1), !is.GroupAssignment(GA2)))
-    stop("Both 'GA1' and 'GA2' need to be of the 'GroupAssignment' class.")
+    cli_abort("Both {.var GA1} and {.var GA2} need to be {.cls GroupAssignment} objects.",
+              class = cli_class$error$Class)
   
-  if(any(inherits(GA1, "Intersect"), inherits(GA2, "Intersect")))
-    stop("Only GroupAssignments that haven't been created by intersection can be intersected")
+  if(is.intersected(GA1) || is.intersected(GA2))
+    cli_abort("{.cls GroupAssignement} can't be intersected twice.",
+              class = cli_class$error$Class)
   
   # make sure that the mode in both GroupAssignment is the same
   if (attr(GA1, "mode") != attr(GA2, "mode"))
-    stop("`mode` of both GroupAssignments need to be the same to intersect them.")
+    cli_abort("{.val mode} of both {.cls GroupAssignment} objects need to be the same.",
+              class = cli_class$error$NoCompatibleAssignements)
   
   # if 'mode' is id, then check the defalt id col
   if (attr(GA1, "mode") == "id") {
     if (attr(GA1, "id_col") != attr(GA2, "id_col")) {
-      stop("Name of default id column in both GroupAssignments need to be the same!")
+      cli_abort("Default of {.val id} in both {.cls GroupAssignment} objects need to be the same.",
+                class = cli_class$error$NoCompatibleAssignements)
     }
   }
   
@@ -509,28 +512,32 @@ intersect_GroupAssignment <- function(
 #'   - *data.frame* if `extract_mode = 'data.frame'` or if only one group is to be
 #'   returned and `simplify = TRUE`
 #' @family observation grouping functions 
-#' @example /examples/extract_observations.R
+#' @example man/examples/extract_observations.R
+#' @importFrom cli cli_abort
 #' @export
 
 extract_observations <- function(
     data, 
     groups, 
     group_names = NULL,
-    extract_mode = "list",
+    extract_mode = c("list", "data.frame"),
     strict_names = TRUE,
     simplify = FALSE,
     id) {
   
+  extract_mode <- match.arg(extract_mode)
+  
   # basic checks ####
   if (!is.data.frame(data))
-    stop("Data provided should be in `data.frame` form.")
+    cli_abort("{.var data} needs to be a {.cls data.frame} object.",
+              class = cli_class$error$Class)
   if (!is.null(group_names) && (!is.character(group_names) || length(group_names) == 0))
-    stop("Names in 'group_names' need to be provided in form of 'character' vector.")
-  if (!extract_mode %in% c("list", "data.frame"))
-    stop("Either 'list' or 'data.frame' need to be provided in 'extract_mode'.")
+    cli_abort("{.var group_names} need to be a {.emph character} vector.",
+              class = cli_class$error$Type)
   if (!is.GroupAssignment(groups))
-    stop("Object of class 'GroupAssignment' need to be provided to 'groups' argument")
-  
+    cli_abort("{.cls GroupAssignment} object need to be provided to {.var groups} argument.",
+              class = cli_class$error$Class)
+
   # if no name is provided, extract all groups with strict name strategy
   if (is.null(group_names)) {
     group_names <- sapply(groups, \(x) paste(x$group, collapse = ":"))
@@ -546,8 +553,9 @@ extract_observations <- function(
     groups_to_extract <- sapply(groups, \(x) any(x$group %in% group_names)) 
   ## additional check
   if (sum(groups_to_extract) == 0)
-    stop("No group matches the provided 'group_names'.")
-  
+    cli_abort("No group matches the provided {.var group_names}: {.val {group_names}}.",
+              class = cli_class$error$WrongGroup)
+
   if (attr(groups, "mode") == "id" && missing(id))
     id <- attr(groups, "id_col")
   
@@ -557,7 +565,8 @@ extract_observations <- function(
     ## if group mode is ID
     if (attr(groups, "mode") == "id") {
       if (!id %in% names(data))
-        stop ("ID column: '", id, "' is not present in the 'data' provided.")
+        cli_abort("ID column: {.val {id}} is not present in the provided data.",
+                  class = cli_class$error$WrongIdVal)
       
       grp_ind <- which(data[[attr(groups, "id_col")]] %in% grp$els)
     } else {

@@ -6,12 +6,14 @@
 #' @param scores numeric vector of standardized scores
 #' @param raws character vector of numeric raw scores separated by `split`.
 #' @param name character name of the scores names
+#' @importFrom cli cli_abort
 #' @noRd  
 
 scores_to_long <- function(scores, raws, name, split = ":") {
   
   if (length(scores) != length(raws)) {
-    stop("Uneven scores and raws lengths")
+    cli_abort("Uneven {.var scores}: {.val {length(scores)}} and {.var raws}: {.val {length(raws)}}",
+              "WrongLengthError")
   }
   
   sc_tbl <- lapply(seq_along(scores), \(i) {
@@ -65,7 +67,7 @@ create_st <- function(short_st,
   ss_ind <- which(grepl(names(raw_table), pattern = paste0("^", standard_scores, "$")))
   
   if (length(ss_ind) != 1)
-    stop(paste0("There is not exactly one column named '", standard_scores, "' (standard_scores)."))
+    cli_abort("There is not exactly one column named {.val {standard_scores}}.")
   
   for (x_val_i in x_ind) {
     
@@ -90,17 +92,17 @@ create_st <- function(short_st,
 #### EXPORTED ####
 
 #' @title Create ScoringTable
-#' @description ScoringTable is a simple version of *ScoreTable* or *GroupedScoreTable*,
-#' that don't include the *FrequencyTable* internally. It can be easily
+#' @description ScoringTable is a simple version of [ScoreTable()] or [GroupedScoreTable()],
+#' that don't include the `FrequencyTable` internally. It can be easily
 #' saved to `csv` or `json` using [export_ScoringTable()] and loaded from these
-#' files using `import_ScoringTable`.
+#' files using [import_ScoringTable()].
 #' 
-#' When using *GroupedScoreTable*, the columns will be named the same as the
-#' name of group. If it was created using two *GroupCondition* object, the names
+#' When using `GroupedScoreTable`, the columns will be named the same as the
+#' name of group. If it was created using two `GroupCondition` object, the names
 #' of columns will be names of the groups seperated by `:`
-#' @param table *ScoreTable* or *GroupedScoreTable* object
+#' @param table `ScoreTable` or `GroupedScoreTable` object
 #' @param ... additional arguments 
-#' @return *ScoringTable*
+#' @return `ScoringTable` object
 #' @export
 
 to_ScoringTable <- function(table, ...) {
@@ -110,22 +112,30 @@ to_ScoringTable <- function(table, ...) {
 }
 
 #' @rdname to_ScoringTable
-#' @param scale *character* name of the scale attached in `table`. If only one
+#' @param scale name of the scale attached in `table`. If only one
 #' scale is attached, it can be left as default `NULL`
-#' @param min_raw *numeric* absolute minimum score that can be received. If left
+#' @param min_raw absolute minimum score that can be received. If left
 #' as default `NULL`, the minimum available in the data will be used.
-#' @param max_raw *numeric* absolute maximum score that can be received. If left
+#' @param max_raw absolute maximum score that can be received. If left
 #' as default `NULL`, the maximum available in the data will be used.
 #' @param score_colname Name of the column containing the raw scores
+#' @importFrom cli cli_abort
 #' @export
 
 to_ScoringTable.ScoreTable <- function(
     table, scale = NULL, min_raw = NULL, max_raw = NULL, score_colname = "Score", ...) {
   
+  
+  
   if (is.null(scale) && length(table$scales) != 1)
-    stop("If 'ScoreTable' have multiple scales attached, provide 'scale' argument.")
-  else if (length(table$scales == 1)) 
+    cli_abort("{.cls ScoreTable} have multiple scales attached: {.val {names(table$scales)}}. Provide one of these names to {.var scale}.",
+              class = "ScaleNonunequivocalError")
+  else if (length(table$scales == 1)) {
+    if (!scale %in% names(table$scales))
+      cli_abort("{.var scale}: {.val {scale}} is not attached. Choose one of {.val {names(table$scales)}}",
+                class = "WrongScaleError")
     scale <- names(table$scales)
+  }
   
   score_values <- table$table[[scale]] |> unique()
   
@@ -176,43 +186,42 @@ to_ScoringTable.GroupedScoreTable <- function(
 }
 
 #' @title Export ScoringTable
-#' @description After creation of *ScoringTable* it can be handy to export it
+#' @description After creation of `ScoringTable` it can be handy to export it
 #' into universally recognized and readable format. Two formats are currently
-#' supported: `csv` and `json`. They can be imported back into *ScoringTable*
-#' using `import_ScoreTable` function.
+#' supported: *csv* and *json*. They can be imported back into `ScoringTable`
+#' using [import_ScoringTable()] function.
 #' 
-#' - `csv` format is more universally readable - it can be opened, edited
-#' and altered (eg. before publication) in any spreadsheet manager. In case of 
-#' *ScoringTable* created from *GroupedScoreTable*, *GroupConditions* can
-#' be exported to another `csv` file, creating two different files.
-#' - `json` format can be more obtuse, but it allows export of both 
-#' *ScoringTable* itself and *GroupConditions* in the same `json` file.
-#' @param table A *ScoringTable* object to export
-#' @param out_file Output file
-#' @param method Method for export, either `csv` or `json`
-#' @param conditions_file Output file for *GroupConditions*. Necessary only
-#' if `method = csv`.
+#' - *csv* format is universally readable - it can be opened, edited
+#' and altered (eg. before publication) in any spreadsheet editor. In case of 
+#' `ScoringTable` created from `GroupedScoreTable`, `GroupConditions` can
+#' be exported to another *csv* file, creating two different files.
+#' - *json* format can be more obtuse, but it allows export of both 
+#' `ScoringTable` itself and `GroupConditions` in the same *json* file.
+#' @param table A `ScoringTable` object to export
+#' @param out_file Output file. Ignored if `method = "object"`
+#' @param method Method for export, either `"csv"`, `"json"` or `"object"`
+#' @param conditions_file Output file for `GroupConditions`. Used only
+#' if `method = csv` and `table` created with `GroupedScoreTable`.
+#' @importFrom cli cli_abort cli_alert_warning
+#' @return list containing `ScoringTable` `tibble` and `GroupConditions` if
+#' `method = "object"`. `NULL` for other methods
 #' @export
 
 export_ScoringTable <- function(table,
                                 out_file,
-                                method = c("csv", "json"),
+                                method = c("csv", "json", "object"),
                                 conditions_file) {
   
   if (!is.ScoringTable(table))
-    stop("Object of class 'ScoringTable', need to be provided in 'table' argument")
+    cli_abort("Object of class {.cls ScoringTable} need to be provided in {.var table}.")
   
   method <- match.arg(method)
   
   cond <- attr(table, "conditions")
   
-  if (method == "csv" && !is.null(cond) && missing(conditions_file))
-    warning("'GroupConditions' haven't been exported. To export them with 'csv' method, ",
-            "please provide the 'conditions_file' argument.")
-  
-  if (method == "json" && !requireNamespace("jsonlite", quietly = T))
-    stop("To use 'json' exporting method, package 'jsonlite' needs to be installed.")
-  
+  if (method == "json")
+    rlang::check_installed("jsonlite")
+
   switch(method,
          csv = {
            utils::write.csv(table, file = out_file, row.names = F)
@@ -221,7 +230,8 @@ export_ScoringTable <- function(table,
              cond_df <- dplyr::bind_rows(cond_ls)
              utils::write.csv(cond_df, conditions_file, row.names = F)
            } else if (!is.null(attr(table, "conditions"))) 
-             message("Exported ScoringTable based on GroupedScoreTable without exporting conditions.")
+             cli_alert_warning("{.cls GroupConditions} haven't been exported. To export them with {.emph csv method}, please provide the {.var conditions_file} argument",
+                               class = "NonExportedConditionsWarning")
          },
          json = {
            out <- list(ScoringTable = table)
@@ -236,92 +246,125 @@ export_ScoringTable <- function(table,
            }
            
            jsonlite::write_json(out, out_file)
+         },
+         object = {
+           out <- list(ScoringTable = dplyr::as_tibble(table))
+           if (!is.null(cond)) {
+             
+             out[["GroupConditions"]] <- 
+               lapply(cond, \(x) 
+                      attr(x, "conditions"))
+             
+             names(out[["GroupConditions"]]) <- sapply(cond, \(x) attr(x, "cond_category"))
+             
+             return(out)
+           }
          })
 }
 
 #' @title Import ScoringTable
-#' @description ScoringTable can be imported from `csv` or `json` file
+#' @description `ScoringTable` can be imported from `csv` or `json` file
 #' into R object. Source file can be either an output of [export_ScoringTable()]
 #' function, or created by hand - though it needs to be created following the
 #' correct format.
-#' @param source_file Path to the file to import the *ScoringTable* from
-#' @param method Method for import, either `csv` or `json`
-#' @param cond_file File to import the *GroupConditions* from, if using `csv` method
-#' @param conditions If no conditions file is provided (when using `csv` method)
-#' or the existing conditions (when using `json` method) are to be overwritten,
-#' provide *GroupCondition* object or list of up to two of them here.
-#' @return ScoringTable object
+#' @param source Path to the file to import the `ScoringTable` from (for *csv* and *json* methods)
+#' or `ScoringTable` in form of `data.frame` (for *object* method)
+#' @param method Method for import, either *csv*, *json* or *object*
+#' @param cond_file File to import the `GroupConditions` from, if using *csv* method
+#' @param conditions `GroupCondition` object or list of up to two of them. Mandatory
+#' for *object* method and *csv* method if no `cond_file` is provided. If provided
+#' while using *json* method, original `GroupConditions` will be ignored.  
+#' @importFrom cli cli_abort
+#' @return `ScoringTable` object
 #' @export
 
 import_ScoringTable <- function(
-    source_file,
-    method = c("csv", "json"),
+    source,
+    method = c("csv", "json", "object"),
     cond_file,
     conditions) {
   
   method <- match.arg(method)
   
-  out <- switch(method,
-                
-                csv = {
-                  st_read <- utils::read.table(source_file, sep = ",")
-                  st_df <- st_read[-1, ]
-                  names(st_df) <- as.character(st_read[1, ])
-                  rownames(st_df) <- NULL
-                  out <- list(st = st_df)
-                  
-                  if (ncol(st_df) > 2) {
-                    
-                    # priority: handle conditions provided
-                    if (!missing(conditions)) {
-                      if (is.GroupConditions(conditions))
-                        conditions <- list(conditions)
-                      gc_df <-  dplyr::bind_rows(
-                        lapply(conditions, as.data.frame.GroupConditions))
-                      
-                    } else if (!missing(cond_file)) {
-                      gc_df <- utils::read.csv(cond_file)
-                    } else {
-                      stop("When importing ScoringTable with groups, provide either 'cond_file' or 'conditions' arguments")
-                    }
-                    out[["gc"]] <- gc_df
-                  }
-                  
-                  out
-                },
-                
-                json = {
-                  
-                  st_read <- jsonlite::read_json(source_file, simplifyVector = T)
-                  st_df <- st_read[["ScoringTable"]]
-                  st_df <- as.data.frame(dplyr::bind_rows(st_df))
-                  
-                  
-                  if (!is.null(st_read[["GroupConditions"]]) && ncol(st_read[["ScoringTable"]]) > 2) {
-                    gc_df <- lapply(st_read[["GroupConditions"]], \(cond) {
-                      data.frame(group = names(cond), condition = unlist(cond), row.names = NULL)
-                    })
-                    
-                    out <- list(st = st_df,
-                                gc = dplyr::bind_rows(gc_df, .id = "category"))
-                    
-                  } else if (ncol(st_read[["ScoringTable"]]) == 2){
-                    
-                    out <- list(st = st_df)
-                    
-                  }
-                  
-                  # if conditions are provided, overwrite them
-                  if (!missing(conditions) && ncol(st_read[["ScoringTable"]]) > 2) {
-                    if (is.GroupConditions(conditions))
-                      conditions <- list(conditions)
-                    out[["gc"]] <- dplyr::bind_rows(
-                      lapply(conditions, as.data.frame.GroupConditions))
-                    
-                  }
-                  
-                  out
-                })
+  if (method %in% c("csv", "json") && (!is.character(source) || length(source) != 1 || !file.exists(source)))
+    cli_abort("With {.code method = {.val {method}}} the {.var source} needs to be a path to the existing file.",
+              class = cli_class$error$WrongSourceError)
+  
+  if (method == "object" && inherits(source, "tibble"))
+    cli_abort("With {.code method = {.val object}} the {.var source} needs to be a {.cls tibble}.",
+              class = cli_class$error$WrongSourceError)
+  
+  switch(method,
+         
+         csv = {
+           st_read <- utils::read.table(source, sep = ",")
+           st_df <- st_read[-1, ]
+           names(st_df) <- as.character(st_read[1, ])
+           rownames(st_df) <- NULL
+           out <- list(st = st_df)
+           
+           if (ncol(st_df) > 2) {
+             
+             # priority: handle conditions provided
+             if (!missing(conditions)) {
+               if (is.GroupConditions(conditions))
+                 conditions <- list(conditions)
+               gc_df <-  dplyr::bind_rows(
+                 lapply(conditions, as.data.frame.GroupConditions))
+               
+             } else if (!missing(cond_file)) {
+               gc_df <- utils::read.csv(cond_file)
+             } else {
+               cli_abort("When importing {.cls ScoringTable} with groups, provide either {.var cond_file} or {.var conditions} arguments",
+                         class = cli_class$error$NoConditions)
+             }
+             out[["gc"]] <- gc_df
+           }
+         },
+         
+         json = {
+           
+           st_read <- jsonlite::read_json(source, simplifyVector = T)
+           st_df <- st_read[["ScoringTable"]]
+           st_df <- as.data.frame(dplyr::bind_rows(st_df))
+           
+           
+           if (!is.null(st_read[["GroupConditions"]]) && ncol(st_read[["ScoringTable"]]) > 2) {
+             gc_df <- lapply(st_read[["GroupConditions"]], \(cond) {
+               data.frame(group = names(cond), condition = unlist(cond), row.names = NULL)
+             })
+             
+             out <- list(st = st_df,
+                         gc = dplyr::bind_rows(gc_df, .id = "category"))
+             
+           } else if (ncol(st_read[["ScoringTable"]]) == 2){
+             
+             out <- list(st = st_df)
+             
+           }
+           
+           # if conditions are provided, overwrite them
+           if (!missing(conditions) && ncol(st_read[["ScoringTable"]]) > 2) {
+             if (is.GroupConditions(conditions))
+               conditions <- list(conditions)
+             out[["gc"]] <- dplyr::bind_rows(
+               lapply(conditions, as.data.frame.GroupConditions))
+             
+           }
+         },
+         
+         object = {
+           
+           out <- list(st = source)
+           
+           if (ncol(out$st) > 2) {
+             if (is.GroupConditions(conditions))
+               conditions <- list(conditions)
+             out[["gc"]] <- dplyr::bind_rows(
+               lapply(conditions, as.data.frame.GroupConditions)
+             )
+           }
+         })
   
   st_out <- out[["st"]]
   if (!is.null(out[["gc"]])) {
@@ -340,6 +383,7 @@ import_ScoringTable <- function(
 #' @param st_df data.frame form of ScoreTable
 #' @param gc_df data.frame form of GroupConditions
 #' @return list of *GroupConditions* objects or `NULL`
+#' @importFrom cli cli_abort
 #' @keywords internal
 
 verify_GC_for_ST <- function(st_df, gc_df) {
@@ -353,8 +397,8 @@ verify_GC_for_ST <- function(st_df, gc_df) {
   is_intersected <- all(sapply(splitted, \(x) length(x)) == 2)
   
   if (is_intersected && length(unique(gc_df$category)) != 2)
-    stop("Imported ScoringTable seems to be based upon intersected GroupConditions, ",
-         "but only one GroupCondition is provided")
+    cli_abort("Imported {.cls ScoringTable} is based upon {.emph intersected} {.cls GroupConditions}, but only one {.cls GroupConditions} object is provided.",
+              class = cli_class$error$ScoringImport)
   
   groups <- lapply(unique(gc_df$category), \(x) {
     out <- list(category = x,
@@ -375,17 +419,38 @@ verify_GC_for_ST <- function(st_df, gc_df) {
   } else {
     
     if (length(unique(gc_df$category)) != 1)
-      stop("Imported ScoringTable seems to be based upon one GroupConditions, ",
-           "but two GroupConditions object are provided")
+      cli_abort("Imported {.cls ScoringTable} is based on one {.cls GroupConditions} object, but two are provided.",
+                class = cli_class$error$ScoringImport)
     
     valid_groups <- isTRUE(
       all(group_cols %in% groups[[1]]$groups)
     )
   }
   
-  if (!isTRUE(valid_groups))
-    stop("Provided GroupConditions are not compatible with imported ScoringTable")
-  
+  # TODO: More informative message
+  if (!isTRUE(valid_groups)) {
+    # cli({
+      cli_abort(c("Provided {.cls GroupConditions} are not compatible with imported {.cls ScoringTable}"),
+                class = cli_class$error$ScoringImport)
+    #   cli_h2("In {.cls ScoringTable}")
+    #   for (n_st in seq_along(splitted[[1]])) {
+    #     
+    #     vals <- unique(sapply(splitted, \(x) x[n_st]))
+    #     vals <- vals[!grepl(vals, pattern = "^\\.")]
+    #     cli_inform(c("*" = "{.val {vals}}"))
+    #   }
+    #   
+    #   cli_h2("In {.cls GroupConditions}")
+    #   for (group in groups) {
+    #     
+    #     vals <- group$groups
+    #     vals <- vals[!grepl(vals, pattern = "^\\.")]
+    #     cli_inform(c("*" = "{.val {vals}}"))
+    #   }
+    #     
+    # })
+  }
+    
   out <- lapply(groups, \(x) {
     
     conds <- paste0("'", x$groups[!grepl(x = x$groups, pattern = "^\\.")], 

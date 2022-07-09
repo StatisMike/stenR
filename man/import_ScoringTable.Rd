@@ -5,28 +5,29 @@
 \title{Import ScoringTable}
 \usage{
 import_ScoringTable(
-  source_file,
-  method = c("csv", "json"),
+  source,
+  method = c("csv", "json", "object"),
   cond_file,
   conditions
 )
 }
 \arguments{
-\item{source_file}{Path to the file to import the \emph{ScoringTable} from}
+\item{source}{Path to the file to import the \code{ScoringTable} from (for \emph{csv} and \emph{json} methods)
+or \code{ScoringTable} in form of \code{data.frame} (for \emph{object} method)}
 
-\item{method}{Method for import, either \code{csv} or \code{json}}
+\item{method}{Method for import, either \emph{csv}, \emph{json} or \emph{object}}
 
-\item{cond_file}{File to import the \emph{GroupConditions} from, if using \code{csv} method}
+\item{cond_file}{File to import the \code{GroupConditions} from, if using \emph{csv} method}
 
-\item{conditions}{If no conditions file is provided (when using \code{csv} method)
-or the existing conditions (when using \code{json} method) are to be overwritten,
-provide \emph{GroupCondition} object or list of up to two of them here.}
+\item{conditions}{\code{GroupCondition} object or list of up to two of them. Mandatory
+for \emph{object} method and \emph{csv} method if no \code{cond_file} is provided. If provided
+while using \emph{json} method, original \code{GroupConditions} will be ignored.}
 }
 \value{
-ScoringTable object
+\code{ScoringTable} object
 }
 \description{
-ScoringTable can be imported from \code{csv} or \code{json} file
+\code{ScoringTable} can be imported from \code{csv} or \code{json} file
 into R object. Source file can be either an output of \code{\link[=export_ScoringTable]{export_ScoringTable()}}
 function, or created by hand - though it needs to be created following the
 correct format.

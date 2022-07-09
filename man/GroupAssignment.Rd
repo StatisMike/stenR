@@ -2,7 +2,6 @@
 % Please edit documentation in R/GroupFuncs.R
 \name{GroupAssignment}
 \alias{GroupAssignment}
-\alias{is.GroupAssignment}
 \alias{print.GroupAssignment}
 \alias{summary.GroupAssignment}
 \title{Assign to groups based on GroupConditions}
@@ -17,8 +16,6 @@ GroupAssignment(
   .all = FALSE,
   ...
 )
-
-is.GroupAssignment(x)
 
 \method{print}{GroupAssignment}(x, ...)
 
@@ -61,7 +58,7 @@ used for creation of \code{\link[=GroupedFrequencyTable]{GroupedFrequencyTable()
 \value{
 \emph{GroupAssignment} object
 
-list of summaries invisibly
+list of summaries, invisibly
 }
 \description{
 Using \emph{GroupConditions} object, assign observations to one

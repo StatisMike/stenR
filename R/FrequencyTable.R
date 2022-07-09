@@ -16,13 +16,17 @@
 #' - status: list containing the total number of simulated observations (`n`) 
 #' and information about raw scores range completion (`range`): complete or incomplete 
 #' @seealso [SimFrequencyTable()]
+#' @importFrom cli cli_abort cli_warn
 #' @export
 
 FrequencyTable <- function(data) {
   
-  if (!is.numeric(data)) stop("Vector of non-numeric values were provided")
+  if (!is.numeric(data)) 
+    cli_abort("Vector of non-numeric values were provided to {.val data}.",
+              class = cli_class$error$Type)
   if (!is.integer(data)) {
-    warning("Non-integer numeric values were coerced to integers")
+    cli_warn("Non-integer values were coerced to integers.",
+             class = cli_class$warning$Type)
     raw <- as.integer(data)
   }
   
@@ -101,13 +105,14 @@ FrequencyTable <- function(data) {
 #' @param max numeric or NULL, specifying the maximal number of entries to be 
 #' printed. By default, when NULL, \code{\link{getOption}("max.print")} used.
 #' @param ... further arguments passed to or from other methods.
-#' @param print_table *boolean* if true, then the `table` object is printed also.
+#' @param print_table if true, then the `table` object is printed also.
+#' @importFrom cli cli_inform
 #' @rdname FrequencyTable
 #' @export
 print.FrequencyTable <- function(x, max = NULL, print_table = FALSE, ...) {
   
-  cat(sep = "", "<FrequencyTable> computed on: ", x$status$n, " observations\n")
-  cat("range:", x$status$range, if(x$status$range != "complete") "(missing raw score values between <min> and <max>)", "\n\n")
+  cli_inform("{.cls FrequencyTable} computed on {.val {x$status$n}} observations")
+  cli_inform("range: {.emph {x$status$range}}")
   
   if (isTRUE(print_table))
     print(x$table, max = max, row.names = F)
@@ -121,8 +126,7 @@ print.FrequencyTable <- function(x, max = NULL, print_table = FALSE, ...) {
 #' @export
 plot.FrequencyTable <- function(x, ...) {
   
-  if (!requireNamespace("ggplot2", quietly = T))
-    stop("Generic plotting of 'FrequencyTable' requires 'ggplot2' package installed")
+  rlang::check_installed("ggplot2")
   
   sds <- factor(ifelse(x$table$Z < -2 | x$table$Z > 2, ">2SD",
                 ifelse(x$table$Z < -1 | x$table$Z > 1, "1SD-2SD", "<1SD")),
@@ -161,24 +165,24 @@ summary.FrequencyTable <- function(object, ...) {
                     skewness = moments::skewness(whole_vec),
                     kurtosis = moments::kurtosis(whole_vec))
   
-  cat(sep = "", "<FrequencyTable> object:\n")
-  
+  cli_inform("{.cls FrequencyTable}")
   class(summaries) <- c("summaryDefault", "table")
+  print(summaries)
   
-  return(summaries)
+  return(invisible(summaries))
   
 }
 
 #' Generate FrequencyTable using simulated distribution
 #' 
-#' @description It is always best to use raw scores for computing the FrequencyTable.
-#' They aren't always be available - in that case, this function can be used
+#' @description It is always best to use raw scores for computing the `FrequencyTable`.
+#' They aren't always available - in that case, this function can be used
 #' to simulate the distribution given its descriptive statistics.
 #' 
 #' This simulation should be always treated as an estimate.
 #' 
-#' The distribution is generated using the *Fleishmann* method from
-#' [SimMultiCorrData::nonnormvar1()] function is used. The 
+#' The distribution is generated using the **Fleishmann** method from
+#' [SimMultiCorrData::nonnormvar1()] function. The 
 #' `SimMultiCorrData` package needs to be installed.
 #' 
 #' @param min minimum value of raw score
@@ -207,12 +211,7 @@ SimFrequencyTable <- function(
   min, max, M, SD, skew = 0, kurt = 3, n = 10000, seed = NULL
 ) {
 
-    if (!requireNamespace("SimMultiCorrData", quietly = T)) {
-      stop(paste0(
-        "To use this function, 'SimMultiCorrData' package needs to be installed. ",
-        "You can install it with `install.packages('SimMultiCorrData')`"
-      ))
-    }
+  rlang::check_installed("SimMultiCorrData")
   
   if (is.null(seed))
     seed <- as.numeric(paste(round(stats::runif(6, 0, 9), 0), collapse = ""))
@@ -239,24 +238,26 @@ SimFrequencyTable <- function(
 }
 
 #' @title Create GroupedFrequencyTable
-#' @description Using [GroupConditions()] object and source *data.frame* compute
+#' @description Using [GroupConditions()] object and source `data.frame` compute
 #' a set of [FrequencyTable()]s for single variable
-#' @param data source *data.frame*
-#' @param conditions up to two *GroupConditions* objects. These objects will be 
+#' @param data source `data.frame`
+#' @param conditions up to two `GroupConditions` objects. These objects will be 
 #' passed along during creation of higher-level objects and used when 
 #' [normalize_scores_grouped()] will be called. If two objects are provided,
 #' then intersection of groups will be made.
-#' @param var name of variable to compute *GroupedFrequencyTable* for
-#' @param force_disjoint *boolean*. It is recommended to keep it as default
+#' @param var name of variable to compute `GroupedFrequencyTable` for
+#' @param force_disjoint It is recommended to keep it as default
 #' `FALSE`, unless the sample size is very big and it is completely mandatory
 #' to have the groups disjointed.
-#' @param .all *boolean* indicating if `.all` or `.all1` and `.all2` groups
-#' should be generated. If they are not generated, all score normalization
+#' @param .all should *.all* or *.all1* and *.all2* groups
+#' be generated. If they are not generated, all score normalization
 #' procedures will fail if the observation can't be assigned to any of the
-#' provided conditions, leaving it's score as `NA`. Defaults to `TRUE`
+#' provided conditions (eg. because of missing data), leaving it's score as `NA`. 
+#' Defaults to `TRUE`
 #' @details `force_exhaustive` will always be checked as `FALSE` during the
 #' calculations. It is mandatory for validity of the created *FrequencyTables*
 #' @seealso plot.GroupedFrequencyTable
+#' @importFrom cli cli_abort
 #' @export
 
 GroupedFrequencyTable <- function(data,
@@ -266,17 +267,21 @@ GroupedFrequencyTable <- function(data,
                                   .all = TRUE) {
   
   if (!is.data.frame(data))
-    stop("Object of class 'data.frame' need to be provided to 'data' argument.")
+    cli_abort("Object of {.cls data.frame} need to be provided to {.var data}",
+              class = cli_class$error$Class)
   if (!is.character(var) || length(var) != 1 || !var %in% names(data))
-    stop("Name of one variable present in the 'data' needs to be passed to the 'var' argument.")
+    cli_abort("Name of one variable present in {.val data} needs to be passed to {.val var}.",
+              class = cli_class$error$NoValidVars)
   
   if (is.GroupConditions(conditions))
     conditions <- list(conditions)
   if (!all(sapply(conditions, is.GroupConditions)))
-    stop("Object of class 'GroupConditions' or list of such objects need to be provided to 'conditions' argument.")
+    cli_abort("Object of class {.cls GroupConditions} or list of two of them need to be provided to {.var conditions}.",
+              class = cli_class$error$Class)
   if (length(conditions) > 2)
-    stop("Up to two 'GroupConditions' can be provided.")
-  
+    cli_abort("Up to two {.cls GroupConditions} can be provided",
+              class = cli_class$error$TooManyConditions)
+
   if (length(conditions) == 2) {
     
     suppressWarnings(
@@ -291,7 +296,7 @@ GroupedFrequencyTable <- function(data,
                               .all = isTRUE(.all)),
         force_disjoint = force_disjoint,
         force_exhaustive = FALSE),
-      classes = "NonExhaustiveWarning"
+      classes = cli_class$warning$NonExhaustive
     )
     
   } else 
@@ -301,7 +306,8 @@ GroupedFrequencyTable <- function(data,
                                  force_exhaustive = FALSE,
                                  force_disjoint = force_disjoint,
                                  .all = isTRUE(.all)),
-      classes = "NonExhaustiveWarning")
+      classes = cli_class$warning$NonExhaustive
+    )
 
   
   FTs <- list()
@@ -312,7 +318,7 @@ GroupedFrequencyTable <- function(data,
       suppressMessages({
         FTs[[paste(group$group, collapse = ":")]] <-
           FrequencyTable(data[group$els, var])
-      }, classes = "IncompleteRangeMessage")
+      }, classes = cli_class$message$IncompleteRange)
   }
   
   inc_groups <- names(FTs)[sapply(FTs, \(ft) ft$status$range == "incomplete")]
@@ -347,6 +353,7 @@ GroupedFrequencyTable <- function(data,
 #' @param ... named list of additional arguments passed to either [ggplot2::facet_wrap()] 
 #' when plotting *GroupedFrequencyTable* created on basis of one *GroupConditions* 
 #' or [ggplot2::facet_grid()] when it was created with two such objects. 
+#' @importFrom cli cli_abort
 #' @export
 plot.GroupedFrequencyTable <- function(
     x, 
@@ -360,11 +367,13 @@ plot.GroupedFrequencyTable <- function(
   if (!is.null(group_names)) {
     if (isTRUE(strict_names)){
       if (!any(group_names %in% names(x)))
-        stop("Not all names specified in 'group_names' specify group names")
+        cli_abort("Not all names specified in {.var group_names} point to actual groups.",
+                  class = cli_class$error$WrongGroup)
    } else {
       all_names <- unique(unlist(strsplit(names(x), split = ":")))
       if (!any(group_names %in% all_names))
-        stop("Not all names specified in 'group_names' specify group names")
+        cli_abort("Not all names specified in {.var group_names} point to actual groups.",
+                  class = cli_class$error$WrongGroup)
     }
   }
     
@@ -464,12 +473,16 @@ plot.GroupedFrequencyTable <- function(
 #' @param x A `GroupedFrequencyTable` object
 #' @param ... further arguments passed to or from other methods.
 #' @rdname GroupedFrequencyTable
+#' @importFrom cli cli cli_inform
 #' @export
 
 print.GroupedFrequencyTable <- function(x, ...) {
   
-  cat("<GroupedFrequencyTable>\n")
-  cat("Contains <FrequencyTables> for", length(x), "groups.\n\n")
+  cli({
+    cli_inform("{.cls GroupedFrequencyTable}")
+    cli_inform("Contains {.cls FrequencyTable}s for {length(x)} groups.")
+  })
+
   
   for (i in seq_along(x)) {
     
@@ -482,6 +495,7 @@ print.GroupedFrequencyTable <- function(x, ...) {
 #' @rdname GroupedFrequencyTable
 #' @param object A `GroupedFrequencyTable` object
 #' @param ... further arguments passed to or from other methods.
+#' @importFrom cli cli_inform
 #' @export
 summary.GroupedFrequencyTable <- function(object, ...) {
   
@@ -503,8 +517,9 @@ summary.GroupedFrequencyTable <- function(object, ...) {
   names(summary_all) <- names(object)
   summary_all <- dplyr::bind_rows(summary_all, .id = "group")
   
-  cat(sep = "", "<GroupedFrequencyTable> object:\n")
+  cli_inform("{.cls GroupedFrequencyTable}")
+  print(summary_all)
   
-  return(as.data.frame(summary_all))
+  return(invisible(summary_all))
   
 }

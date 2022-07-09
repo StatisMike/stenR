@@ -8,7 +8,7 @@ extract_observations(
   data,
   groups,
   group_names = NULL,
-  extract_mode = "list",
+  extract_mode = c("list", "data.frame"),
   strict_names = TRUE,
   simplify = FALSE,
   id

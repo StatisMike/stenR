@@ -2,6 +2,38 @@
 
 utils::globalVariables(c("SD", "group1", "group2", "n", "prop", "score", "sds", "spec"))
 
+cli_class <- list(
+  error = list(
+    Class = "ClassError",
+    Type = "TypeError",
+    Attached = "AttachedError",
+    TableConflict = "TableConflictError",
+    NoScale = "NoScaleError",
+    NoTable = "NoTableError",
+    NoValidWhat = "NoValidWhatError",
+    NoValidVars = "NoValidVarsError",
+    NoConditionsVars = "NoConditionsVarsError",
+    NoCompatibleAssignements = "NoCompatibleAssignementsError",
+    WrongLength = "WrongLengthError",
+    ScaleNonunequicoval = "ScaleNonunequivocalError",
+    NoConditions = "NoConditionsError",
+    WrongSource = "WrongSourceError",
+    ScoringImport = "ScoringImportError",
+    TooManyConditions = "TooManyConditionsError",
+    WrongGroup = "WrongGroupError",
+    WrongFormula = "WrongFormulaError",
+    WrongIdVal = "WrongIdValError"
+  ),
+  warning = list(
+    Type = "TypeWarning",
+    NonExportedConditions = "NonExportedConditionsWarning",
+    NonExhaustive = "NonExhaustiveWarning"
+  ),
+  message = list(
+    IncompleteRange = "IncompleteRangeMessage"
+  )
+)
+
 
 # all .warnings for functions
 
@@ -40,7 +72,7 @@ FQ_incomplete_message <- function(incompletes, total) {
   cli::cli_inform(
     message = c("i" = "There are missing raw score values between minimum and maximum raw scores. They have been filled automatically.",
                 " " = "No. missing: {length(incompletes)}/{total} [{round(length(incompletes)/total*100, 2)}%]"),
-    class = "IncompleteRangeMessage"
+    class = cli_class$message$IncompleteRange
   )  
 }
     
@@ -56,14 +88,14 @@ GFQ_incomplete_message <- function(groups, incompletes, total) {
       stats::setNames(nm = rep("*", length = length(groups)),
                       object = sapply(seq_along(groups), 
                                       \(i) paste0("{.field {groups[", i, "]}} No. missing: {incompletes[", i,"]}/{total[", i, "]}; {percentages[", i, "]}")))),
-    class = c("IncompleteRangeMessage")
+    class = cli_class$message$IncompleteRange
   )
 }
   
 
 GA_exhaustive_warning <- function()
   cli::cli_warn(c("!" = "Some observations were not assigned on provided condition. Set the {.code force_exhaustive = TRUE} to gather them in {.code .NA} group."),
-                class = "NonExhaustiveWarning")
+                class = cli_class$warning$NonExhaustive)
 
 
 

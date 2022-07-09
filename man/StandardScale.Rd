@@ -34,12 +34,11 @@ detailed are the plots. Default to 1000 for nicely detailed plot.}
 StandardScale object
 }
 \description{
-\code{StandardScale} objects are used with \code{\link{ScoreTable}}
-objects to recalculate \code{\link{FrequencyTable}} into some standardized
-scale score.
+\code{StandardScale} objects are used with \code{\link[=ScoreTable]{ScoreTable()}} or
+\code{\link[=GroupedScoreTable]{GroupedScoreTable()}} objects to recalculate \code{\link[=FrequencyTable]{FrequencyTable()}} or
+\code{\link[=GroupedFrequencyTable]{GroupedFrequencyTable()}} into some standardized scale score.
 
-There are some \code{StandardScale} defaults available. Check out the
-\code{\link{default_scales}} help page for more information.
+There are few \code{StandardScale} defaults available.
 
 Plot method requires \code{ggplot2} package to be installed.
 }

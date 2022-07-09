@@ -19,23 +19,24 @@ GroupedFrequencyTable(
 \method{summary}{GroupedFrequencyTable}(object, ...)
 }
 \arguments{
-\item{data}{source \emph{data.frame}}
+\item{data}{source \code{data.frame}}
 
-\item{conditions}{up to two \emph{GroupConditions} objects. These objects will be
+\item{conditions}{up to two \code{GroupConditions} objects. These objects will be
 passed along during creation of higher-level objects and used when
 \code{\link[=normalize_scores_grouped]{normalize_scores_grouped()}} will be called. If two objects are provided,
 then intersection of groups will be made.}
 
-\item{var}{name of variable to compute \emph{GroupedFrequencyTable} for}
+\item{var}{name of variable to compute \code{GroupedFrequencyTable} for}
 
-\item{force_disjoint}{\emph{boolean}. It is recommended to keep it as default
+\item{force_disjoint}{It is recommended to keep it as default
 \code{FALSE}, unless the sample size is very big and it is completely mandatory
 to have the groups disjointed.}
 
-\item{.all}{\emph{boolean} indicating if \code{.all} or \code{.all1} and \code{.all2} groups
-should be generated. If they are not generated, all score normalization
+\item{.all}{should \emph{.all} or \emph{.all1} and \emph{.all2} groups
+be generated. If they are not generated, all score normalization
 procedures will fail if the observation can't be assigned to any of the
-provided conditions, leaving it's score as \code{NA}. Defaults to \code{TRUE}}
+provided conditions (eg. because of missing data), leaving it's score as \code{NA}.
+Defaults to \code{TRUE}}
 
 \item{x}{A \code{GroupedFrequencyTable} object}
 
@@ -44,7 +45,7 @@ provided conditions, leaving it's score as \code{NA}. Defaults to \code{TRUE}}
 \item{object}{A \code{GroupedFrequencyTable} object}
 }
 \description{
-Using \code{\link[=GroupConditions]{GroupConditions()}} object and source \emph{data.frame} compute
+Using \code{\link[=GroupConditions]{GroupConditions()}} object and source \code{data.frame} compute
 a set of \code{\link[=FrequencyTable]{FrequencyTable()}}s for single variable
 }
 \details{

@@ -12,7 +12,7 @@
 #' 
 #' @param ft a `FrequencyTable` object
 #' @param scale a `StandardScale` object or list of multiple `StandardScale` objects
-#' @example examples/ScoreTable.R
+#' @example man/examples/ScoreTable.R
 #' @return object of class `ScoreTable`. Consists of:
 #' 
 #' - table: data.frame containing for each point in the raw score: 
@@ -133,7 +133,7 @@ plot.ScoreTable <- function(x, scale_name = NULL, ...) {
 
 #' Revert the ScoreTable back to FrequencyTable object.
 #' @param x a *ScoreTable* object
-#' @example examples/strip_ScoreTable.R
+#' @example man/examples/strip_ScoreTable.R
 #' @export
 strip_ScoreTable <- function(x) {
   
@@ -154,7 +154,7 @@ strip_ScoreTable <- function(x) {
 #' Attach additional StandardScale to already created ScoreTable
 #' @param x A *ScoreTable* object
 #' @param scale a *StandardScale* object or list of multiple *StandardScale* objects
-#' @example examples/attach_scales.R
+#' @example man/examples/attach_scales.R
 #' @export
 attach_scales <- function(x, scale) {
   

@@ -23,7 +23,7 @@ FrequencyTable(data)
 \item{max}{numeric or NULL, specifying the maximal number of entries to be
 printed. By default, when NULL, \code{\link{getOption}("max.print")} used.}
 
-\item{print_table}{\emph{boolean} if true, then the \code{table} object is printed also.}
+\item{print_table}{if true, then the \code{table} object is printed also.}
 
 \item{...}{further arguments passed to or from other methods.}
 

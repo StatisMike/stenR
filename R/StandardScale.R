@@ -1,12 +1,11 @@
 #' Specify standard scale
 #' 
-#' @description `StandardScale` objects are used with \code{\link{ScoreTable}}
-#' objects to recalculate \code{\link{FrequencyTable}} into some standardized
-#' scale score. 
+#' @description `StandardScale` objects are used with [ScoreTable()] or
+#' [GroupedScoreTable()] objects to recalculate [FrequencyTable()] or 
+#' [GroupedFrequencyTable()] into some standardized scale score. 
 #' 
-#' There are some `StandardScale` defaults available. Check out the
-#' \code{\link{default_scales}} help page for more information.
-#' 
+#' There are few `StandardScale` defaults available. 
+#'  
 #' Plot method requires `ggplot2` package to be installed.
 #' 
 #' @param name Name of the scale
@@ -14,6 +13,7 @@
 #' @param SD Standard deviation of the scale
 #' @param min Minimal value the scale takes
 #' @param max Maximal value the scale takes
+#' @importFrom cli cli_abort
 #' @return StandardScale object
 #' 
 #' @export
@@ -22,20 +22,25 @@ StandardScale <- function(
   name, M, SD, min, max
 ) {
   
-  if (!is.character(name) || length(name)) {
-    "Argument provided to 'name' should be of type 'character'"
+  if (!is.character(name) || length(name) > 1) {
+    cli_abort("Argument provided to {.var name} should be of type {.cls character} and length 1.",
+              class = "TypeError")
   }
-  if (!is.numeric(M) || length(M)) {
-    "Argument provided to 'M' should be of type 'numeric'"
+  if (!is.numeric(M) || length(M) > 1) {
+    cli_abort("Argument provided to {.var M} should be of type {.cls numeric} and length 1.",
+              class = "TypeError")
   }
-  if (!is.numeric(SD) || length(SD)) {
-    "Argument provided to 'SD' should be of type 'numeric'"
+  if (!is.numeric(SD) || length(SD) > 1) {
+    cli_abort("Argument provided to {.var SD} should be of type {.cls numeric} and length 1.",
+              class = "TypeError")
   }
-  if (!is.numeric(min) || length(min)) {
-    "Argument provided to 'min' should be of type 'numeric'"
+  if (!is.numeric(min) || length(min) > 1) {
+    cli_abort("Argument provided to {.var min} should be of type {.cls numeric} and length 1.",
+              class = "TypeError")
   }
-  if (!is.numeric(max) || length(max)) {
-    "Argument provided to 'max' should be of type 'numeric'"
+  if (!is.numeric(max) || length(max) > 1) {
+    cli_abort("Argument provided to {.var max} should be of type {.cls numeric} and length 1.",
+              class = "TypeError")
   }
   
   obj <- list(name = name,
@@ -53,12 +58,12 @@ StandardScale <- function(
 #' @param x a `StandardScale` object.
 #' @param ... further arguments passed to or from other methods.
 #' @rdname StandardScale
+#' @importFrom cli cli_inform
 #' @export
 print.StandardScale <- function(x, ...) {
   
-  cat("<StandardScale>: '", x$name, "'\n", sep = "")
-  cat("( M: ", x$M, "; SD: ", x$SD, "; min: ", x$min, "; max: ", x$max, " )", sep = "")
-  cat("\n")
+  cli_inform("{.cls StandardScale}: {.emph {x$name}}")
+  cli_inform("{.var M}: {x$M} {.var SD}: {x$SD} {.var min} {x$min}: {.var max}: {x$max}")
   
 }
 
@@ -100,8 +105,7 @@ WECHSLER_IQ <- StandardScale(name = "wechslerIQ", M = 100, SD = 15, min = 40, ma
 #' @export
 plot.StandardScale <- function(x, n = 1000, ...) {
   
-  if (!requireNamespace("ggplot2", quietly = T))
-    stop("Generic plotting of 'StandardScore' requires 'ggplot2' package installed")
+  rlang::check_installed("ggplot2")
   
   data_points = data.frame(score = seq(from = x$min, to = x$max, by = 1))
   
@@ -141,11 +145,3 @@ plot.StandardScale <- function(x, n = 1000, ...) {
     ggplot2::guides(fill = ggplot2::guide_legend(override.aes = list(alpha = 0.15)))
   
 }
-  
-.default_scales <- list(
-  StandardScale(name = "sten", M = 5.5, SD = 2, min = 1, max = 10),
-  StandardScale(name = "stanine", M = 5, SD = 2, min = 1, max = 9),
-  StandardScale(name = "tanine", M = 50, SD = 10, min = 1, max = 100),
-  StandardScale(name = "tetronic", M = 10, SD = 4, min = 0, max = 20),
-  StandardScale(name = "wechsler-iq", 100, SD = 15, min = 40, max = 160)
-)

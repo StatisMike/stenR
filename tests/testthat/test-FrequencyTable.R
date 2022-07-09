@@ -28,22 +28,6 @@ test_that("FrequencyTable can be simulated", {
   
 })
 
-test_that("FrequencyTable prints", {
-  
-  expect_output(
-    print(ft),
-    regex = paste0(
-      "^<FrequencyTable>.*", ft$status$n, " observations"
-    ))
-  
-  expect_output(
-    print(ft_sim),
-    regex = paste0(
-      "^<FrequencyTable>.*", ft_sim$status$n, " observations"
-    ))
-  
-})
-
 test_that("FrequencyTable plots", {
   
   expect_s3_class(

@@ -2,7 +2,6 @@
 % Please edit documentation in R/GroupFuncs.R
 \name{GroupConditions}
 \alias{GroupConditions}
-\alias{is.GroupConditions}
 \alias{print.GroupConditions}
 \alias{as.data.frame.GroupConditions}
 \title{Conditions for observation grouping}
@@ -14,8 +13,6 @@ GroupConditions(
   force_exhaustive = FALSE,
   .dots = list()
 )
-
-is.GroupConditions(x)
 
 \method{print}{GroupConditions}(x, ...)
 

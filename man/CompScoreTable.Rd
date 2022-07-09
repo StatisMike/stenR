@@ -86,7 +86,11 @@ Attach previously generated \code{FrequencyTable} for a given
 variable. \code{ScoreTable} containing every attached scale will be calulcated
 automatically based on every new \code{FrequencyTable}.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{CompScoreTable$attach_FrequencyTable(ft, var, if_exists = "stop")}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{CompScoreTable$attach_FrequencyTable(
+  ft,
+  var,
+  if_exists = c("stop", "append", "replace")
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{

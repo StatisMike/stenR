@@ -11,9 +11,9 @@ test_that("CompScoreTable initializes", {
 
 test_that("CompScoreTable attaches scales", {
   HEX_ST$attach_StandardScale(STEN)
-  sink(tempfile())
-  sum_test <- summary(HEX_ST)
-  sink()
+  suppressMessages(
+    sum_test <- summary(HEX_ST)
+  )
   expect_equal(sum_test$scales$name[1], "sten")
 })
 
@@ -29,9 +29,9 @@ test_that("CompScoreTable normalizes data with attachement", {
       calc = TRUE
     )
   
-  sink(tempfile())
-  sum_test <<- summary(HEX_ST)
-  sink()
+  suppressMessages(
+    sum_test <<- summary(HEX_ST)
+  )  
   
   # names need to be the same as in source data
   expect_equal(names(standardized), names(HEXACO_60))
@@ -46,11 +46,11 @@ test_that("CompScoreTable normalizes data with attachement", {
 
 test_that("CompScoreTable initializes with scales and tables", {
   
-  suppressWarnings(
+  suppressMessages(
     freqtables <- lapply(
       paste("HEX", c("H", "E", "X", "A", "C", "O"), sep = "_"),
       \(x) FrequencyTable(HEXACO_60[[x]])
-    ))
+    ), class = stenR:::cli_class$message$IncompleteRange)
   
   names(freqtables) <- paste("HEX", c("H", "E", "X", "A", "C", "O"), sep = "_")
   
@@ -65,10 +65,10 @@ test_that("CompScoreTable initializes with scales and tables", {
 
 test_that("CompScoreTables created in different ways are equal", {
   
-  sink(tempfile())
-  sum_test2 <<- summary(HEX_ST2)
-  sink()
-  
+  suppressMessages(
+    sum_test2 <<- summary(HEX_ST2)
+  )  
+
   expect_equal(sum_test$tables, sum_test2$tables)
   expect_equal(sum_test$scales, sum_test$scales)
   
@@ -88,16 +88,16 @@ test_that("Tables can be exported from CompScoreTables", {
 
 test_that("New data can be added to existing CompScoreTables", {
   
-  new_stand <- HEX_ST$standardize(
+  suppressWarnings(new_stand <- HEX_ST$standardize(
     HEXACO_60[1:20, paste("HEX", c("H", "E", "X", "A", "C", "O"), sep = "_")],
     what = "sten",
     calc = T
+  ), class = stenR:::cli_class$warning$Type)
+  
+  suppressMessages(
+    sum_test3 <- summary(HEX_ST)
   )
-  
-  sink(tempfile())
-  sum_test3 <- summary(HEX_ST)
-  sink()
-  
+
   expect_equal(
     sum_test3$tables$n[1], nrow(HEXACO_60) + 20
   )

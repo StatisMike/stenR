@@ -39,13 +39,13 @@ and information about raw scores range completion (\code{range}): complete or in
 }
 }
 \description{
-It is always best to use raw scores for computing the FrequencyTable.
-They aren't always be available - in that case, this function can be used
+It is always best to use raw scores for computing the \code{FrequencyTable}.
+They aren't always available - in that case, this function can be used
 to simulate the distribution given its descriptive statistics.
 
 This simulation should be always treated as an estimate.
 
-The distribution is generated using the \emph{Fleishmann} method from
-\code{\link[SimMultiCorrData:nonnormvar1]{SimMultiCorrData::nonnormvar1()}} function is used. The
+The distribution is generated using the \strong{Fleishmann} method from
+\code{\link[SimMultiCorrData:nonnormvar1]{SimMultiCorrData::nonnormvar1()}} function. The
 \code{SimMultiCorrData} package needs to be installed.
 }
