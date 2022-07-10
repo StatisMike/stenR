@@ -1,4 +1,4 @@
-Neu_ST <- 
+Extr_ST <- 
   # create FrequencyTable
   FrequencyTable(data = IPIP_NEO_300$E) |>
   # create ScoreTable
@@ -9,4 +9,4 @@ Neu_ST <-
     max_raw = 300
   )
 
-summary(Neu_ST)
+summary(Extr_ST)

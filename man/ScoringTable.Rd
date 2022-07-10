@@ -52,7 +52,7 @@ name of group. If it was created using two \code{GroupCondition} object, the nam
 of columns will be names of the groups seperated by \code{:}
 }
 \examples{
-Neu_ST <- 
+Extr_ST <- 
   # create FrequencyTable
   FrequencyTable(data = IPIP_NEO_300$E) |>
   # create ScoreTable
@@ -63,7 +63,7 @@ Neu_ST <-
     max_raw = 300
   )
 
-summary(Neu_ST)
+summary(Extr_ST)
 #### GroupConditions creation ####
 
 sex_grouping <- GroupConditions(

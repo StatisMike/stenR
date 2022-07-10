@@ -1,34 +1,55 @@
 url: https://statismike.github.io/stenR/
 template:
+  package: preferably
+  params:
+    toggle: manual
   bootstrap: 5
 reference:
-- title: S3 classes constructors
-  desc: Functions to create basic objects in procedural workflow
+- title: Basic normalization
+  desc: Functions for basic (ungrouped) normalization in procedural workflow
 - contents:
   - StandardScale
   - FrequencyTable
   - ScoreTable
   - SimFrequencyTable
-- title: Mutate raw scores
-  desc: Normalize and standardize raw scores using `FrequencyTable` or `ScoreTable` objects
-- contents:
   - normalize_score
   - normalize_scores_df
+- title: Grouping normalization
+  desc: Functions for grouped normalization in procedural workflow
+- contents:
+  - GroupConditions
+  - GroupAssignment
+  - intersect_GroupAssignment
+  - extract_observations
+  - GroupedFrequencyTable
+  - GroupedScoreTable
+  - normalize_scores_grouped
+  - plot.GroupedFrequencyTable
+  - plot.GroupedScoreTable
+- title: ScoringTable 
+  desc: Portable object for grouped and ungrouped normalization.
+- contents:
+  - to_ScoringTable
+  - import_ScoringTable
+  - export_ScoringTable
+  - normalize_scores_scoring
 - title: S3 classes manipulators
   desc:  Manipulate and transform objects of S3 classes
 - contents:
   - attach_scales
   - strip_ScoreTable
-- title: R6 class for Object Oriented workflow
-- contents:
-  - CompScoreTable
 - title: Item score preprocessors
 - contents:
   - ScaleSpec
   - CombScaleSpec
   - sum_items_to_scale
+- title: R6 class for Object Oriented workflow
+- contents:
+  - CompScoreTable
 - title: Various objects provided within the package
 - contents:
+  - is_stenR_classes
   - default_scales
   - HEXACO_60
   - SLCS
+  - IPIP_NEO_300

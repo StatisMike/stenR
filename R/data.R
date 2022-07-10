@@ -53,7 +53,7 @@
 #' 
 "SLCS"
 
-#' Sample data if IPIP-NEO-300 (scale scores)
+#' Sample data of IPIP-NEO-300 (scale scores)
 #' @description 
 #' Dataset containing sample of 13198 results of IPIP-NEO-300 results from
 #' Johnson J.A. study published at 2014, preprocessed using [sum_items_to_scale()] 
