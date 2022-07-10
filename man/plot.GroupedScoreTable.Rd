@@ -4,7 +4,14 @@
 \alias{plot.GroupedScoreTable}
 \title{Gerenic plot of the GroupedScoreTable}
 \usage{
-\method{plot}{GroupedScoreTable}(x, scale_name = NULL, group_names = NULL, strict_names = TRUE, ...)
+\method{plot}{GroupedScoreTable}(
+  x,
+  scale_name = NULL,
+  group_names = NULL,
+  strict_names = TRUE,
+  plot_grid = is.intersected(x),
+  ...
+)
 }
 \arguments{
 \item{x}{A \code{GroupedScoreTable} object}
@@ -12,17 +19,19 @@
 \item{scale_name}{if scores for multiple scales available, provide the name
 of the scale for plotting.}
 
-\item{group_names}{\emph{character} vector specifying which groups should appear in the plots}
+\item{group_names}{names specifying which groups should appear in the plots}
 
-\item{strict_names}{\emph{boolean} If \code{TRUE}, then intersected groups are filtered
+\item{strict_names}{If \code{TRUE}, then intersected groups are filtered
 using \emph{strict} strategy: \code{group_names} need to be provided in form: \code{"group1:group2"}. If
 \code{FALSE}, then intersected groups will be taken into regard separately, so
 eg. when \code{"group1"} is provided to \code{group_names}, all of: \code{"group1:group2"},
 \code{"group1:group3"}, \code{"group1:groupN"}  will be plotted. Defaults to \code{TRUE}}
 
-\item{...}{named list of additional arguments passed to either \code{\link[ggplot2:facet_wrap]{ggplot2::facet_wrap()}}
-when plotting \code{GroupedScoreTable} created on basis of one \code{GroupConditions}
-or \code{\link[ggplot2:facet_grid]{ggplot2::facet_grid()}} when it was created with two such objects.}
+\item{plot_grid}{boolean indicating if the \code{\link[ggplot2:facet_grid]{ggplot2::facet_grid()}} should be used.
+If \code{FALSE}, then \code{\link[ggplot2:facet_wrap]{ggplot2::facet_wrap()}} is used. If groups are not intersected,
+then it will be ignored and \code{facet_wrap} will be used.}
+
+\item{...}{named list of additional arguments passed to \code{facet} function.}
 }
 \description{
 Generic plot using \code{ggplot2}. It plots ScoreTables for all

@@ -9,7 +9,7 @@
 \usage{
 FrequencyTable(data)
 
-\method{print}{FrequencyTable}(x, max = NULL, print_table = FALSE, ...)
+\method{print}{FrequencyTable}(x, ...)
 
 \method{plot}{FrequencyTable}(x, ...)
 
@@ -19,11 +19,6 @@ FrequencyTable(data)
 \item{data}{vector of raw scores. Double values are coerced to integer}
 
 \item{x}{A \code{FrequencyTable} object}
-
-\item{max}{numeric or NULL, specifying the maximal number of entries to be
-printed. By default, when NULL, \code{\link{getOption}("max.print")} used.}
-
-\item{print_table}{if true, then the \code{table} object is printed also.}
 
 \item{...}{further arguments passed to or from other methods.}
 

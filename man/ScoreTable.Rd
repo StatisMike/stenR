@@ -8,7 +8,7 @@
 \usage{
 ScoreTable(ft, scale)
 
-\method{print}{ScoreTable}(x, max = NULL, ...)
+\method{print}{ScoreTable}(x, ...)
 
 \method{plot}{ScoreTable}(x, scale_name = NULL, ...)
 }
@@ -18,9 +18,6 @@ ScoreTable(ft, scale)
 \item{scale}{a \code{StandardScale} object or list of multiple \code{StandardScale} objects}
 
 \item{x}{a \code{ScoreTable} object}
-
-\item{max}{numeric or NULL, specifying the maximal number of entries to be
-printed. By default, when NULL, \code{\link{getOption}("max.print")} used.}
 
 \item{...}{further arguments passed to or from other methods}
 
@@ -40,7 +37,7 @@ object of class \code{ScoreTable}. Consists of:
 }
 \item status: list containing the total number of simulated observations (\code{n})
 and information about raw scores range completion (\code{range}): complete or incomplete
-\item scale: named list of all attached \code{StandardScale} objects
+\item scale: named list of all attached \code{StandardScale} objects \
 }
 }
 \description{

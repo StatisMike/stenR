@@ -2,14 +2,21 @@
 % Please edit documentation in R/ScoreTable.R
 \name{GroupedScoreTable}
 \alias{GroupedScoreTable}
+\alias{print.GroupedScoreTable}
 \title{Create GroupedScoreTable}
 \usage{
 GroupedScoreTable(table, scale)
+
+\method{print}{GroupedScoreTable}(x, ...)
 }
 \arguments{
 \item{table}{\code{GroupedFrequencyTable} object}
 
 \item{scale}{a \code{StandardScale} object or list of multiple \code{StandardScale} objects}
+
+\item{x}{A \code{GroupedScoreTable} object}
+
+\item{...}{further arguments passed to or from other methods.}
 }
 \value{
 \code{GroupedScoreTable} object, which consists of named \code{list} of

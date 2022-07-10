@@ -14,9 +14,8 @@ test_that("ScoreTable is can be contructed", {
 
 test_that("ScoreTable prints", {
   
-  expect_output(
-    print(st),
-    regex = paste0("^<ScoreTable>.*", nrow(HEXACO_60), " observations")
+  expect_message(
+    print(st)
   )
 })
 

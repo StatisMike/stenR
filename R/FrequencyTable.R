@@ -102,20 +102,19 @@ FrequencyTable <- function(data) {
 }
 
 #' @param x A `FrequencyTable` object
-#' @param max numeric or NULL, specifying the maximal number of entries to be 
-#' printed. By default, when NULL, \code{\link{getOption}("max.print")} used.
 #' @param ... further arguments passed to or from other methods.
-#' @param print_table if true, then the `table` object is printed also.
 #' @importFrom cli cli_inform
 #' @rdname FrequencyTable
 #' @export
-print.FrequencyTable <- function(x, max = NULL, print_table = FALSE, ...) {
+print.FrequencyTable <- function(x, ...) {
   
   cli_text("{.cls FrequencyTable} computed on {.val {x$status$n}} observations")
-  cli_text("range: {.emph {x$status$range}}")
+  if (is.Simulated(x))
+    cli_text("Distribution is {.strong Simulated}")
+  else
+    cli_text("computed on {.val {x$status$n}} observations")
   
-  if (isTRUE(print_table))
-    print(x$table, max = max, row.names = F)
+  cli_text("range: {.emph {x$status$range}}")
   
   invisible(x)
 }
@@ -333,7 +332,8 @@ GroupedFrequencyTable <- function(data,
   
   attr(FTs, "all") <- isTRUE(.all)
   attr(FTs, "conditions") <- conditions
-  class(FTs) <- "GroupedFrequencyTable"
+  
+  class(FTs) <- c("GroupedFrequencyTable", if (length(conditions) == 2) "Intersected")
   
   return(FTs)
   
@@ -343,21 +343,24 @@ GroupedFrequencyTable <- function(data,
 #' @description Generic plot using `ggplot2`. It plots FrequencyTables for all 
 #' groups by default, or only chosen ones using when `group_names` argument is specified. 
 #' @param x A `GroupedFrequencyTable` object
-#' @param group_names *character* vector specifying which groups should appear in the plots
-#' @param strict_names *boolean* If `TRUE`, then intersected groups are filtered
+#' @param group_names vector specifying which groups should appear in the plots
+#' @param strict_names If `TRUE`, then intersected groups are filtered
 #' using *strict* strategy: `group_names` need to be provided in form: `"group1:group2"`. If
 #' `FALSE`, then intersected groups will be taken into regard separately, so 
 #' eg. when `"group1"` is provided to `group_names`, all of: `"group1:group2"`, 
 #' `"group1:group3"`, `"group1:groupN"`  will be plotted. Defaults to `TRUE`
-#' @param ... named list of additional arguments passed to either [ggplot2::facet_wrap()] 
-#' when plotting *GroupedFrequencyTable* created on basis of one *GroupConditions* 
-#' or [ggplot2::facet_grid()] when it was created with two such objects. 
+#' @param plot_grid boolean indicating if the [ggplot2::facet_grid()] should be used.
+#' If `FALSE`, then [ggplot2::facet_wrap()] is used. If groups are not intersected,
+#' then it will be ignored and `facet_wrap` will be used.
+#' @param ... named list of additional arguments passed to `facet` function
+#' used. 
 #' @importFrom cli cli_abort
 #' @export
 plot.GroupedFrequencyTable <- function(
     x, 
     group_names = NULL,
     strict_names = TRUE,
+    plot_grid = is.intersected(x),
     ...
 ) {
   
@@ -410,7 +413,7 @@ plot.GroupedFrequencyTable <- function(
   
   plot_data <- data.table::rbindlist(plot_data)
   
-  if ("group2" %in% names(plot_data)) {
+  if ("group2" %in% names(plot_data) && isTRUE(plot_grid)) {
     
     plot_data$group1 <- factor(plot_data$group1, 
                                levels = c(if (attr(x, "all")) ".all1", attr(attr(x, "conditions")[[1]], "groups")))
@@ -443,8 +446,20 @@ plot.GroupedFrequencyTable <- function(
     
   } else {
     
-    plot_data$group1 <- factor(plot_data$group1, 
-                               levels = c(if (attr(x, "all")) ".all", attr(attr(x, "conditions")[[1]], "groups")))
+    if (is.intersected(x)) {
+      
+      plot_data$group1 <- factor(plot_data$group1, 
+                                 levels = c(if (attr(x, "all")) ".all1", attr(attr(x, "conditions")[[1]], "groups")))
+      plot_data$group2 <- factor(plot_data$group2, 
+                                 levels = c(if (attr(x, "all")) ".all2", attr(attr(x, "conditions")[[2]], "groups")))
+      plot_data$group1 <- paste(plot_data$group1, plot_data$group2, sep = ":")
+      
+    } else {
+      
+      plot_data$group1 <- factor(plot_data$group1, 
+                                 levels = c(if (attr(x, "all")) ".all", attr(attr(x, "conditions")[[1]], "groups")))
+    }
+
     
     plot <- 
       ggplot2::ggplot(data = plot_data, ggplot2::aes(x = score, y = n)) + 
@@ -477,7 +492,6 @@ plot.GroupedFrequencyTable <- function(
 
 print.GroupedFrequencyTable <- function(x, ...) {
   
-
     cli_text("{.cls GroupedFrequencyTable}")
     cli_text("{.field No. groups}: {.val {length(x)}}")
     cli_text("{.field GroupConditions}: {.val {length(attr(x, 'conditions'))}}")
@@ -492,8 +506,6 @@ print.GroupedFrequencyTable <- function(x, ...) {
     cli_end(ol)
     cli_text("{.field .all groups:} {.val {attr(x, 'all')}}")  
 
-  
-  
 }
 
 #' @rdname GroupedFrequencyTable
