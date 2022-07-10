@@ -17,16 +17,14 @@ compare_tables <- function(t1, t2) {
   
 }
 
-#### GroupConditions ####
+####    GroupConditions to be used in   ####
+##        grouped tables creation         ##
 
 age_grouping <- GroupConditions(
   conditions_category = "Age",
-  "below 18" ~ age < 18,
-  "18-22" ~ age >= 18 & age <= 22,
-  "23-26" ~ age >= 23 & age <= 26,
-  "27-32" ~ age >= 27 & age <= 32,
-  "33-40" ~ age >= 33 & age <= 40,
-  "40-60" ~ age >= 40 & age <= 60,
+  "to 20" ~ age <= 20,
+  "21 to 40" ~ age >= 21 & age <= 40,
+  "41 to 60" ~ age >= 41 & age <= 60,
   "above 60" ~ age > 60
 )
 sex_grouping <- GroupConditions(

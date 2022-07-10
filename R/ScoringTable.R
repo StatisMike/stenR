@@ -1,4 +1,5 @@
 #### INTERNAL, UNUSED ####
+## nocov start
 
 #' @title Pivot wide ScoringTable csv into longer
 #' @description Pivot wide ScoringTable into longer table with raw scores 
@@ -89,6 +90,8 @@ create_st <- function(short_st,
   return(out_score)
 }
 
+## nocov end
+
 #### EXPORTED ####
 
 #' @title Create ScoringTable
@@ -122,20 +125,23 @@ to_ScoringTable <- function(table, ...) {
 #' @param score_colname Name of the column containing the raw scores
 #' @importFrom cli cli_abort
 #' @aliases to_ScoringTable
+#' @example man/examples/ScoringTable_ungrouped.R
 #' @export
 
 to_ScoringTable.ScoreTable <- function(
     table, scale = NULL, min_raw = NULL, max_raw = NULL, score_colname = "Score", ...) {
   
-  if (is.null(scale) && length(table$scales) != 1)
-    cli_abort("{.cls ScoreTable} have multiple scales attached: {.val {names(table$scales)}}. Provide one of these names to {.var scale}.",
+  if (is.null(scale) && length(table$scale) != 1)
+    cli_abort("{.cls ScoreTable} have multiple scales attached: {.val {names(table$scale)}}. Provide one of these names to {.var scale}.",
               class = "ScaleNonunequivocalError")
-  else if (length(table$scales == 1)) {
-    if (!scale %in% names(table$scales))
-      cli_abort("{.var scale}: {.val {scale}} is not attached. Choose one of {.val {names(table$scales)}}",
+  else if (is.null(scale) && length(table$scale) == 1) 
+    scale <- names(table$scale)
+  
+  else if (!scale %in% names(table$scale)) 
+      cli_abort("{.var scale}: {.val {scale}} is not attached. Choose one of {.val {names(table$scale)}}",
                 class = "WrongScaleError")
-    scale <- names(table$scales)
-  }
+    
+  
   
   score_values <- table$table[[scale]] |> unique()
   
@@ -163,19 +169,22 @@ to_ScoringTable.ScoreTable <- function(
 
 #' @rdname ScoringTable
 #' @aliases to_ScoringTable
+#' @example man/examples/ScoringTable_grouped.R
 #' @export
 
 to_ScoringTable.GroupedScoreTable <- function(
     table, scale = NULL, min_raw = NULL, max_raw = NULL, ...) {
   
-  if (is.null(scale) && length(table$scales) != 1)
-    cli_abort("{.cls ScoreTable} have multiple scales attached: {.val {names(table$scales)}}. Provide one of these names to {.var scale}.",
+  if (is.null(scale) && length(table[[1]]$scale) != 1)
+    cli_abort("{.cls ScoreTable} have multiple scales attached: {.val {names(table[[1]]$scale)}}. Provide one of these names to {.var scale}.",
               class = "ScaleNonunequivocalError")
-  else if (length(table$scales == 1)) {
-    if (!scale %in% names(table$scales))
-      cli_abort("{.var scale}: {.val {scale}} is not attached. Choose one of {.val {names(table$scales)}}",
+  else if (is.null(scale) && length(table[[1]]$scale) == 1) 
+    scale <- names(table[[1]]$scale)
+    
+  else if (!scale %in% names(table[[1]]$scale)) {
+      cli_abort("{.var scale}: {.val {scale}} is not attached. Choose one of {.val {names(table$scale)}}",
                 class = "WrongScaleError")
-    scale <- names(table$scales)
+    scale <- names(table$scale)
   }
   
   tables <- mapply(to_ScoringTable, 
@@ -212,10 +221,11 @@ to_ScoringTable.GroupedScoreTable <- function(
 #' @param table A `ScoringTable` object to export
 #' @param out_file Output file. Ignored if `method = "object"`
 #' @param method Method for export, either `"csv"`, `"json"` or `"object"`
-#' @param conditions_file Output file for `GroupConditions`. Used only
+#' @param cond_file Output file for `GroupConditions`. Used only
 #' if `method = csv` and `table` created with `GroupedScoreTable`.
 #' @seealso import_ScoringTable
 #' @importFrom cli cli_abort cli_warn
+#' @example man/examples/import_export_ScoringTable.R
 #' @return list containing `ScoringTable` as a `tibble` and `GroupConditions` 
 #' if `method = "object"`. `NULL` for other methods
 #' @export
@@ -223,7 +233,7 @@ to_ScoringTable.GroupedScoreTable <- function(
 export_ScoringTable <- function(table,
                                 out_file,
                                 method = c("csv", "json", "object"),
-                                conditions_file) {
+                                cond_file) {
   
   if (!is.ScoringTable(table))
     cli_abort("Object of class {.cls ScoringTable} need to be provided in {.var table}.")
@@ -238,12 +248,12 @@ export_ScoringTable <- function(table,
   switch(method,
          csv = {
            utils::write.csv(table, file = out_file, row.names = F)
-           if (!is.null(cond) && !missing(conditions_file)) {
+           if (!is.null(cond) && !missing(cond_file)) {
              cond_ls <- lapply(cond, as.data.frame.GroupConditions)
              cond_df <- dplyr::bind_rows(cond_ls)
-             utils::write.csv(cond_df, conditions_file, row.names = F)
+             utils::write.csv(cond_df, cond_file, row.names = F)
            } else if (!is.null(attr(table, "conditions"))) 
-             cli_warn("{.cls GroupConditions} haven't been exported. To export them with {.emph csv method}, please provide the {.var conditions_file} argument",
+             cli_warn("{.cls GroupConditions} haven't been exported. To export them with {.emph csv method}, please provide the {.var cond_file} argument",
                       class = "NonExportedConditionsWarning")
          },
          json = {
@@ -289,6 +299,7 @@ export_ScoringTable <- function(table,
 #' while using *json* method, original `GroupConditions` will be ignored.  
 #' @importFrom cli cli_abort
 #' @seealso export_ScoringTable
+#' @example man/examples/import_export_ScoringTable.R
 #' @return `ScoringTable` object
 #' @export
 
@@ -314,6 +325,7 @@ import_ScoringTable <- function(
            st_read <- utils::read.table(source, sep = ",")
            st_df <- st_read[-1, ]
            names(st_df) <- as.character(st_read[1, ])
+           st_df[[1]] <- as.numeric(st_df[[1]])
            rownames(st_df) <- NULL
            out <- list(st = st_df)
            

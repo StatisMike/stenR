@@ -8,7 +8,7 @@ export_ScoringTable(
   table,
   out_file,
   method = c("csv", "json", "object"),
-  conditions_file
+  cond_file
 )
 }
 \arguments{
@@ -18,12 +18,12 @@ export_ScoringTable(
 
 \item{method}{Method for export, either \code{"csv"}, \code{"json"} or \code{"object"}}
 
-\item{conditions_file}{Output file for \code{GroupConditions}. Used only
+\item{cond_file}{Output file for \code{GroupConditions}. Used only
 if \code{method = csv} and \code{table} created with \code{GroupedScoreTable}.}
 }
 \value{
-list containing \code{ScoringTable} \code{tibble} and \code{GroupConditions} if
-\code{method = "object"}. \code{NULL} for other methods
+list containing \code{ScoringTable} as a \code{tibble} and \code{GroupConditions}
+if \code{method = "object"}. \code{NULL} for other methods
 }
 \description{
 After creation of \code{ScoringTable} it can be handy to export it
@@ -38,6 +38,60 @@ be exported to another \emph{csv} file, creating two different files.
 \item \emph{json} format can be more obtuse, but it allows export of both
 \code{ScoringTable} itself and \code{GroupConditions} in the same \emph{json} file.
 }
+}
+\examples{
+# Scoring table to export / import #
+
+Consc_ST <- 
+  GroupedFrequencyTable(
+    data = IPIP_NEO_300,
+    conditions = GroupConditions("Sex", "M" ~ sex == "M", "F" ~ sex == "F"), 
+    var = "C") |>
+  GroupedScoreTable(scale = STEN) |>
+  to_ScoringTable(min_raw = 60, max_raw = 300)
+
+#### Export/import method: csv ####
+
+scoretable_csv <- tempfile(fileext = ".csv")
+conditions_csv <- tempfile(fileext = ".csv")
+
+export_ScoringTable(
+  table = Consc_ST,
+  out_file = scoretable_csv,
+  method = "csv",
+  cond_file = conditions_csv
+)
+
+## check if these are regular csv files
+writeLines(head(readLines(scoretable_csv)))
+writeLines(head(readLines(conditions_csv)))
+
+imported_from_csv <- import_ScoringTable(
+  source = scoretable_csv,
+  method = "csv",
+  cond_file = conditions_csv
+)
+
+all.equal(Consc_ST, imported_from_csv)
+
+#### Export/import method: json ####
+scoretable_json <- tempfile(fileext = ".json")
+
+export_ScoringTable(
+  table = Consc_ST,
+  out_file = scoretable_json,
+  method = "json"
+)
+
+## check if this is regular json file
+writeLines(head(readLines(scoretable_json)))
+
+imported_from_json <- import_ScoringTable(
+  source = scoretable_json,
+  method = "json"
+)
+
+all.equal(Consc_ST, imported_from_json)
 }
 \seealso{
 import_ScoringTable

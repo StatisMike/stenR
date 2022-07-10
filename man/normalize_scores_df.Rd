@@ -32,7 +32,7 @@ instead of individually in \code{...}.}
 \code{data.frame} with normalized scores
 }
 \description{
-Wrapper for \link{normalize_score} that works on data frame
+Wrapper for \code{\link[=normalize_score]{normalize_score()}} that works on data frame
 and multiple variables
 }
 \examples{

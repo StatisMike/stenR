@@ -30,11 +30,9 @@ to_ScoringTable(table, ...)
 \item{scale}{name of the scale attached in \code{table}. If only one
 scale is attached, it can be left as default \code{NULL}}
 
-\item{min_raw}{absolute minimum score that can be received. If left
-as default \code{NULL}, the minimum available in the data will be used.}
-
-\item{max_raw}{absolute maximum score that can be received. If left
-as default \code{NULL}, the maximum available in the data will be used.}
+\item{min_raw, max_raw}{absolute minimum/maximum score that can be received.
+If left as default \code{NULL}, the minimum/maximum available in the data will be
+used.}
 
 \item{score_colname}{Name of the column containing the raw scores}
 
@@ -52,4 +50,45 @@ files using \code{\link[=import_ScoringTable]{import_ScoringTable()}}.
 When using \code{GroupedScoreTable}, the columns will be named the same as the
 name of group. If it was created using two \code{GroupCondition} object, the names
 of columns will be names of the groups seperated by \code{:}
+}
+\examples{
+Neu_ST <- 
+  # create FrequencyTable
+  FrequencyTable(data = IPIP_NEO_300$E) |>
+  # create ScoreTable
+  ScoreTable(scale = STEN) |>
+  # and transform into ScoringTable
+  to_ScoringTable(
+    min_raw = 60,
+    max_raw = 300
+  )
+
+summary(Neu_ST)
+#### GroupConditions creation ####
+
+sex_grouping <- GroupConditions(
+  conditions_category = "Sex",
+  "Male" ~ sex == "M",
+  "Female" ~ sex == "F"
+)
+
+####   Creating ScoringTable   #### 
+##     based on grouped data     ##
+
+Neu_ST <- 
+  # create FrequencyTable
+  GroupedFrequencyTable(
+    data = IPIP_NEO_300,
+    conditions = sex_grouping, 
+    var = "N") |>
+  # create ScoreTable
+  GroupedScoreTable(
+    scale = STEN) |>
+  # and transform into ScoringTable
+  to_ScoringTable(
+    min_raw = 60,
+    max_raw = 300
+  )
+
+summary(Neu_ST)
 }

@@ -59,7 +59,7 @@ normalize_score <- function(
 }
 
 #' Normalize raw scores for multiple variables
-#' @description Wrapper for [normalize_score] that works on data frame
+#' @description Wrapper for [normalize_score()] that works on data frame
 #' and multiple variables
 #' @param data `data.frame` containing raw scores
 #' @param vars names of columns to normalize. Length of `vars`
@@ -548,3 +548,4 @@ handle_retain <- function(data, output, retain) {
   return(out)
 
 }
+
