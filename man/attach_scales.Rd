@@ -2,17 +2,17 @@
 % Please edit documentation in R/ScoreTable.R
 \name{attach_scales}
 \alias{attach_scales}
-\title{Attach additional \code{StandardScale} to already created \code{ScoreTable}}
+\title{Attach additional StandardScale to already created ScoreTable}
 \usage{
-attach_scales(st, scale)
+attach_scales(x, scale)
 }
 \arguments{
-\item{st}{A \code{ScoreTable} object}
+\item{x}{A \emph{ScoreTable} object}
 
-\item{scale}{a \code{StandardScale} object or list of multiple \code{StandardScale} objects}
+\item{scale}{a \emph{StandardScale} object or list of multiple \emph{StandardScale} objects}
 }
 \description{
-Attach additional \code{StandardScale} to already created \code{ScoreTable}
+Attach additional StandardScale to already created ScoreTable
 }
 \examples{
 # having a ScoreTable with one StandardScale attached

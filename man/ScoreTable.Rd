@@ -8,19 +8,18 @@
 \usage{
 ScoreTable(ft, scale)
 
-\method{print}{ScoreTable}(st, max = NULL)
+\method{print}{ScoreTable}(x, ...)
 
-\method{plot}{ScoreTable}(st, scale_name = NULL)
+\method{plot}{ScoreTable}(x, scale_name = NULL, ...)
 }
 \arguments{
 \item{ft}{a \code{FrequencyTable} object}
 
 \item{scale}{a \code{StandardScale} object or list of multiple \code{StandardScale} objects}
 
-\item{st}{a \code{ScoreTable} object}
+\item{x}{a \code{ScoreTable} object}
 
-\item{max}{numeric or NULL, specifying the maximal number of entries to be
-printed. By default, when NULL, \code{\link{getOption}("max.print")} used.}
+\item{...}{further arguments passed to or from other methods}
 
 \item{scale_name}{if scores for multiple scales available, provide the name
 of the scale for plotting.}
@@ -38,19 +37,19 @@ object of class \code{ScoreTable}. Consists of:
 }
 \item status: list containing the total number of simulated observations (\code{n})
 and information about raw scores range completion (\code{range}): complete or incomplete
-\item scale: named list of all attached \code{StandardScale} objects
+\item scale: named list of all attached \code{StandardScale} objects \
 }
 }
 \description{
 Creates a table to calculate scores in specified standardized
 scale for each discrete raw score. Uses normalization provided by
-\code{\link{FrequencyTable}} and scale definition created with
-\code{\link{StandardScale}}.
+\code{\link[=FrequencyTable]{FrequencyTable()}} and scale definition created with
+\code{\link[=StandardScale]{StandardScale()}}.
 
 After creation it can be used to normalize and standardize raw scores with
-\code{\link{normalize_score}}.
+\code{\link[=normalize_score]{normalize_score()}} or \code{\link[=normalize_scores_df]{normalize_scores_df()}}.
 
-\code{plot.ScoreTable} method requires \code{ggplot2} package to be installed.
+\code{\link[=plot.ScoreTable]{plot.ScoreTable()}} method requires \code{ggplot2} package to be installed.
 }
 \examples{
 # firstly compute FrequencyTable for a variable

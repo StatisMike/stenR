@@ -15,7 +15,7 @@ normalize_score(x, table, what)
 \itemize{
 \item \code{quan} - the quantile of x in the raw score distribution
 \item \code{Z} - normalized Z score for the x raw score
-\item name of the scale calculated in \code{StandardScale} provided to \code{x} argument
+\item name of the scale calculated in \code{ScoreTable} provided to \code{table} argument
 }}
 }
 \value{
@@ -29,14 +29,18 @@ provided raw scores.
 # normalize with FrequencyTable
 ft <- FrequencyTable(HEXACO_60$HEX_H)
 
-normalize_score(HEXACO_60$HEX_H[1:5], ft)
+normalize_score(HEXACO_60$HEX_H[1:5], ft, what = "Z")
 
 # normalize with ScoreTable
 st <- ScoreTable(ft, list(STEN, STANINE))
 
-normalize_score(HEXACO_60$HEX_H[1:5], st, "sten")
-normalize_score(HEXACO_60$HEX_H[1:5], st, "stanine")
+normalize_score(HEXACO_60$HEX_H[1:5], st, what = "sten")
+normalize_score(HEXACO_60$HEX_H[1:5], st, what = "stanine")
 }
 \seealso{
-\code{\link[=normalize_scores_df]{normalize_scores_df()}}
+Other score-normalization functions: 
+\code{\link{normalize_scores_df}()},
+\code{\link{normalize_scores_grouped}()},
+\code{\link{normalize_scores_scoring}()}
 }
+\concept{score-normalization functions}

@@ -4,10 +4,10 @@
 \alias{strip_ScoreTable}
 \title{Revert the ScoreTable back to FrequencyTable object.}
 \usage{
-strip_ScoreTable(st)
+strip_ScoreTable(x)
 }
 \arguments{
-\item{st}{ScoreTable object}
+\item{x}{a \emph{ScoreTable} object}
 }
 \description{
 Revert the ScoreTable back to FrequencyTable object.

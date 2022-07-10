@@ -35,10 +35,9 @@ CompScoreTable <- R6::R6Class(
     initialize = function(tables = NULL, scales = NULL) {
       
       if (!is.null(tables)) {
-        if (class(tables) != "list" ||
-            !all(sapply(tables, \(x) "FrequencyTable" %in% class(x))) ||
-            any(is.null(names(tables))))
-          stop("Object provided to 'tables' argument should be a named list of 'FrequencyTable' objects.")
+        if (!all(sapply(tables, is.FrequencyTable)) || any(is.null(names(tables))))
+          cli::cli_abort("Object provided to {.var tables} argument should be a named list of {.cls FrequencyTable} objects.",
+                         class = "ClassError")
         for (n_table in seq_along(tables))
         self$attach_FrequencyTable(
           ft = tables[[n_table]], var = names(tables)[n_table]
@@ -46,14 +45,11 @@ CompScoreTable <- R6::R6Class(
       }
       
       if (!is.null(scales)) {
-        if (!class(scales) %in% c("StandardScale", "list"))
-          stop("Object of class 'StandardScale' or list of such objects needs to be provided to 'scale' argument")
-        if (class(scales) == "StandardScale") {
+        if (!all(sapply(scales, is.StandardScale)) && !is.StandardScale(scales))
+          cli::cli_abort("{.cls StandardScale} object or list of such objects needs to be provided to {.var scale} argument",
+                         class = "ClassError")
+        if (is.StandardScale(scales)) {
           scales <- list(scales)
-        } else if (class(scales) == "list") {
-          areScales <- all(sapply(scales, \(x) class(x) == "StandardScale"))
-          if (!isTRUE(areScales)) 
-            stop("List provided to 'scale' argument should contain only StandardScale objects")
         }
         for (scale in scales) {
           self$attach_StandardScale(scale = scale)
@@ -71,16 +67,16 @@ CompScoreTable <- R6::R6Class(
     
     attach_StandardScale = function(scale, overwrite = FALSE) {
       
-      if (class(scale) != "StandardScale")
-        stop("Scale definition should be provided in form of the `StandardScale` object")
+      if (!is.StandardScale(scale))
+        cli::cli_abort("Scale definition should be provided in form of the {.cls StandardScale} object",
+                       class = "ClassError")
       
       if (!is.null(private$attached_scales[[scale$name]])) {
         if (isTRUE(overwrite)) {
-          warning(paste0("Definition of scale '", scale$name, 
-                         "' was already attached. It is being overwritten. All calculated ScoreTables are being recalculated."))
+          cli::cli_inform("Definition of scale {.val {scale$name}} was already attached. It is being overwritten. All calculated {.cls ScoreTables} are being recalculated.")
         } else {
-          stop(paste0("Definition of scale '", scale$name, 
-                      "' was already attached. To overwrite the scale and recalculate all computed ScoreTables specify `overwrite == TRUE`."))
+          cli::cli_abort("Definition of scale {.val {scale$name}} was already attached. To overwrite the scale and recalculate all computed {.cls ScoreTables} specify {.code overwrite = TRUE}.",
+                         class = "AttachedError")
         }
       }
       
@@ -104,18 +100,20 @@ CompScoreTable <- R6::R6Class(
     #' - `replace` replaces existing table
     #' 
     
-    attach_FrequencyTable = function(ft, var, if_exists = "stop") {
+    attach_FrequencyTable = function(ft, var, if_exists = c("stop", "append", "replace")) {
+      
+      if_exists <- match.arg(if_exists)
       
       if (!is.character(var) || length(var) != 1) 
-        stop("Value provided to 'val' should be a string.")
-      if (!"FrequencyTable" %in% class(ft))
-        stop("Object provided to 'ft' should be a 'FreqencyTable'")
-      if (!if_exists %in% c("stop", "append", "replace") || length(if_exists) != 1)
-        stop("Value provided to 'if_exists' should be either 'stop', 'append' or 'replace'.")
+        cli::cli_abort("Value provided to {.var val} should be a {.cls character}.",
+                       class = "TypeError")
+      if (!is.FrequencyTable(ft))
+        cli::cli_abort("Object provided to {.var ft} should be a {.cls FreqencyTable}",
+                       class = "ClassError")
       
       if (var %in% names(private$tables) && if_exists == "stop") {
-        stop(paste0("Table for '", var, "' already exists. To replace or append",
-                    " the frequencies specify `if_exists` argument accordingly"))
+        cli::cli_abort("Table for {.val {var}} already exists. To {.emph append} or {.emph replace} the frequencies specify {.var if_exists} argument accordingly.",
+                       class = "TableConflictError")
         
       } else if (var %in% names(private$tables) && if_exists == "append") {
         private$merge_ft(data = rep(ft$table$score, ft$table$n),
@@ -141,18 +139,17 @@ CompScoreTable <- R6::R6Class(
     export_ScoreTable = function(vars = NULL, strip = FALSE) {
       
       if (length(private$tables) == 0 || 
-          !all(sapply(private$tables, \(x) "ScoreTable" %in% class(x))))
-        stop("No 'ScoreTable's objects are available to extract.")
+          !all(sapply(private$tables, is.ScoreTable)))
+        cli::cli_abort("No {.cls ScoreTable} objects are available to extract.",
+                       class = "NoTableError")
       
       if (is.null(vars)) {
         out <- private$tables
       } else {
         if (any(!vars %in% names(private$tables))) 
-          stop(
-            paste0("Some of the provided 'vars' aren't valid ScoreTable names. ",
-                   "Currently computed tables for: '",
-                   paste(names(private$tables), sep = "', '"), "'.")
-            )
+          cli::cli_abort("Some of the provided {.var vars} aren't valid computed {.cls ScoreTable} names. Currently computed tables for {.val {names(private$table}}.",
+                         class = "NoTableError")
+        
         out <- private$tables[which(names(private$tables) %in% vars)]
       }
       
@@ -182,16 +179,25 @@ CompScoreTable <- R6::R6Class(
     #' 
     standardize = function(data, what, vars = names(data), calc = FALSE) {
       
+      # TODO: cli messages
+      
       if (length(private$attached_scales) == 0)
-        stop("No 'StandardScales' are currently attached. Attach some of them first.")
-      if (!what %in% c("quan", "Z", names(private$attached_scales)))
-        stop("Provide either 'quan', 'Z' or name of the computed scale to the 'what' argument.")
-      if (!"data.frame" %in% class(data))
-        stop("Object provided to 'data' argument should be a 'data.frame'")
+        cli::cli_abort("No {.cls StandardScale} have been attached yet. To standardize, please use {.var attach_StandardScale()} method.",
+                       class = "NoAttachedScaleError")
+      
+      valid_whats <- c("quan", "Z", names(private$attached_scales))
+      if (!what %in% valid_whats)
+        cli::cli_abort("Provide one valid value to {.var what} argument. Valid values: {.val {valid_whats}}.",
+                       class = "NoValidWhatError")
+      if (!is.data.frame(data))
+        cli::cli_abort("Object provided to {.var data} needs to be a {.cls data.frame}.",
+                       class = "ClassError")
       if (!all(vars %in% names(data)))
-        stop("All 'vars' should be pointing to columns in provided 'data.frame'")
+        cli::cli_abort("All values provided to {.var vars} need to be variables in provided {.var data}.",
+                       class = "NoValidVarsError")
       if (!all(sapply(vars, \(x) is.numeric(data[[x]]))))
-        stop("All specified 'vars' should be of type 'numeric'")
+        cli::cli_abort("All specified {.val vars} should be of type {.cls numeric}.",
+                       class = "TypeError")
       
       data[, vars] <- sapply(data[, vars], as.integer)
       
@@ -205,7 +211,8 @@ CompScoreTable <- R6::R6Class(
         }
       } else {
         if (length(private$tables) == 0)
-          stop("No ScoreTables to get the values from.")
+          cli::cli_abort("No {.cls ScoreTable} to get the values from.",
+                         class = "NoTableError")
       }
       
       # compute the values
@@ -265,10 +272,12 @@ CompScoreTable <- R6::R6Class(
     calculate_ft = function(data, var = NULL) {
       
       if (!is.null(var)) 
-        suppressWarnings(private$tables[[var]] <- FrequencyTable(data))
+        suppressMessages(private$tables[[var]] <- FrequencyTable(data),
+                         class = "IncompleteRangeMessage")
       else 
         for (v in names(private$tables))
-          suppressWarnings(private$tables[[v]] <- FrequencyTable(data))
+          suppressMessages(private$tables[[v]] <- FrequencyTable(data),
+                           class = "IncompleteRangeMessage")
       
       private$calculate_st(var = var)  
         
@@ -277,13 +286,15 @@ CompScoreTable <- R6::R6Class(
     ## merge Frequency tables ##
     merge_ft = function(data, var) {
       
-      if (any(c(class(private$tables[[var]]), class(data)) == "Simulated"))
-        stop("You can't add new raw values to Simulated FrequencyTable", call. = F)
+      if (is.Simulated(private$tables[[var]]))
+        cli::cli_abort("You can't add new raw values to {.strong Simulated} {.cls FrequencyTable}.",
+                       class = "SimulatedError")
       
       vals <- rep(private$tables[[var]]$table$score, 
                   private$tables[[var]]$table$n)
       
-      suppressWarnings(private$tables[[var]] <- FrequencyTable(c(data, vals)))
+      suppressMessages(private$tables[[var]] <- FrequencyTable(c(data, vals)),
+                       class = "IncompleteRangeMessage")
       private$calculate_st(var = var)
       
     }
@@ -291,49 +302,49 @@ CompScoreTable <- R6::R6Class(
 )
 
 #' @export
-summary.CompScoreTable <- function(x) {
+summary.CompScoreTable <- function(object, ...) {
   
-  cat("<CompScoreTable> object\n\n")
+  cli::cli_inform("{.cls CompScoreTable}")
   
   summaries <- list()
   
-  if (length(x$.__enclos_env__$private$tables) > 0) {
+  if (length(object$.__enclos_env__$private$tables) > 0) {
     
     table_class <- 
-      unique(unlist(sapply(x$.__enclos_env__$private$tables, \(t) class(t))))
+      unique(unlist(sapply(object$.__enclos_env__$private$tables, \(t) class(t))))
     
     table_class <-
-      table_class[table_class != "Simulated"]
+      table_class[!is.Simulated(table_class)]
     
-    cat("Attached <", table_class, "s>:\n", sep = "")
+    cli::cli_inform("{.strong Attached {.cls {table_class}}}")
     summaries[["tables"]] <- 
       data.frame(
-        variable = names(x$.__enclos_env__$private$tables),
-        n = sapply(x$.__enclos_env__$private$tables, \(t) t$status$n),
-        range = sapply(x$.__enclos_env__$private$tables, \(t) t$status$range))
+        variable = names(object$.__enclos_env__$private$tables),
+        n = sapply(object$.__enclos_env__$private$tables, \(t) t$status$n),
+        range = sapply(object$.__enclos_env__$private$tables, \(t) t$status$range))
     rownames(summaries[["tables"]]) <- NULL
     print(summaries[["tables"]], row.names = F)
   } else {
-    cat("No tables attached.\n")
+    cli::cli_inform("{.strong No tables attached}.")
   }
   
   if(length(summaries) == 1) cat("\n")
   
-  if (length(x$.__enclos_env__$private$attached_scales) > 0){
+  if (length(object$.__enclos_env__$private$attached_scales) > 0){
     
-    cat("Attached <StandardScales>:\n")
+    cli::cli_inform("{.strong Attached {.cls StandardScale}}")
     summaries[["scales"]] <-
       data.frame(
-        name = names(x$.__enclos_env__$private$attached_scales),
-        M = sapply(x$.__enclos_env__$private$attached_scales, \(s) s$M),
-        SD = sapply(x$.__enclos_env__$private$attached_scales, \(s) s$SD),
-        min = sapply(x$.__enclos_env__$private$attached_scales, \(s) s$min),
-        max = sapply(x$.__enclos_env__$private$attached_scales, \(s) s$max)
+        name = names(object$.__enclos_env__$private$attached_scales),
+        M = sapply(object$.__enclos_env__$private$attached_scales, \(s) s$M),
+        SD = sapply(object$.__enclos_env__$private$attached_scales, \(s) s$SD),
+        min = sapply(object$.__enclos_env__$private$attached_scales, \(s) s$min),
+        max = sapply(object$.__enclos_env__$private$attached_scales, \(s) s$max)
       )
     rownames(summaries[["scales"]]) <- NULL
     print(summaries[["scales"]], row.names = F)
   } else {
-    cat("No StandardScales attached.")
+    cli::cli_inform("{.strong No {.cls StandardScale} attached}.")
   }
   
   return(invisible(summaries))

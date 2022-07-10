@@ -10,7 +10,7 @@ simple_scaleSpec <- ScaleSpec(
   # item 2 and 5 need to be reversed
   reverse = c("item_2", "item_5"))
 
-print(simple_scale)
+print(simple_scaleSpec)
 
 # scale specification with literal NA imputation strategy 
 

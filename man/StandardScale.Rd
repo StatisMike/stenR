@@ -8,9 +8,9 @@
 \usage{
 StandardScale(name, M, SD, min, max)
 
-\method{print}{StandardScale}(object)
+\method{print}{StandardScale}(x, ...)
 
-\method{plot}{StandardScale}(scale, n = 1000)
+\method{plot}{StandardScale}(x, n = 1000, ...)
 }
 \arguments{
 \item{name}{Name of the scale}
@@ -23,9 +23,9 @@ StandardScale(name, M, SD, min, max)
 
 \item{max}{Maximal value the scale takes}
 
-\item{object}{an object for which a summary is desired.}
+\item{x}{a \code{StandardScale} object}
 
-\item{scale}{StandardScale object}
+\item{...}{further arguments passed to or from other methods.}
 
 \item{n}{Number of points the plot generates. The higher the number, the more
 detailed are the plots. Default to 1000 for nicely detailed plot.}
@@ -34,12 +34,11 @@ detailed are the plots. Default to 1000 for nicely detailed plot.}
 StandardScale object
 }
 \description{
-\code{StandardScale} objects are used with \code{\link{ScoreTable}}
-objects to recalculate \code{\link{FrequencyTable}} into some standardized
-scale score.
+\code{StandardScale} objects are used with \code{\link[=ScoreTable]{ScoreTable()}} or
+\code{\link[=GroupedScoreTable]{GroupedScoreTable()}} objects to recalculate \code{\link[=FrequencyTable]{FrequencyTable()}} or
+\code{\link[=GroupedFrequencyTable]{GroupedFrequencyTable()}} into some standardized scale score.
 
-There are some \code{StandardScale} defaults available. Check out the
-\code{\link{default_scales}} help page for more information.
+There are few \code{StandardScale} defaults available.
 
 Plot method requires \code{ggplot2} package to be installed.
 }

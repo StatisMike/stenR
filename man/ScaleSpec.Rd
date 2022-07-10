@@ -17,9 +17,9 @@ ScaleSpec(
   na_value_custom
 )
 
-\method{print}{ScaleSpec}(spec)
+\method{print}{ScaleSpec}(x, ...)
 
-\method{summary}{ScaleSpec}(spec)
+\method{summary}{ScaleSpec}(object, ...)
 }
 \arguments{
 \item{name}{character with name of the scale/factor}
@@ -31,8 +31,8 @@ scale/factor consists of.}
 answer to the item can be scored as.}
 
 \item{reverse}{character vector containing names of the items that need to be
-reversed during scale/factor summing. Reversed using the default \code{min} and
-\code{max} values.}
+reversed during scale/factor summing. Reversed using the default \code{"min"} and
+\code{"max"} values.}
 
 \item{na_strategy}{character vector specifying which strategy should be taken
 during filling of \code{NA}. Defaults to \code{"asis"} and, other options are \code{"mean"},
@@ -45,10 +45,16 @@ Defaults to \code{as.integer(NA)}.}
 specific values in place of \code{NA}s, provide a named integer vector there. Names
 should be the names of the questons.}
 
-\item{spec}{\emph{ScaleSpec} object}
+\item{x}{a \code{ScaleSpec} object}
+
+\item{...}{further arguments passed to or from other methods.}
+
+\item{object}{a \code{ScaleSpec} object}
 }
 \value{
-object of \emph{ScaleSpec} class
+object of \code{ScaleSpec} class
+
+data.frame of item names, if they are reversed, and custom NA value if available, invisibly
 }
 \description{
 Object containing scale or factor specification data. It describes
@@ -59,7 +65,7 @@ To be used with \code{\link[=sum_items_to_scale]{sum_items_to_scale()}} function
 \details{
 \subsection{NA imputation}{
 
-it specifies how \code{NA} values should be treated during \code{\link[=sum_items_to_scales]{sum_items_to_scales()}}
+it specifies how \code{NA} values should be treated during \code{\link[=sum_items_to_scale]{sum_items_to_scale()}}
 function run.
 \strong{asis} strategy is literal: the values specified in \code{na_value} or \code{na_value_custom}
 will be used without any changes.
@@ -91,7 +97,7 @@ simple_scaleSpec <- ScaleSpec(
   # item 2 and 5 need to be reversed
   reverse = c("item_2", "item_5"))
 
-print(simple_scale)
+print(simple_scaleSpec)
 
 # scale specification with literal NA imputation strategy 
 

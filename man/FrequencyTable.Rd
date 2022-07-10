@@ -9,19 +9,20 @@
 \usage{
 FrequencyTable(data)
 
-\method{print}{FrequencyTable}(ft, max = NULL)
+\method{print}{FrequencyTable}(x, ...)
 
-\method{plot}{FrequencyTable}(ft)
+\method{plot}{FrequencyTable}(x, ...)
 
-\method{summary}{FrequencyTable}(ft)
+\method{summary}{FrequencyTable}(object, ...)
 }
 \arguments{
 \item{data}{vector of raw scores. Double values are coerced to integer}
 
-\item{ft}{A \code{FrequencyTable} object}
+\item{x}{A \code{FrequencyTable} object}
 
-\item{max}{numeric or NULL, specifying the maximal number of entries to be
-printed. By default, when NULL, \code{\link{getOption}("max.print")} used.}
+\item{...}{further arguments passed to or from other methods.}
+
+\item{object}{A \code{FrequencyTable} object}
 }
 \value{
 FrequencyTable object. Consists of:
@@ -32,6 +33,8 @@ raw score
 \item status: list containing the total number of simulated observations (\code{n})
 and information about raw scores range completion (\code{range}): complete or incomplete
 }
+
+\code{data.frame} of descriptive statistcs
 }
 \description{
 Normalizes the distribution of raw scores. It can be used to construct

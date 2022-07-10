@@ -1,6 +1,6 @@
 Package: stenR
 Title: R6-based Standardization of Raw Discrete Scores 
-Version: 0.5.2
+Version: 0.6.4
 Authors@R: 
     person(given = "Michal",
            family = "Kosinski",
@@ -17,18 +17,23 @@ LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.2
 Depends:
-    R6
+    R (>= 4.1)
 Imports:
+    cli,
     data.table,
     dplyr,
     moments,
+    rlang,
+    R6,
     stats
 Suggests: 
+    covr,
+    ggplot2,
+    jsonlite,
     knitr,
     rmarkdown,
     SimMultiCorrData,
-    testthat (>= 3.0.0),
-    covr
+    testthat (>= 3.0.0)
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 URL: https://statismike.github.io/stenR/

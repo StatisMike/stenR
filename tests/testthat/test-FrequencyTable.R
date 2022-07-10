@@ -3,8 +3,9 @@ ft_sim <- NULL
 
 test_that("FrequencyTable can be constructed from raw values", {
   
-  expect_warning(
-    ft <<- FrequencyTable(HEXACO_60$HEX_H)  
+  expect_message(
+    ft <<- FrequencyTable(HEXACO_60$HEX_H),
+    class = "IncompleteRangeMessage"
   )
   
   expect_s3_class(
@@ -27,22 +28,6 @@ test_that("FrequencyTable can be simulated", {
   
 })
 
-test_that("FrequencyTable prints", {
-  
-  expect_output(
-    print(ft),
-    regex = paste0(
-      "^<FrequencyTable>.*", ft$status$n, " observations"
-    ))
-  
-  expect_output(
-    print(ft_sim),
-    regex = paste0(
-      "^<FrequencyTable>.*", ft_sim$status$n, " observations"
-    ))
-  
-})
-
 test_that("FrequencyTable plots", {
   
   expect_s3_class(
@@ -57,11 +42,11 @@ test_that("FrequencyTable generates summary", {
   
   expect_equal(
     names(summary(ft)),
-    c("n", "min", "max", "mean", "median", "sd", "skewness", "kurtosis")
+    c("n", "min", "max", "mean", "median", "sd", "skewness", "kurtosis", "incomplete")
   )
   
   expect_equal(
     names(summary(ft_sim)),
-    c("n", "min", "max", "mean", "median", "sd", "skewness", "kurtosis")
+    c("n", "min", "max", "mean", "median", "sd", "skewness", "kurtosis", "incomplete")
   )
 })

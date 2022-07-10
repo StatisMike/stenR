@@ -3,8 +3,9 @@ st <- NULL
 test_that("ScoreTable is can be contructed", {
   
   # incomplete warning
-  expect_warning(
-    st <<- ScoreTable(FrequencyTable(HEXACO_60$HEX_H), STEN)
+  expect_message(
+    st <<- ScoreTable(FrequencyTable(HEXACO_60$HEX_H), STEN),
+    class = "IncompleteRangeMessage"
   )
 
   expect_s3_class(st, "ScoreTable")
@@ -13,9 +14,8 @@ test_that("ScoreTable is can be contructed", {
 
 test_that("ScoreTable prints", {
   
-  expect_output(
-    print(st),
-    regex = paste0("^<ScoreTable>.*", nrow(HEXACO_60), " observations")
+  expect_message(
+    print(st)
   )
 })
 

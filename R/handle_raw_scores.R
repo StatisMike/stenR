@@ -8,19 +8,19 @@
 
 items_summing <- function(spec, data, warn_env) {
   
- if (class(spec) == "CombScaleSpec") {
+ if (is.CombScaleSpec(spec)) {
     
     comb_scale <- lapply(spec$ScaleSpecs, \(single_spec) {
       
       single_scale <- items_summing(single_spec, data, warn_env)
       
-      if (single_spec$name %in% spec$reverse && class(single_spec) == "ScaleSpec") {
+      if (single_spec$name %in% spec$reverse && is.ScaleSpec(single_spec)) {
         single_scale <- 
           (single_spec$min * length(single_spec$item_names) + 
              single_spec$max * length(single_spec$item_names)) - single_scale
       }
       
-      if (single_spec$name %in% spec$reverse && class(single_spec) == "CombScaleSpec") {
+      if (single_spec$name %in% spec$reverse && is.CombScaleSpec(single_spec)) {
         single_scale <- single_spec$min + single_spec$max - single_scale
       }
       
@@ -74,7 +74,7 @@ items_summing <- function(spec, data, warn_env) {
           na_val <- round(mean(as.numeric(items_to_process[, !items_with_NAs])))
         
         if (spec$na_strategy == "median")
-          na_val <- round(median(as.numeric(items_to_process[, !items_with_NAs])))
+          na_val <- round(stats::median(as.numeric(items_to_process[, !items_with_NAs])))
         
         # input NA value in chosen strategy
         items_to_process[, items_with_NAs] <- na_val
@@ -129,8 +129,8 @@ items_summing <- function(spec, data, warn_env) {
 #' @param min,max integer containing the default minimal/maximal value that the
 #' answer to the item can be scored as. 
 #' @param reverse character vector containing names of the items that need to be
-#' reversed during scale/factor summing. Reversed using the default `min` and
-#' `max` values.
+#' reversed during scale/factor summing. Reversed using the default `"min"` and
+#' `"max"` values.
 #' @param na_strategy character vector specifying which strategy should be taken
 #' during filling of `NA`. Defaults to `"asis"` and, other options are `"mean"`, 
 #' `"median"` and `"mode"`. Strategies are explained in the details section. 
@@ -142,7 +142,7 @@ items_summing <- function(spec, data, warn_env) {
 #' @details 
 #' 
 #' ## NA imputation
-#' it specifies how `NA` values should be treated during [sum_items_to_scales()]
+#' it specifies how `NA` values should be treated during [sum_items_to_scale()]
 #' function run.
 #' **asis** strategy is literal: the values specified in `na_value` or `na_value_custom` 
 #' will be used without any changes.
@@ -157,10 +157,11 @@ items_summing <- function(spec, data, warn_env) {
 #' - functional `NA`s imputation
 #' - literal `NA`s imputation  
 #' 
-#' @return object of *ScaleSpec* class
-#' @example examples/ScaleSpec.R
+#' @return object of `ScaleSpec` class
+#' @example man/examples/ScaleSpec.R
 #' @family item preprocessing functions
 #' @rdname ScaleSpec
+#' @importFrom cli cli_abort
 #' @export
 #' 
 ScaleSpec <- function(
@@ -173,15 +174,17 @@ ScaleSpec <- function(
     na_value = as.integer(NA),
     na_value_custom) {
   
-  if (!na_strategy[1] %in% c("asis", "mean", "median", "mode"))
-    stop("The 'na_strategy' needs to be one of 'asis', 'mean', 'median' or 'mode'")
+  na_strategy <- match.arg(na_strategy)
   
   if (min >= max)
-    stop("'min' needs to be lesser than 'max'")
+    cli_abort("{.var min} needs to be smaller than {.var max}",
+              class = cli_class$error$WrongMinMax)
   if (min < 0 || max < 0)
-    stop("Only non-negative 'min' and 'max' values are supported.")
+    cli_abort("Only non-negative {.var min} and {.var max} are supported.",
+              class = cli_class$error$WrongMinMax)
   if (!is.character(reverse))
-    stop("Character vector should be specified for 'reverse' argument.")
+    cli_abort("For {.var reverse} argument a character vector should be specified.",
+              class = cli_class$error$Type)
   
   out <- list(
     name = name,
@@ -189,7 +192,7 @@ ScaleSpec <- function(
     min = min,
     max = max,
     reverse = character(0),
-    na_strategy = na_strategy[1],
+    na_strategy = na_strategy,
     na_value = na_value)
   
   class(out) <- "ScaleSpec"
@@ -201,21 +204,21 @@ ScaleSpec <- function(
     rev_missing <- out[["reverse"]][!out[["reverse"]] %in% out[["item_names"]]]
     
     if (length(rev_missing) > 0)
-      stop(paste0("There are some item names specified in `reverse` that are missing from the `item_names`:\n",
-                  "'", paste(rev_missing, sep = "', '"), "'."))
-    
+      cli_abort("There are some item names specified in {.var reverse} that are missing from {.var item_names}: {.val {rev_missing}}.",
+                class = cli_class$error$NoValidVars)
   }
   
   if (!missing(na_value_custom)) {
     if (any(sapply(names(na_value_custom), \(x) is.null(x))) || !is.numeric(na_value_custom))
-      stop("Integer vector assigned to the `na_value_custom` should be named.")
+      cli_abort("Character vector provided to {.var na_value_custom} needs to be named.",
+                 class = cli_class$error$Class)
     
     na_value_names_missing <- names(na_value_custom)
     na_value_names_missing <- na_value_names_missing[!na_value_names_missing %in% item_names]
     
     if (length(na_value_names_missing) > 0)
-      stop(paste0("There are some item names specified in `na_value_custom` that are missing from the `item_names`:\n",
-                  "'", paste(na_value_names_missing, sep = "', '"), "'."))
+      cli_abort("There are some item names specified in {.var na_value_custom} that are missing from {.var item_names}: {.val {na_value_names_missing}}.",
+                class = cli_class$error$NoValidVars)
     
     out[["na_value_custom"]] <- na_value_custom
   }
@@ -225,62 +228,73 @@ ScaleSpec <- function(
 }
 
 #' @rdname ScaleSpec
-#' @param spec *ScaleSpec* object
+#' @param x a `ScaleSpec` object
+#' @param ... further arguments passed to or from other methods.
+#' @importFrom cli cli cli_text
 #' @export
-print.ScaleSpec <- function(spec) {
+print.ScaleSpec <- function(x, ...) {
   
-  cat(sep = "", "<ScaleSpec>: '", spec$name, "'\n")
-  cat(sep = "", "No. items: ", length(spec$item_names))
-  if (length(spec$reverse) > 0) 
-    cat(sep = "", " (", length(spec$reverse), " reversed)")
-  cat("\nNA imputation method:", spec$na_strategy, "\n")
-  cat("NA literal value:", spec$na_value, "\n")
+  cli({
+    cli_text("{.cls ScaleSpec}: {.strong {x$name}}")
+    cli_text(paste0("{.field No. items}: {.val {length(x$item_names)}}"),
+             if (length(x$reverse) > 0) " [{.val {length(x$reverse)}} reversed]")
+  })
   
 }
 
 #' @rdname ScaleSpec
-#' @param spec *ScaleSpec* object
+#' @param object a `ScaleSpec` object
+#' @param ... further arguments passed to or from other methods.
+#' @importFrom cli cli_text cli_ol cli_li cli_end 
+#' @return data.frame of item names, if they are reversed, and custom NA value if available, invisibly
 #' @export
-summary.ScaleSpec <- function(spec) {
+summary.ScaleSpec <- function(object, ...) {
   
-  cat(sep = "", "<ScaleSpec>: '", spec$name, "'\n")
+  items <- data.frame(
+    item_name = object$item_names,
+    reversed = sapply(object$item_names, \(name) name %in% object$reverse),
+    custom_na = sapply(object$item_names, \(name) if (is.null(object$custom_na[[name]])) NA 
+                                                else object$custom_na[[name]])
+  )
   
-  cat(sep = "", "min: ", spec$min, "; ", "max: ", spec$max, "\n")
+  row.names(items) <- NULL
   
-  cat("NA imputation method:", spec$na_strategy, "\n")
-  cat("NA literal value:", spec$na_value, "\n\n")
+  cli_text("{.cls ScaleSpec}: {.strong {object$name}}")
+  cli_text("{.strong min}: {.val {object$min}}; {.strong max}: {.val {object$max}}")
+  cli_text("{.field NA imputation method}: {.val {object$na_strategy}}")
+  cli_text("{.field NA literal value}: {.val {object$na_value}}")
+  ol <- cli_ol()
+  for (item_i in seq_along(items$item_name))
+    cli_li(
+      paste0(
+        "{.emph {items$item_name[item_i]}}",
+        ifelse(items$reversed[item_i], " {.bold reversed}", ""),
+        ifelse(!is.na(items$custom_na[item_i]), " {.field custom NA}: {.val items$custom_na}", "")
+      )
+    )
+  cli_end(ol)
   
-  cat("Items:\n")
-  invisible(lapply(spec$item_names, \(item) {
-    
-    cat(item)
-    if (item %in% spec$reverse) cat(" <reversed>")
-    if (item %in% names(spec$custom_na)) cat(" <custom NA>: ", spec$custom_na[item])
-    cat("\n")
-    
-  }))
-  
-  return(invisible(NULL))
-  
+  return(invisible(items))
 }
 
 #' @title Combined Scale Specification
 #' @description
-#' Combine multiple *ScaleSpec* objects into one in regards of [sum_items_to_scales()]
+#' Combine multiple `ScaleSpec` objects into one in regards of [sum_items_to_scale()]
 #' function. Useful when one scale of factor contains items of different possible
 #' values or if there is hierarchy of scale or factors.
 #' 
-#' Also allows combining *CombScaleSpec* object, if the factor structure have deeper
+#' Also allows combining `CombScaleSpec` object if the factor structure have deeper
 #' hierarchy.
 #' 
 #' @param name Name of the combined scale or factor
-#' @param ... *ScaleSpec* or other *CombScaleSpec* objects
+#' @param ... `ScaleSpec` or other `CombScaleSpec` objects
 #' @param reverse character vector containing names of the underlying subscales
-#' of factors that need to be reversed
+#' or factors that need to be reversed
 #' @family item preprocessing functions
-#' @return *CombScaleSpec* object
-#' @example examples/CombScaleSpec.R
+#' @return `CombScaleSpec` object
+#' @example man/examples/CombScaleSpec.R
 #' @rdname CombScaleSpec
+#' @importFrom cli cli_abort
 #' @export
 CombScaleSpec <- function(name, ..., reverse = character(0)) {
   
@@ -290,13 +304,16 @@ CombScaleSpec <- function(name, ..., reverse = character(0)) {
   
   class(out) <- "CombScaleSpec"
   
-  if (any(sapply(out$ScaleSpecs, \(x) !class(x) %in% c("ScaleSpec", "CombScaleSpec"))))
-    stop("Objects of class 'ScaleSpec' or 'CombScaleSpec' need to be provided in '...' argument.")
+  if (any(sapply(out$ScaleSpecs, \(x) !is.ScaleSpec(x) && !is.CombScaleSpec(x))))
+    cli_abort("Objects of class {.cls ScaleSpec} or {.cls CombScaleSpec} need to be provided in {.var ...} argument.",
+              class = cli_class$error$Class)
   if (!is.character(reverse))
-    stop("Character vector need to be provided to 'reverse' argument.")
+    cli_abort("For {.var reverse} argument a character vector should be specified.",
+              class = cli_class$error$Type)
   else if (length(reverse) > 0 && any(!reverse %in% sapply(out$ScaleSpecs, \(spec) spec$name)))
-    stop("Some names provided in 'reverse' argument are reffering to the names of provided scales.")
-  
+    cli_abort("Not all names provided in {.val reverse} argument are refering to the names of provided objects.",
+              class = cli_class$error$NoScale)
+
   out[["item_names"]] <- lapply(out$ScaleSpecs, \(spec) {
     spec$item_names
   })
@@ -304,18 +321,18 @@ CombScaleSpec <- function(name, ..., reverse = character(0)) {
   out[["item_names"]] <- unlist(out[["item_names"]])
   
   out[["min"]] <- sapply(out$ScaleSpecs, \(spec) {
-    if (class(spec) == "ScaleSpec")
+    if (is.ScaleSpec(spec))
       spec$min * length(spec$item_names)
-    else if (class(spec) == "CombScaleSpec")
+    else if (is.CombScaleSpec(spec))
       spec$min
   })
   
   out[["min"]] <- sum(out[["min"]])
   
   out[["max"]] <- sapply(out$ScaleSpecs, \(spec) {
-    if (class(spec) == "ScaleSpec")
+    if (is.ScaleSpec(spec))
       spec$max * length(spec$item_names)
-    else if (class(spec) == "CombScaleSpec")
+    else if (is.CombScaleSpec(spec))
       spec$max
   })
   
@@ -326,34 +343,54 @@ CombScaleSpec <- function(name, ..., reverse = character(0)) {
 } 
 
 #' @rdname CombScaleSpec
-#' @param spec *CombScaleSpec* object
+#' @param x a *CombScaleSpec* object
+#' @param ... further arguments passed to or from other methods.
+#' @importFrom cli cli_text cli_ol cli_end
 #' @export
-print.CombScaleSpec <- function(spec) {
+print.CombScaleSpec <- function(x, ...) {
   
-  cat(sep = "", "<CombScaleSpec>: '", spec$name, "'\n")
-  cat(sep = "", "No. items total: ", length(spec$item_names), "\n\n")
-  cat("Underlying objects:\n")
-  invisible(lapply(spec$ScaleSpecs, \(x) {
-    cat(sep = "", "<", class(x), ">: ", x$name)
-    if (x$name %in% spec$reverse) cat(" <reversed>")
-    cat("\n")
-  }))
-  
+    cli_text("{.cls CombScaleSpec}: {.strong x$name}")
+    cli_text("{.field Total items}: {.val {length(x$item_names)}}")
+    cli_text("{.strong Underlying objects}:")
+    ol <- cli_ol()
+    for (spec in x$ScaleSpecs)
+      cli_li("{.cls {class(spec)}} {.strong {spec$name}} [{.field No.items}: {.val {length(spec$item_names)}}]")
+    cli_end(ol)
+
 }
 
 #' @rdname CombScaleSpec
-#' @param spec *CombScaleSpec* object
+#' @param object a *CombScaleSpec* object
+#' @param ... further arguments passed to or from other methods.
+#' @importFrom cli cli_text cli_ol cli_li cli_ul cli_end  
 #' @export
-summary.CombScaleSpec <- function(spec) {
+summary.CombScaleSpec <- function(object, ...) {
   
-  cat(sep = "", "<CombScaleSpec>: '", spec$name, "'\n")
-  cat(sep = "", "No. items total: ", length(spec$item_names), "\n\n")
-  cat("Underlying objects:\n")
-  invisible(lapply(spec$ScaleSpecs, \(x) {
-    cat("- ")
-    print(x)
-    cat("\n")
-  }))
+  suppressMessages(
+    items_ls <- lapply(object$ScaleSpec, summary)
+  )
+  
+  items_ls <- list()
+  
+  cli_text("{.cls CombScaleSpec}: {.strong {object$name}}")
+  cli_text("{.strong Underlying objects}:")
+  
+  ol <- cli_ol()
+  for (spec in object$ScaleSpecs) {
+    cli_li("{.strong {spec$name}}")
+    ul <- cli_ul()
+    cli_li("{.field Class}: {.cls {class(spec)}}")
+    cli_li("{.field Items}: {.val {spec$item_names}}")
+    if (length(spec$reverse) > 0)
+      cli_li("{.field Reversed}: {.val {spec$reverse}}")
+    cli_end(ul)
+  }
+  cli_end(ol)
+  
+  names(items_ls) <- sapply(object$ScaleSpecs, \(spec) spec$name)
+  items_df <- dplyr::bind_rows(items_ls, .id = "scale")
+  
+  return(invisible(items_df))
   
 }
 
@@ -365,43 +402,47 @@ summary.CombScaleSpec <- function(spec) {
 #' score is done according to provided specifications utilizing [ScaleSpec()]
 #' objects. For more information refer to their constructor help page.
 #' @param data `data.frame` object containing numerical values of items data
-#' @param ... objects of class *ScaleSpec*. If all item names for *ScaleSpec*
+#' @param ... objects of class `ScaleSpec` or `CombScaleSpec`. If all item names
 #' are found in `data`, summed items will be available in returned data.frame
-#' as column named as the *ScaleSpec* `name` value.
-#' @param retain either *boolean*: `TRUE` if all columns in the `data` are to be
+#' as column named as their `name` value.
+#' @param retain either `boolean`: `TRUE` if all columns in the `data` are to be
 #' retained, `FALSE` if none, or character vector with names of columns to be retained
-#' @param .dots *ScaleSpec* objects provided as a list, instead of individually
-#' in `...`. 
-#' @return object of class *data.frame*
-#' @example examples/sum_items_to_scale.R
+#' @param .dots `ScaleSpec` or `CombScaleSpec` objects provided as a list, instead 
+#' of individually in `...`. 
+#' @return object of class `data.frame`
+#' @example man/examples/sum_items_to_scale.R
 #' @family item preprocessing functions
+#' @importFrom cli cli_abort cli_warn
 #' @export
 sum_items_to_scale <- function(
     data,
     ...,
     retain = FALSE,
-    .dots) {
+    .dots = list()) {
   
-  if (!missing(.dots)) 
-    ScaleSpacs <- .dots
+  if (length(.dots) != 0) 
+    ScaleSpecs <- .dots
   else
     ScaleSpecs <- list(...)
   
-  if (any(sapply(ScaleSpecs, \(x) !class(x) %in% c("ScaleSpec", "CombScaleSpec"))))
-    stop ("Objects of class `ScaleSpec` or 'CombScaleSpec' need to be provided in `...` argument")
+  if (any(sapply(ScaleSpecs, \(x) !is.ScaleSpec(x) && !is.CombScaleSpec(x))))
+    cli_abort("Objects of class {.cls ScaleSpec} or {.cls CombScaleSpec} need to be provided in {.var ...} argument.",
+              class = cli_class$error$Class)
   
   if (length(ScaleSpecs) == 0)
-    stop ("There should be at least one `ScaleSpec` or 'CombScaleSpec' object provided in `...` argument")
+    cli_abort("There should be at least one object provided in {.var ...} or {.var .dots} arguments.",
+              class = cli_class$error$Class)
   
   if (!is.logical(retain) && !is.character(retain)) 
-    stop ("`retain` argument need to be either a character vector with column names to retain or boolean.")
-  
+    cli_abort("{.var retain} argument should be a {.emph character} vector or {.emph boolean} value.",
+              class = cli_class$error$Type)
+
   if (is.character(retain)) {
     retain_missing <- retain[!retain %in% names(data)]
     
     if (length(retain_missing) > 0)
-      stop(paste0("There are some colnames specified in `retain` that are not in the data:\n",
-                  "'", paste(retain_missing, sep = "', '"), "'."))
+      cli_abort("There are some variables specified in {.var retain} that are not available in the {.var data}: {.val {retain_missing}}",
+                class = cli_class$error$NoValidVars)
   }
   
   warn_env <- new.env()
@@ -411,21 +452,18 @@ sum_items_to_scale <- function(
   
   summed_scales <- lapply(ScaleSpecs, items_summing, data = data, warn_env = warn_env)
   
-  if (length(warn_env$not_summed) > 0) 
-    warning(paste0("Some of the scales were not summed: not all specified items were available in data:\n",
-                  paste(warn_env$not_summed, collapse = ", ")))
+  if (length(warn_env$not_summed) > 0)
+    cli_warn("Some of the scales were not summed: not all specified items were available in the data: {.val {warn_env$not_summed}}",
+             class = cli_class$warning$NotSummed)
   
   if (warn_env$not_enough > 0)
-    warning(paste0("Functional NA imputations weren't done for ",
-                   warn_env$not_enough, 
-                   " observations, because less than 2 non-NA values were available."))
+    cli_warn("Functional {.emph NA imputations} weren't done for {.val {warn_env$not_enough}} observations, because less than 2 {.emph non-NA} values were available.",
+             class = cli_class$warning$NoInputNA)
   
   if (warn_env$mode > 0)
-    warning(paste0("Functional 'mode' NA imputations weren't done for ",
-                   warn_env$mode,
-                   " observations, because polimodals were detected for observations."))
-  
-  
+    cli_warn("Function {.strong mode} {.emph NA imputations} weren't done for {.val {warn_env$mode}} observations, because of polimodals.",
+             class = cli_class$warning$NoInputNA)
+
   if (isTRUE(retain)) {
     out <- dplyr::bind_cols(data,
                             summed_scales)

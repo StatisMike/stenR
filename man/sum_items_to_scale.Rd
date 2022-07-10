@@ -4,23 +4,23 @@
 \alias{sum_items_to_scale}
 \title{Sum up discrete raw data}
 \usage{
-sum_items_to_scale(data, ..., retain = FALSE, .dots)
+sum_items_to_scale(data, ..., retain = FALSE, .dots = list())
 }
 \arguments{
 \item{data}{\code{data.frame} object containing numerical values of items data}
 
-\item{...}{objects of class \emph{ScaleSpec}. If all item names for \emph{ScaleSpec}
+\item{...}{objects of class \code{ScaleSpec} or \code{CombScaleSpec}. If all item names
 are found in \code{data}, summed items will be available in returned data.frame
-as column named as the \emph{ScaleSpec} \code{name} value.}
+as column named as their \code{name} value.}
 
-\item{retain}{either \emph{boolean}: \code{TRUE} if all columns in the \code{data} are to be
+\item{retain}{either \code{boolean}: \code{TRUE} if all columns in the \code{data} are to be
 retained, \code{FALSE} if none, or character vector with names of columns to be retained}
 
-\item{.dots}{\emph{ScaleSpec} objects provided as a list, instead of individually
-in \code{...}.}
+\item{.dots}{\code{ScaleSpec} or \code{CombScaleSpec} objects provided as a list, instead
+of individually in \code{...}.}
 }
 \value{
-object of class \emph{data.frame}
+object of class \code{data.frame}
 }
 \description{
 Helper function to sum-up and - if needed - automatically

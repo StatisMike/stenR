@@ -7,32 +7,32 @@
 normalize_scores_df(data, vars, ..., what, retain = FALSE, .dots = list())
 }
 \arguments{
-\item{data}{\emph{data.frame} object containing raw scores}
+\item{data}{\code{data.frame} containing raw scores}
 
-\item{vars}{\emph{character vector} with names of columns to normalize. Length of vars
+\item{vars}{names of columns to normalize. Length of \code{vars}
 need to be the same as number of tables provided to either \code{...} or \code{.dots}}
 
-\item{...}{\emph{ScoreTable} or \emph{FrequencyTable} objects to be used for normalization}
+\item{...}{\code{ScoreTable} or \code{FrequencyTable} objects to be used for normalization}
 
 \item{what}{the values to get. One of either:
 \itemize{
 \item \code{quan} - the quantile of x in the raw score distribution
 \item \code{Z} - normalized Z score for the x raw score
-\item name of the scale calculated in \code{StandardScale}s provided to \code{...} or
+\item name of the scale calculated in \code{ScoreTables} provided to \code{...} or
 \code{.dots} argument
 }}
 
-\item{retain}{either \emph{boolean}: \code{TRUE} if all columns in the \code{data} are to be
-retained, \code{FALSE} if none, or \emph{character vector} with names of columns to be retained}
+\item{retain}{either boolean: \code{TRUE} if all columns in the \code{data} are to be
+retained, \code{FALSE} if none; or character vector with names of columns to be retained}
 
-\item{.dots}{\emph{ScoreTable} or \emph{FrequencyTable} objects provided as a list,
+\item{.dots}{\code{ScoreTable} or \code{FrequencyTable} objects provided as a list,
 instead of individually in \code{...}.}
 }
 \value{
-\emph{data.frame} with normalized scores
+\code{data.frame} with normalized scores
 }
 \description{
-Wrapper for \link{normalize_score} that works on data frame
+Wrapper for \code{\link[=normalize_score]{normalize_score()}} that works on data frame
 and multiple variables
 }
 \examples{
@@ -61,5 +61,9 @@ normalize_scores_df(data = head(HEXACO_60),
                     what = "sten")
 }
 \seealso{
-\code{\link[=normalize_score]{normalize_score()}}
+Other score-normalization functions: 
+\code{\link{normalize_scores_grouped}()},
+\code{\link{normalize_scores_scoring}()},
+\code{\link{normalize_score}()}
 }
+\concept{score-normalization functions}
