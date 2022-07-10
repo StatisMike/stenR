@@ -6,7 +6,10 @@ template:
   bootstrap: 5
 reference:
 - title: Basic normalization
-  desc: Functions for basic (ungrouped) normalization in procedural workflow
+  desc: |>
+   Functions for basic (ungrouped) normalization in procedural workflow. They
+   allow calculating table objects from raw scale/factor results and normalizing
+   them (or new raw data) into quantiles, Z-scores or some standard score.
 - contents:
   - StandardScale
   - FrequencyTable
@@ -15,7 +18,12 @@ reference:
   - normalize_score
   - normalize_scores_df
 - title: Grouping normalization
-  desc: Functions for grouped normalization in procedural workflow
+  desc: |>
+   Functions for grouped normalization in procedural workflow. There are functions
+   for creating groups/strata based on some conditions, extracting their data 
+   from whole dataset, and creating table objects for each of these groups.
+   Similarly to basic normalization, grouped normalization can be then made
+   based on these tables.
 - contents:
   - GroupConditions
   - GroupAssignment
@@ -26,27 +34,44 @@ reference:
   - normalize_scores_grouped
   - plot.GroupedFrequencyTable
   - plot.GroupedScoreTable
-- title: ScoringTable 
-  desc: Portable object for grouped and ungrouped normalization.
+- title: ScoringTable - portable object for normalization
+  desc: |> 
+   FrequencyTable and ScoreTable objects (and their grouped brethren) are easily
+   created from raw data. They aren't as easile exported or imported, though.
+   ScoringTable allows keeping the standardized scores for one scale in easily
+   transferrable way, exporting them into `json` or `csv` objects and also
+   importing them from these files. You can also create file to import yourself.
 - contents:
   - to_ScoringTable
   - import_ScoringTable
   - export_ScoringTable
   - normalize_scores_scoring
 - title: S3 classes manipulators
-  desc:  Manipulate and transform objects of S3 classes
+  desc: |>
+   Simple helper functions for manipulation and transforming basic S3 classes.
 - contents:
   - attach_scales
   - strip_ScoreTable
 - title: Item score preprocessors
+  desc: |>
+   Data is most often available not as a raw scores of scales, but individual
+   items. These functions are created to make your jouney from items to scales
+   as painless as possible!
 - contents:
   - ScaleSpec
   - CombScaleSpec
   - sum_items_to_scale
-- title: R6 class for Object Oriented workflow
+- title: Object Oriented workflow
+  desc: |>
+   Complex R6 object mirroring the ungrouped procedural workflow, allowing
+   for much faster and expressive calculations and continuous recalculation
+   of tables based on new data. Object for grouped tables coming soon!
 - contents:
   - CompScoreTable
-- title: Various objects provided within the package
+- title: Varia
+  desc: |>
+   Various additional simple functions, default StandardScale objects available
+   within the package and some prepackaged data for learning.
 - contents:
   - is_stenR_classes
   - default_scales

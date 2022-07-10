@@ -3,7 +3,7 @@
 \docType{data}
 \name{SLCS}
 \alias{SLCS}
-\title{Sample data of SLCS questionnaire results (item scores)}
+\title{Sample data of SLCS questionnaire results}
 \format{
 A data frame with 103 rows and 19 variables
 \describe{

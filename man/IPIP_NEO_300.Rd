@@ -3,7 +3,7 @@
 \docType{data}
 \name{IPIP_NEO_300}
 \alias{IPIP_NEO_300}
-\title{Sample data if IPIP-NEO-300 (scale scores)}
+\title{Sample data of IPIP-NEO-300 questionnaire results}
 \format{
 A data frame with 13198 rows and 7 variables
 \describe{
@@ -23,7 +23,7 @@ IPIP_NEO_300
 Dataset containing sample of 13198 results of IPIP-NEO-300 results from
 Johnson J.A. study published at 2014, preprocessed using \code{\link[=sum_items_to_scale]{sum_items_to_scale()}}
 function. It contains many observations of different ages and sexes, also
-including \code{NA} values, when even one of the underlying item scores were
+including \code{NA} values, whenever at least one of the underlying item scores were
 missing.
 }
 \references{

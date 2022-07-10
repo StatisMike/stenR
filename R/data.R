@@ -1,4 +1,4 @@
-#' Sample data of HEXACO-60 questionnaire results (summed scales)
+#' Sample data of HEXACO-60 questionnaire results
 #'
 #' @description
 #' Dataset containing summed scale scores of HEXACO-60 questionnaire. They 
@@ -25,7 +25,7 @@
 #'
 "HEXACO_60"
 
-#' Sample data of SLCS questionnaire results (item scores)
+#' Sample data of SLCS questionnaire results
 #' @description 
 #' Dataset containing individual items answers of SLCS questionnaire. They
 #' were obtained during 2020 study on Polish incidental sample.
@@ -53,12 +53,12 @@
 #' 
 "SLCS"
 
-#' Sample data of IPIP-NEO-300 (scale scores)
+#' Sample data of IPIP-NEO-300 questionnaire results
 #' @description 
 #' Dataset containing sample of 13198 results of IPIP-NEO-300 results from
 #' Johnson J.A. study published at 2014, preprocessed using [sum_items_to_scale()] 
 #' function. It contains many observations of different ages and sexes, also
-#' including `NA` values, when even one of the underlying item scores were
+#' including `NA` values, whenever at least one of the underlying item scores were
 #' missing.
 #' 
 #' @format A data frame with 13198 rows and 7 variables
