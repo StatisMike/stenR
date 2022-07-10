@@ -64,7 +64,7 @@
     <div class="section level2">
       <h2 id="basic-normalization">Basic normalization<a class="anchor" aria-label="anchor" href="#basic-normalization"></a></h2>
       
-      <p class="section-desc"></p><p>Functions for basic (ungrouped) normalization in procedural workflow</p>
+      <p class="section-desc"></p><p>Functions for basic (ungrouped) normalization in procedural workflow. They allow calculating table objects from raw scale/factor results and normalizing them (or new raw data) into quantiles, Z-scores or some standard score.</p>
 
       
     </div><div id="" class="section level2">
@@ -105,7 +105,7 @@
       </dl></div><div class="section level2">
       <h2 id="grouping-normalization">Grouping normalization<a class="anchor" aria-label="anchor" href="#grouping-normalization"></a></h2>
       
-      <p class="section-desc"></p><p>Functions for grouped normalization in procedural workflow</p>
+      <p class="section-desc"></p><p>Functions for grouped normalization in procedural workflow. There are functions for creating groups/strata based on some conditions, extracting their data from whole dataset, and creating table objects for each of these groups. Similarly to basic normalization, grouped normalization can be then made based on these tables.</p>
 
       
     </div><div id="" class="section level2">
@@ -159,9 +159,9 @@
         </dt>
         <dd>Gerenic plot of the GroupedScoreTable</dd>
       </dl></div><div class="section level2">
-      <h2 id="scoringtable">ScoringTable<a class="anchor" aria-label="anchor" href="#scoringtable"></a></h2>
+      <h2 id="scoringtable-portable-object-for-normalization">ScoringTable - portable object for normalization<a class="anchor" aria-label="anchor" href="#scoringtable-portable-object-for-normalization"></a></h2>
       
-      <p class="section-desc"></p><p>Portable object for grouped and ungrouped normalization.</p>
+      <p class="section-desc"></p><p>FrequencyTable and ScoreTable objects (and their grouped brethren) are easily created from raw data. They aren’t as easile exported or imported, though. ScoringTable allows keeping the standardized scores for one scale in easily transferrable way, exporting them into <code>json</code> or <code>csv</code> objects and also importing them from these files. You can also create file to import yourself.</p>
 
       
     </div><div id="" class="section level2">
@@ -192,7 +192,7 @@
       </dl></div><div class="section level2">
       <h2 id="s-classes-manipulators">S3 classes manipulators<a class="anchor" aria-label="anchor" href="#s-classes-manipulators"></a></h2>
       
-      <p class="section-desc"></p><p>Manipulate and transform objects of S3 classes</p>
+      <p class="section-desc"></p><p>Simple helper functions for manipulation and transforming basic S3 classes.</p>
 
       
     </div><div id="" class="section level2">
@@ -213,7 +213,7 @@
       </dl></div><div class="section level2">
       <h2 id="item-score-preprocessors">Item score preprocessors<a class="anchor" aria-label="anchor" href="#item-score-preprocessors"></a></h2>
       
-      
+      <p class="section-desc"></p><p>Data is most often available not as a raw scores of scales, but individual items. These functions are created to make your jouney from items to scales as painless as possible!</p>
 
       
     </div><div id="" class="section level2">
@@ -237,9 +237,9 @@
         </dt>
         <dd>Sum up discrete raw data</dd>
       </dl></div><div class="section level2">
-      <h2 id="r-class-for-object-oriented-workflow">R6 class for Object Oriented workflow<a class="anchor" aria-label="anchor" href="#r-class-for-object-oriented-workflow"></a></h2>
+      <h2 id="object-oriented-workflow">Object Oriented workflow<a class="anchor" aria-label="anchor" href="#object-oriented-workflow"></a></h2>
       
-      
+      <p class="section-desc"></p><p>Complex R6 object mirroring the ungrouped procedural workflow, allowing for much faster and expressive calculations and continuous recalculation of tables based on new data. Object for grouped tables coming soon!</p>
 
       
     </div><div id="" class="section level2">
@@ -253,9 +253,9 @@
         </dt>
         <dd>R6 class for producing easily re-computable ScoreTable</dd>
       </dl></div><div class="section level2">
-      <h2 id="various-objects-provided-within-the-package">Various objects provided within the package<a class="anchor" aria-label="anchor" href="#various-objects-provided-within-the-package"></a></h2>
+      <h2 id="varia">Varia<a class="anchor" aria-label="anchor" href="#varia"></a></h2>
       
-      
+      <p class="section-desc"></p><p>Various additional simple functions, default StandardScale objects available within the package and some prepackaged data for learning.</p>
 
       
     </div><div id="" class="section level2">
@@ -277,17 +277,17 @@
           
           <code><a href="HEXACO_60.html">HEXACO_60</a></code> 
         </dt>
-        <dd>Sample data of HEXACO-60 questionnaire results (summed scales)</dd>
+        <dd>Sample data of HEXACO-60 questionnaire results</dd>
       </dl><dl><dt>
           
           <code><a href="SLCS.html">SLCS</a></code> 
         </dt>
-        <dd>Sample data of SLCS questionnaire results (item scores)</dd>
+        <dd>Sample data of SLCS questionnaire results</dd>
       </dl><dl><dt>
           
           <code><a href="IPIP_NEO_300.html">IPIP_NEO_300</a></code> 
         </dt>
-        <dd>Sample data if IPIP-NEO-300 (scale scores)</dd>
+        <dd>Sample data of IPIP-NEO-300 questionnaire results</dd>
       </dl></div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>
