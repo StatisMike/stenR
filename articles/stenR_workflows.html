@@ -6,7 +6,20 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <meta name="description" content="stenR">
-<title>Procedural and Object-oriented workflows of stenR • stenR</title>
+<!-- Inform modern browsers that this page supports both dark and light color schemes,
+  and the page author prefers light. --><meta name="color-scheme" content="dark light">
+<script>
+  // If `prefers-color-scheme` is not supported, fall back to light mode.
+  // i.e. In this case, inject the `light` CSS before the others, with
+  // no media filter so that it will be downloaded with highest priority.
+  if (window.matchMedia("(prefers-color-scheme: dark)").media === "not all") {
+    document.documentElement.style.display = "none";
+    document.head.insertAdjacentHTML(
+      "beforeend",
+      "<link id=\"css\" rel=\"stylesheet\" href=\"https://bootswatch.com/5/flatly/bootstrap.css\" onload=\"document.documentElement.style.display = ''\">"
+    );
+  }
+</script><title>Procedural and Object-oriented workflows of stenR • stenR</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
 <link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png">
@@ -24,24 +37,29 @@
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-<![endif]-->
+<![endif]--><!-- Flatly Theme - Light  --><link id="css-light" rel="stylesheet" href="https://bootswatch.com/5/flatly/bootstrap.css" media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)">
+<!-- Darkly Theme - Dark --><link id="css-dark" rel="stylesheet" href="https://bootswatch.com/5/darkly/bootstrap.css" media="(prefers-color-scheme: dark)">
+<!-- preferably CSS --><link rel="stylesheet" href="../preferably.css">
+<link id="css-code-light" rel="stylesheet" href="../code-color-scheme-light.css" media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)">
+<link id="css-code-dark" rel="stylesheet" href="../code-color-scheme-dark.css" media="(prefers-color-scheme: dark)">
+<script src="../darkswitch.js"></script>
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
     
 
-    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light"><div class="container">
+    <nav class="navbar fixed-top navbar-dark navbar-expand-lg bg-primary"><div class="container">
     
     <a class="navbar-brand me-2" href="../index.html">stenR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.4</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
 
-    <div id="navbar" class="collapse navbar-collapse ms-3">
+    <div id="navbar" class="collapse navbar-collapse ms-2">
       <ul class="navbar-nav me-auto">
 <li class="nav-item">
   <a class="nav-link" href="../reference/index.html">Reference</a>
@@ -58,7 +76,16 @@
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off">
 </form>
 
-      <ul class="navbar-nav"></ul>
+      <ul class="navbar-nav">
+<li>
+          <a class="external-link nav-link" id="css-toggle-btn" aria-label="github">
+            <span class="fas fa fas fa-adjust fa-lg"></span>
+          </a>
+        </li>
+        
+        
+        
+      </ul>
 </div>
 
     
@@ -69,7 +96,7 @@
 
 
 <div class="row">
-  <main id="main"><div class="page-header">
+  <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Procedural and Object-oriented workflows of stenR</h1>
             
       
@@ -100,76 +127,39 @@
 </h2>
 <p><code>stenR</code> currently is based on few <code>S3</code> classes and can be used in purely procedural workflow, which will be described below. Exemplary data provided with package will be used:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://statismike.github.io/stenR/">stenR</a></span><span class="op">)</span>
-
-<span class="co"># data gathered in Polish sample - 204 summed results of HEXACO-60 questionnaires</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">HEXACO_60</span><span class="op">)</span>
-<span class="co">#&gt; 'data.frame':    204 obs. of  9 variables:</span>
-<span class="co">#&gt;  $ user_id: chr  "neutral_peregrinefalcon" "trapeziform_zebradove" "polyhedral_solenodon" "decrepit_norwayrat" ...</span>
-<span class="co">#&gt;  $ sex    : chr  "F" "F" "F" "F" ...</span>
-<span class="co">#&gt;  $ age    : int  26 24 26 25 31 25 62 19 24 26 ...</span>
-<span class="co">#&gt;  $ HEX_H  : int  42 38 18 21 32 34 37 39 41 30 ...</span>
-<span class="co">#&gt;  $ HEX_E  : int  33 31 17 24 35 30 37 13 33 24 ...</span>
-<span class="co">#&gt;  $ HEX_X  : int  34 36 16 29 24 34 39 27 23 34 ...</span>
-<span class="co">#&gt;  $ HEX_A  : int  36 44 42 22 31 34 23 27 15 21 ...</span>
-<span class="co">#&gt;  $ HEX_C  : int  36 36 35 43 34 28 41 19 49 38 ...</span>
-<span class="co">#&gt;  $ HEX_O  : int  31 28 37 47 28 39 44 42 22 38 ...</span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://statismike.github.io/stenR/">stenR</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># data gathered in Polish sample - 204 summed results of HEXACO-60 questionnaires</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">HEXACO_60</span><span class="op">)</span></span>
+<span><span class="co">#&gt; 'data.frame':    204 obs. of  9 variables:</span></span>
+<span><span class="co">#&gt;  $ user_id: chr  "neutral_peregrinefalcon" "trapeziform_zebradove" "polyhedral_solenodon" "decrepit_norwayrat" ...</span></span>
+<span><span class="co">#&gt;  $ sex    : chr  "F" "F" "F" "F" ...</span></span>
+<span><span class="co">#&gt;  $ age    : int  26 24 26 25 31 25 62 19 24 26 ...</span></span>
+<span><span class="co">#&gt;  $ HEX_H  : int  42 38 18 21 32 34 37 39 41 30 ...</span></span>
+<span><span class="co">#&gt;  $ HEX_E  : int  33 31 17 24 35 30 37 13 33 24 ...</span></span>
+<span><span class="co">#&gt;  $ HEX_X  : int  34 36 16 29 24 34 39 27 23 34 ...</span></span>
+<span><span class="co">#&gt;  $ HEX_A  : int  36 44 42 22 31 34 23 27 15 21 ...</span></span>
+<span><span class="co">#&gt;  $ HEX_C  : int  36 36 35 43 34 28 41 19 49 38 ...</span></span>
+<span><span class="co">#&gt;  $ HEX_O  : int  31 28 37 47 28 39 44 42 22 38 ...</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="create-a-frequency-table-object-on-basis-of-some-variable">1. Create a Frequency Table object on basis of some variable<a class="anchor" aria-label="anchor" href="#create-a-frequency-table-object-on-basis-of-some-variable"></a>
 </h3>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">HEX_H_ft</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/FrequencyTable.html">FrequencyTable</a></span><span class="op">(</span><span class="va">HEXACO_60</span><span class="op">$</span><span class="va">HEX_H</span><span class="op">)</span>
-<span class="co">#&gt; Warning in FrequencyTable(HEXACO_60$HEX_H): There are missing score values</span>
-<span class="co">#&gt; between minimum and maximum scores. They have been filled automatically.</span>
-<span class="va">HEX_H_ft</span>
-<span class="co">#&gt; &lt;FrequencyTable&gt; computed on: 204 observations</span>
-<span class="co">#&gt; range: incomplete (missing raw score values between &lt;min&gt; and &lt;max&gt;) </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;  score  n      freq       quan           Z</span>
-<span class="co">#&gt;     14  1 0.4901961  0.2450980 -2.81340671</span>
-<span class="co">#&gt;     15  1 0.4901961  0.7352941 -2.43954226</span>
-<span class="co">#&gt;     16  2 0.9803922  1.4705882 -2.17792307</span>
-<span class="co">#&gt;     17  0 0.0000000  1.4705882 -2.17792307</span>
-<span class="co">#&gt;     18  3 1.4705882  2.6960784 -1.92746610</span>
-<span class="co">#&gt;     19  2 0.9803922  3.9215686 -1.75986103</span>
-<span class="co">#&gt;     20  1 0.4901961  4.6568627 -1.67907589</span>
-<span class="co">#&gt;     21  3 1.4705882  5.6372549 -1.58597448</span>
-<span class="co">#&gt;     22  0 0.0000000  5.6372549 -1.58597448</span>
-<span class="co">#&gt;     23  2 0.9803922  6.8627451 -1.48609157</span>
-<span class="co">#&gt;     24  3 1.4705882  8.0882353 -1.39916101</span>
-<span class="co">#&gt;     25  3 1.4705882  9.5588235 -1.30710672</span>
-<span class="co">#&gt;     26  5 2.4509804 11.5196078 -1.19934929</span>
-<span class="co">#&gt;     27  8 3.9215686 14.7058824 -1.04913140</span>
-<span class="co">#&gt;     28  8 3.9215686 18.6274510 -0.89170883</span>
-<span class="co">#&gt;     29 10 4.9019608 23.0392157 -0.73755598</span>
-<span class="co">#&gt;     30 14 6.8627451 28.9215686 -0.55567745</span>
-<span class="co">#&gt;     31 11 5.3921569 35.0490196 -0.38399738</span>
-<span class="co">#&gt;     32  7 3.4313725 39.4607843 -0.26732923</span>
-<span class="co">#&gt;     33  9 4.4117647 43.3823529 -0.16664795</span>
-<span class="co">#&gt;     34 11 5.3921569 48.2843137 -0.04301914</span>
-<span class="co">#&gt;     35 13 6.3725490 54.1666667  0.10463346</span>
-<span class="co">#&gt;     36 17 8.3333333 61.5196078  0.29288789</span>
-<span class="co">#&gt;     37  7 3.4313725 67.4019608  0.45103991</span>
-<span class="co">#&gt;     38 13 6.3725490 72.3039216  0.59189400</span>
-<span class="co">#&gt;     39 13 6.3725490 78.6764706  0.79524571</span>
-<span class="co">#&gt;     40  5 2.4509804 83.0882353  0.95765790</span>
-<span class="co">#&gt;     41  6 2.9411765 85.7843137  1.07067914</span>
-<span class="co">#&gt;     42  5 2.4509804 88.4803922  1.19934929</span>
-<span class="co">#&gt;     43  2 0.9803922 90.1960784  1.29280523</span>
-<span class="co">#&gt;     44  6 2.9411765 92.1568627  1.41570209</span>
-<span class="co">#&gt;     45  6 2.9411765 95.0980392  1.65443473</span>
-<span class="co">#&gt;     46  3 1.4705882 97.3039216  1.92746610</span>
-<span class="co">#&gt;     47  0 0.0000000 97.3039216  1.92746610</span>
-<span class="co">#&gt;     48  0 0.0000000 97.3039216  1.92746610</span>
-<span class="co">#&gt;     49  2 0.9803922 98.5294118  2.17792307</span>
-<span class="co">#&gt;     50  2 0.9803922 99.5098039  2.58266941</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">HEX_H_ft</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/FrequencyTable.html">FrequencyTable</a></span><span class="op">(</span><span class="va">HEXACO_60</span><span class="op">$</span><span class="va">HEX_H</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> There are missing raw score values between minimum and maximum raw scores.</span></span>
+<span><span class="co">#&gt;   They have been filled automatically.</span></span>
+<span><span class="co">#&gt;   No. missing: 4/37 [10.81%]</span></span>
+<span><span class="va">HEX_H_ft</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">&lt;FrequencyTable&gt;</span> computed on <span style="color: #0000BB;">204</span> observations</span></span>
+<span><span class="co">#&gt; computed on <span style="color: #0000BB;">204</span> observations</span></span>
+<span><span class="co">#&gt; range: <span style="font-style: italic;">incomplete</span></span></span></code></pre></div>
 <p>Generated warning tells us that there were some raw scores between <code><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min()</a></code> and <code><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max()</a></code> values that weren’t represented in the sample. We can see that was the case for a few scores:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">HEX_H_ft</span><span class="op">$</span><span class="va">table</span><span class="op">$</span><span class="va">n</span> <span class="op">==</span> <span class="fl">0</span><span class="op">)</span>
-<span class="co">#&gt; [1]  4  9 34 35</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">HEX_H_ft</span><span class="op">$</span><span class="va">table</span><span class="op">$</span><span class="va">n</span> <span class="op">==</span> <span class="fl">0</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1]  4  9 34 35</span></span></code></pre></div>
 <p>We can also see it while plotting the resulting <em>FrequencyTable</em>:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">HEX_H_ft</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">HEX_H_ft</span><span class="op">)</span></span></code></pre></div>
 <p><img src="stenR_workflows_files/figure-html/FrequencyTable_plot-1.png" width="576" style="display: block; margin: auto;"></p>
 <p>By the rule of thumb: the more possible values the raw scores can get and the smaller your data, the bigger possibility for this to happen. If you feel that your sample was representative, you can ignore it. It is recommended though to get more varied, greater number of observations when getting this warning.</p>
 </div>
@@ -179,34 +169,46 @@
 <p><em>FrequencyTable</em> is a basis for normalizing the distribution of your data. Now, the next step is to standardize it using some <em>StandardScale</em> and generating <em>ScoreTable</em>.</p>
 <p>There are some <em>StandardScale</em> objects available in the package. They define score scale. We can use the popular in psychology <strong>STEN</strong> scale to calculate the scores.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># check out the scale definition</span>
-<span class="va">STEN</span>
-<span class="co">#&gt; &lt;StandardScale&gt;: 'sten'</span>
-<span class="co">#&gt; ( M: 5.5; SD: 2; min: 1; max: 10 )</span>
-<span class="co"># see its distribution graphically</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">STEN</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># check out the scale definition</span></span>
+<span><span class="va">STEN</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">&lt;StandardScale&gt;</span>: <span style="font-style: italic;">sten</span></span></span>
+<span><span class="co">#&gt; `M`: 5.5 `SD`: 2 `min` 1: `max`: 10</span></span>
+<span><span class="co"># see its distribution graphically</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">STEN</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: Computation failed in `stat_function()`:</span></span>
+<span><span class="co">#&gt; $ operator is invalid for atomic vectors</span></span>
+<span><span class="co">#&gt; Computation failed in `stat_function()`:</span></span>
+<span><span class="co">#&gt; $ operator is invalid for atomic vectors</span></span>
+<span><span class="co">#&gt; Computation failed in `stat_function()`:</span></span>
+<span><span class="co">#&gt; $ operator is invalid for atomic vectors</span></span></code></pre></div>
 <p><img src="stenR_workflows_files/figure-html/STEN_scale-1.png" width="576" style="display: block; margin: auto;"></p>
 <p>Now, we can generate the ScoreTable using our FrequencyTable and scale of our choosing.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">HEX_H_st</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ScoreTable.html">ScoreTable</a></span><span class="op">(</span><span class="va">HEX_H_ft</span>, <span class="va">STEN</span><span class="op">)</span>
-
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">HEX_H_st</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">HEX_H_st</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ScoreTable.html">ScoreTable</a></span><span class="op">(</span><span class="va">HEX_H_ft</span>, <span class="va">STEN</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">HEX_H_st</span><span class="op">)</span></span></code></pre></div>
 <p><img src="stenR_workflows_files/figure-html/ScoreTable-1.png" width="576" style="display: block; margin: auto;"></p>
 <p>We can see that the shape of the generated distribution is similar to the distribution associated with the <em>StandardScale</em>. It is a good sign: number of values of raw scores is appropriate for the chosen scale. In contrast, we can see that the <strong>TANINE</strong> scale would be an ill choice:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="../reference/ScoreTable.html">ScoreTable</a></span><span class="op">(</span><span class="va">HEX_H_ft</span>, <span class="va">TANINE</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="../reference/ScoreTable.html">ScoreTable</a></span><span class="op">(</span><span class="va">HEX_H_ft</span>, <span class="va">TANINE</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="stenR_workflows_files/figure-html/HEXACO_tanine-1.png" width="576" style="display: block; margin: auto;"></p>
 <p>You can also define your own <em>StandardScale</em> object using the <code>StandardScale</code> function.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">new_scale</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/StandardScale.html">StandardScale</a></span><span class="op">(</span><span class="st">"my_scale"</span>, <span class="fl">10</span>, <span class="fl">3</span>, <span class="fl">0</span>, <span class="fl">20</span><span class="op">)</span>
-
-<span class="co"># let's see if everything is correct</span>
-<span class="va">new_scale</span>
-<span class="co">#&gt; &lt;StandardScale&gt;: 'my_scale'</span>
-<span class="co">#&gt; ( M: 10; SD: 3; min: 0; max: 20 )</span>
-
-<span class="co"># how does its distribution looks like?</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">new_scale</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">new_scale</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/StandardScale.html">StandardScale</a></span><span class="op">(</span><span class="st">"my_scale"</span>, <span class="fl">10</span>, <span class="fl">3</span>, <span class="fl">0</span>, <span class="fl">20</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># let's see if everything is correct</span></span>
+<span><span class="va">new_scale</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">&lt;StandardScale&gt;</span>: <span style="font-style: italic;">my_scale</span></span></span>
+<span><span class="co">#&gt; `M`: 10 `SD`: 3 `min` 0: `max`: 20</span></span>
+<span></span>
+<span><span class="co"># how does its distribution looks like?</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">new_scale</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: Computation failed in `stat_function()`:</span></span>
+<span><span class="co">#&gt; $ operator is invalid for atomic vectors</span></span>
+<span><span class="co">#&gt; Computation failed in `stat_function()`:</span></span>
+<span><span class="co">#&gt; $ operator is invalid for atomic vectors</span></span>
+<span><span class="co">#&gt; Computation failed in `stat_function()`:</span></span>
+<span><span class="co">#&gt; $ operator is invalid for atomic vectors</span></span></code></pre></div>
 <p><img src="stenR_workflows_files/figure-html/StandardScale-1.png" width="576" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level3">
@@ -214,20 +216,20 @@
 </h3>
 <p>Now, if we have our <em>ScoreTable</em> created, we can use it to standardize some scores! We will do it for some randomly generated ones using <code><a href="../reference/normalize_score.html">normalize_score()</a></code> function:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">2137</span><span class="op">)</span>
-
-<span class="co"># generate some random raw scores of valid values</span>
-<span class="va">raw_scores</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">10</span>, min <span class="op">=</span> <span class="fl">10</span>, max <span class="op">=</span> <span class="fl">50</span><span class="op">)</span>, <span class="fl">0</span><span class="op">)</span>
-
-<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">raw_scores</span><span class="op">)</span>
-<span class="co">#&gt;  [1] 19 12 14 45 20 22 30 39 33 23</span>
-
-<span class="co"># and now - get the 'STEN' values!</span>
-<span class="fu"><a href="../reference/normalize_score.html">normalize_score</a></span><span class="op">(</span>
-  x <span class="op">=</span> <span class="va">raw_scores</span>,
-  table <span class="op">=</span> <span class="va">HEX_H_st</span>,
-  what <span class="op">=</span> <span class="st">"sten"</span><span class="op">)</span>
-<span class="co">#&gt;  [1] 2 1 1 9 2 2 4 7 5 3</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">2137</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># generate some random raw scores of valid values</span></span>
+<span><span class="va">raw_scores</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">10</span>, min <span class="op">=</span> <span class="fl">10</span>, max <span class="op">=</span> <span class="fl">50</span><span class="op">)</span>, <span class="fl">0</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">raw_scores</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  [1] 19 12 14 45 20 22 30 39 33 23</span></span>
+<span></span>
+<span><span class="co"># and now - get the 'STEN' values!</span></span>
+<span><span class="fu"><a href="../reference/normalize_score.html">normalize_score</a></span><span class="op">(</span></span>
+<span>  x <span class="op">=</span> <span class="va">raw_scores</span>,</span>
+<span>  table <span class="op">=</span> <span class="va">HEX_H_st</span>,</span>
+<span>  what <span class="op">=</span> <span class="st">"sten"</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  [1] 2 1 1 9 2 2 4 7 5 3</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -240,102 +242,94 @@
 </h3>
 <p>During object initialization you can attach some previously calculated <em>FrequencyTables</em> and/or <em>StandardScales</em>. It is fully optional, as it can also be done afterwards.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># attach during initialization</span>
-<span class="va">HexCST</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/CompScoreTable.html">CompScoreTable</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span>
-  tables <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>HEX_H <span class="op">=</span> <span class="va">HEX_H_ft</span><span class="op">)</span>,
-  scales <span class="op">=</span> <span class="va">STEN</span>
-<span class="op">)</span>
-
-<span class="co"># attach later</span>
-<span class="va">altCST</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/CompScoreTable.html">CompScoreTable</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span>
-<span class="va">altCST</span><span class="op">$</span><span class="fu">attach_FrequencyTable</span><span class="op">(</span><span class="va">HEX_H_ft</span>, <span class="st">"HEX_H"</span><span class="op">)</span>
-<span class="va">altCST</span><span class="op">$</span><span class="fu">attach_StandardScale</span><span class="op">(</span><span class="va">STEN</span><span class="op">)</span>
-
-<span class="co"># there are no visible differences in objects structure</span>
-<span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">HexCST</span><span class="op">)</span>
-<span class="co">#&gt; &lt;CompScoreTable&gt; object</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Attached &lt;ScoreTables&gt;:</span>
-<span class="co">#&gt;  variable   n      range</span>
-<span class="co">#&gt;     HEX_H 204 incomplete</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Attached &lt;StandardScales&gt;:</span>
-<span class="co">#&gt;  name   M SD min max</span>
-<span class="co">#&gt;  sten 5.5  2   1  10</span>
-<span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">altCST</span><span class="op">)</span>
-<span class="co">#&gt; &lt;CompScoreTable&gt; object</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Attached &lt;ScoreTables&gt;:</span>
-<span class="co">#&gt;  variable   n      range</span>
-<span class="co">#&gt;     HEX_H 204 incomplete</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Attached &lt;StandardScales&gt;:</span>
-<span class="co">#&gt;  name   M SD min max</span>
-<span class="co">#&gt;  sten 5.5  2   1  10</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># attach during initialization</span></span>
+<span><span class="va">HexCST</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/CompScoreTable.html">CompScoreTable</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span>
+<span>  tables <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>HEX_H <span class="op">=</span> <span class="va">HEX_H_ft</span><span class="op">)</span>,</span>
+<span>  scales <span class="op">=</span> <span class="va">STEN</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># attach later</span></span>
+<span><span class="va">altCST</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/CompScoreTable.html">CompScoreTable</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">altCST</span><span class="op">$</span><span class="fu">attach_FrequencyTable</span><span class="op">(</span><span class="va">HEX_H_ft</span>, <span class="st">"HEX_H"</span><span class="op">)</span></span>
+<span><span class="va">altCST</span><span class="op">$</span><span class="fu">attach_StandardScale</span><span class="op">(</span><span class="va">STEN</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># there are no visible differences in objects structure</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">HexCST</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">&lt;CompScoreTable&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="font-weight: bold;">Attached </span><span style="color: #0000BB; font-weight: bold;">&lt;ScoreTable&gt;</span></span></span>
+<span><span class="co">#&gt;  variable   n      range</span></span>
+<span><span class="co">#&gt;     HEX_H 204 incomplete</span></span>
+<span><span class="co">#&gt; <span style="font-weight: bold;">Attached </span><span style="color: #0000BB; font-weight: bold;">&lt;StandardScale&gt;</span></span></span>
+<span><span class="co">#&gt;  name   M SD min max</span></span>
+<span><span class="co">#&gt;  sten 5.5  2   1  10</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">altCST</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">&lt;CompScoreTable&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="font-weight: bold;">Attached </span><span style="color: #0000BB; font-weight: bold;">&lt;ScoreTable&gt;</span></span></span>
+<span><span class="co">#&gt;  variable   n      range</span></span>
+<span><span class="co">#&gt;     HEX_H 204 incomplete</span></span>
+<span><span class="co">#&gt; <span style="font-weight: bold;">Attached </span><span style="color: #0000BB; font-weight: bold;">&lt;StandardScale&gt;</span></span></span>
+<span><span class="co">#&gt;  name   M SD min max</span></span>
+<span><span class="co">#&gt;  sten 5.5  2   1  10</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="expand-compscoretable">2. Expand <em>CompScoreTable</em><a class="anchor" aria-label="anchor" href="#expand-compscoretable"></a>
 </h3>
 <p>After creation the object can be expanded with more <em>FrequencyTables</em> and <em>StandardScales.</em> All <em>ScoreTables</em> will be internally recalculated</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># add new FrequencyTable</span>
-<span class="va">HexCST</span><span class="op">$</span><span class="fu">attach_FrequencyTable</span><span class="op">(</span><span class="fu"><a href="../reference/FrequencyTable.html">FrequencyTable</a></span><span class="op">(</span><span class="va">HEXACO_60</span><span class="op">$</span><span class="va">HEX_C</span><span class="op">)</span>, <span class="st">"HEX_C"</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">HexCST</span><span class="op">)</span>
-<span class="co">#&gt; &lt;CompScoreTable&gt; object</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Attached &lt;ScoreTables&gt;:</span>
-<span class="co">#&gt;  variable   n      range</span>
-<span class="co">#&gt;     HEX_H 204 incomplete</span>
-<span class="co">#&gt;     HEX_C 204   complete</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Attached &lt;StandardScales&gt;:</span>
-<span class="co">#&gt;  name   M SD min max</span>
-<span class="co">#&gt;  sten 5.5  2   1  10</span>
-
-<span class="co"># add new StandardScale</span>
-<span class="va">HexCST</span><span class="op">$</span><span class="fu">attach_StandardScale</span><span class="op">(</span><span class="va">STANINE</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">HexCST</span><span class="op">)</span>
-<span class="co">#&gt; &lt;CompScoreTable&gt; object</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Attached &lt;ScoreTables&gt;:</span>
-<span class="co">#&gt;  variable   n      range</span>
-<span class="co">#&gt;     HEX_H 204 incomplete</span>
-<span class="co">#&gt;     HEX_C 204   complete</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Attached &lt;StandardScales&gt;:</span>
-<span class="co">#&gt;     name   M SD min max</span>
-<span class="co">#&gt;     sten 5.5  2   1  10</span>
-<span class="co">#&gt;  stanine 5.0  2   1   9</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># add new FrequencyTable</span></span>
+<span><span class="va">HexCST</span><span class="op">$</span><span class="fu">attach_FrequencyTable</span><span class="op">(</span><span class="fu"><a href="../reference/FrequencyTable.html">FrequencyTable</a></span><span class="op">(</span><span class="va">HEXACO_60</span><span class="op">$</span><span class="va">HEX_C</span><span class="op">)</span>, <span class="st">"HEX_C"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">HexCST</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">&lt;CompScoreTable&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="font-weight: bold;">Attached </span><span style="color: #0000BB; font-weight: bold;">&lt;ScoreTable&gt;</span></span></span>
+<span><span class="co">#&gt;  variable   n      range</span></span>
+<span><span class="co">#&gt;     HEX_H 204 incomplete</span></span>
+<span><span class="co">#&gt;     HEX_C 204   complete</span></span>
+<span><span class="co">#&gt; <span style="font-weight: bold;">Attached </span><span style="color: #0000BB; font-weight: bold;">&lt;StandardScale&gt;</span></span></span>
+<span><span class="co">#&gt;  name   M SD min max</span></span>
+<span><span class="co">#&gt;  sten 5.5  2   1  10</span></span>
+<span></span>
+<span><span class="co"># add new StandardScale</span></span>
+<span><span class="va">HexCST</span><span class="op">$</span><span class="fu">attach_StandardScale</span><span class="op">(</span><span class="va">STANINE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">HexCST</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">&lt;CompScoreTable&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="font-weight: bold;">Attached </span><span style="color: #0000BB; font-weight: bold;">&lt;ScoreTable&gt;</span></span></span>
+<span><span class="co">#&gt;  variable   n      range</span></span>
+<span><span class="co">#&gt;     HEX_H 204 incomplete</span></span>
+<span><span class="co">#&gt;     HEX_C 204   complete</span></span>
+<span><span class="co">#&gt; <span style="font-weight: bold;">Attached </span><span style="color: #0000BB; font-weight: bold;">&lt;StandardScale&gt;</span></span></span>
+<span><span class="co">#&gt;     name   M SD min max</span></span>
+<span><span class="co">#&gt;     sten 5.5  2   1  10</span></span>
+<span><span class="co">#&gt;  stanine 5.0  2   1   9</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="a--standardize-scores">3a. Standardize scores<a class="anchor" aria-label="anchor" href="#a--standardize-scores"></a>
 </h3>
 <p>After the object is ready, the score standardization may begin. Let’s feed it some raw scores!</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># standardize the Honesty-Humility and Consciousness</span>
-<span class="va">HexCST</span><span class="op">$</span><span class="fu">standardize</span><span class="op">(</span>
-  data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">HEXACO_60</span><span class="op">)</span>,
-  what <span class="op">=</span> <span class="st">"sten"</span>,
-  vars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"HEX_H"</span>, <span class="st">"HEX_C"</span><span class="op">)</span>
-<span class="op">)</span>
-<span class="co">#&gt;                   user_id sex age HEX_H HEX_E HEX_X HEX_A HEX_C HEX_O</span>
-<span class="co">#&gt; 1 neutral_peregrinefalcon   F  26     8    33    34    36     6    31</span>
-<span class="co">#&gt; 2   trapeziform_zebradove   F  24     7    31    36    44     6    28</span>
-<span class="co">#&gt; 3    polyhedral_solenodon   F  26     2    17    16    42     5    37</span>
-<span class="co">#&gt; 4      decrepit_norwayrat   F  25     2    24    29    22     8    47</span>
-<span class="co">#&gt; 5          unawake_wisent   F  31     5    35    24    31     5    28</span>
-<span class="co">#&gt; 6   turophilic_spreadwing   M  25     5    30    34    34     3    39</span>
-
-<span class="co"># you can also do this easily with pipes!</span>
-<span class="va">HEXACO_60</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"HEX_H"</span>, <span class="st">"HEX_C"</span><span class="op">)</span><span class="op">]</span> |&gt;
-  <span class="co"># no need to specify 'vars', as the correct columns are already selected</span>
-  <span class="va">HexCST</span><span class="op">$</span><span class="fu">standardize</span><span class="op">(</span><span class="st">"sten"</span><span class="op">)</span>
-<span class="co">#&gt;   HEX_H HEX_C</span>
-<span class="co">#&gt; 1     8     6</span>
-<span class="co">#&gt; 2     7     6</span>
-<span class="co">#&gt; 3     2     5</span>
-<span class="co">#&gt; 4     2     8</span>
-<span class="co">#&gt; 5     5     5</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># standardize the Honesty-Humility and Consciousness</span></span>
+<span><span class="va">HexCST</span><span class="op">$</span><span class="fu">standardize</span><span class="op">(</span></span>
+<span>  data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">HEXACO_60</span><span class="op">)</span>,</span>
+<span>  what <span class="op">=</span> <span class="st">"sten"</span>,</span>
+<span>  vars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"HEX_H"</span>, <span class="st">"HEX_C"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt;                   user_id sex age HEX_H HEX_E HEX_X HEX_A HEX_C HEX_O</span></span>
+<span><span class="co">#&gt; 1 neutral_peregrinefalcon   F  26     8    33    34    36     6    31</span></span>
+<span><span class="co">#&gt; 2   trapeziform_zebradove   F  24     7    31    36    44     6    28</span></span>
+<span><span class="co">#&gt; 3    polyhedral_solenodon   F  26     2    17    16    42     5    37</span></span>
+<span><span class="co">#&gt; 4      decrepit_norwayrat   F  25     2    24    29    22     8    47</span></span>
+<span><span class="co">#&gt; 5          unawake_wisent   F  31     5    35    24    31     5    28</span></span>
+<span><span class="co">#&gt; 6   turophilic_spreadwing   M  25     5    30    34    34     3    39</span></span>
+<span></span>
+<span><span class="co"># you can also do this easily with pipes!</span></span>
+<span><span class="va">HEXACO_60</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"HEX_H"</span>, <span class="st">"HEX_C"</span><span class="op">)</span><span class="op">]</span> <span class="op">|&gt;</span></span>
+<span>  <span class="co"># no need to specify 'vars', as the correct columns are already selected</span></span>
+<span>  <span class="va">HexCST</span><span class="op">$</span><span class="fu">standardize</span><span class="op">(</span><span class="st">"sten"</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   HEX_H HEX_C</span></span>
+<span><span class="co">#&gt; 1     8     6</span></span>
+<span><span class="co">#&gt; 2     7     6</span></span>
+<span><span class="co">#&gt; 3     2     5</span></span>
+<span><span class="co">#&gt; 4     2     8</span></span>
+<span><span class="co">#&gt; 5     5     5</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="b--automatically-recalculate-scoretables">3b. Automatically recalculate ScoreTables<a class="anchor" aria-label="anchor" href="#b--automatically-recalculate-scoretables"></a>
@@ -346,62 +340,60 @@
 <p>You can actually use <code>standardize()</code> with <code>calc = TRUE</code> just after attaching the scale or scales. <em>ScoreTables</em> will be generated automatically before the data standardization - so you will receive both the data and computed <em>ScoreTables</em></p>
 </blockquote>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># check the current state of the object</span>
-<span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">HexCST</span><span class="op">)</span>
-<span class="co">#&gt; &lt;CompScoreTable&gt; object</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Attached &lt;ScoreTables&gt;:</span>
-<span class="co">#&gt;  variable   n      range</span>
-<span class="co">#&gt;     HEX_H 204 incomplete</span>
-<span class="co">#&gt;     HEX_C 204   complete</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Attached &lt;StandardScales&gt;:</span>
-<span class="co">#&gt;     name   M SD min max</span>
-<span class="co">#&gt;     sten 5.5  2   1  10</span>
-<span class="co">#&gt;  stanine 5.0  2   1   9</span>
-
-<span class="co"># now, standardize and recalculate!</span>
-<span class="va">HEXACO_60</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"HEX_H"</span>, <span class="st">"HEX_C"</span><span class="op">)</span><span class="op">]</span> |&gt;
-  <span class="va">HexCST</span><span class="op">$</span><span class="fu">standardize</span><span class="op">(</span><span class="st">"sten"</span>, calc <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-<span class="co">#&gt;   HEX_H HEX_C</span>
-<span class="co">#&gt; 1     8     6</span>
-<span class="co">#&gt; 2     7     6</span>
-<span class="co">#&gt; 3     2     5</span>
-<span class="co">#&gt; 4     2     8</span>
-<span class="co">#&gt; 5     5     5</span>
-
-<span class="co"># check the new state</span>
-<span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">HexCST</span><span class="op">)</span>
-<span class="co">#&gt; &lt;CompScoreTable&gt; object</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Attached &lt;ScoreTables&gt;:</span>
-<span class="co">#&gt;  variable   n      range</span>
-<span class="co">#&gt;     HEX_H 209 incomplete</span>
-<span class="co">#&gt;     HEX_C 209   complete</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Attached &lt;StandardScales&gt;:</span>
-<span class="co">#&gt;     name   M SD min max</span>
-<span class="co">#&gt;     sten 5.5  2   1  10</span>
-<span class="co">#&gt;  stanine 5.0  2   1   9</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># check the current state of the object</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">HexCST</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">&lt;CompScoreTable&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="font-weight: bold;">Attached </span><span style="color: #0000BB; font-weight: bold;">&lt;ScoreTable&gt;</span></span></span>
+<span><span class="co">#&gt;  variable   n      range</span></span>
+<span><span class="co">#&gt;     HEX_H 204 incomplete</span></span>
+<span><span class="co">#&gt;     HEX_C 204   complete</span></span>
+<span><span class="co">#&gt; <span style="font-weight: bold;">Attached </span><span style="color: #0000BB; font-weight: bold;">&lt;StandardScale&gt;</span></span></span>
+<span><span class="co">#&gt;     name   M SD min max</span></span>
+<span><span class="co">#&gt;     sten 5.5  2   1  10</span></span>
+<span><span class="co">#&gt;  stanine 5.0  2   1   9</span></span>
+<span></span>
+<span><span class="co"># now, standardize and recalculate!</span></span>
+<span><span class="va">HEXACO_60</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"HEX_H"</span>, <span class="st">"HEX_C"</span><span class="op">)</span><span class="op">]</span> <span class="op">|&gt;</span></span>
+<span>  <span class="va">HexCST</span><span class="op">$</span><span class="fu">standardize</span><span class="op">(</span><span class="st">"sten"</span>, calc <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: Non-integer values were coerced to integers.</span></span>
+<span><span class="co">#&gt; Non-integer values were coerced to integers.</span></span>
+<span><span class="co">#&gt;   HEX_H HEX_C</span></span>
+<span><span class="co">#&gt; 1     8     6</span></span>
+<span><span class="co">#&gt; 2     7     6</span></span>
+<span><span class="co">#&gt; 3     2     5</span></span>
+<span><span class="co">#&gt; 4     2     8</span></span>
+<span><span class="co">#&gt; 5     5     5</span></span>
+<span></span>
+<span><span class="co"># check the new state</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">HexCST</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">&lt;CompScoreTable&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="font-weight: bold;">Attached </span><span style="color: #0000BB; font-weight: bold;">&lt;ScoreTable&gt;</span></span></span>
+<span><span class="co">#&gt;  variable   n      range</span></span>
+<span><span class="co">#&gt;     HEX_H 209 incomplete</span></span>
+<span><span class="co">#&gt;     HEX_C 209   complete</span></span>
+<span><span class="co">#&gt; <span style="font-weight: bold;">Attached </span><span style="color: #0000BB; font-weight: bold;">&lt;StandardScale&gt;</span></span></span>
+<span><span class="co">#&gt;     name   M SD min max</span></span>
+<span><span class="co">#&gt;     sten 5.5  2   1  10</span></span>
+<span><span class="co">#&gt;  stanine 5.0  2   1   9</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="c--export-tables">3c. Export tables<a class="anchor" aria-label="anchor" href="#c--export-tables"></a>
 </h3>
 <p>There is also option to export the <em>ScoreTables</em> - either to use them later in procedural way or to create new <em>CompScoreTable</em> in another session - for this reason there is also option to export them as <em>FrequencyTables</em>!</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># export as ScoreTables</span>
-<span class="va">st_list</span> <span class="op">&lt;-</span> <span class="va">HexCST</span><span class="op">$</span><span class="fu">export_ScoreTable</span><span class="op">(</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">st_list</span><span class="op">)</span>
-<span class="co">#&gt;       Length Class      Mode</span>
-<span class="co">#&gt; HEX_H 3      ScoreTable list</span>
-<span class="co">#&gt; HEX_C 3      ScoreTable list</span>
-
-<span class="co"># export as FrequencyTables</span>
-<span class="va">ft_list</span> <span class="op">&lt;-</span> <span class="va">HexCST</span><span class="op">$</span><span class="fu">export_ScoreTable</span><span class="op">(</span>strip <span class="op">=</span> <span class="cn">T</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">ft_list</span><span class="op">)</span>
-<span class="co">#&gt;       Length Class          Mode</span>
-<span class="co">#&gt; HEX_H 2      FrequencyTable list</span>
-<span class="co">#&gt; HEX_C 2      FrequencyTable list</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># export as ScoreTables</span></span>
+<span><span class="va">st_list</span> <span class="op">&lt;-</span> <span class="va">HexCST</span><span class="op">$</span><span class="fu">export_ScoreTable</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">st_list</span><span class="op">)</span></span>
+<span><span class="co">#&gt;       Length Class      Mode</span></span>
+<span><span class="co">#&gt; HEX_H 3      ScoreTable list</span></span>
+<span><span class="co">#&gt; HEX_C 3      ScoreTable list</span></span>
+<span></span>
+<span><span class="co"># export as FrequencyTables</span></span>
+<span><span class="va">ft_list</span> <span class="op">&lt;-</span> <span class="va">HexCST</span><span class="op">$</span><span class="fu">export_ScoreTable</span><span class="op">(</span>strip <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">ft_list</span><span class="op">)</span></span>
+<span><span class="co">#&gt;       Length Class          Mode</span></span>
+<span><span class="co">#&gt; HEX_H 2      FrequencyTable list</span></span>
+<span><span class="co">#&gt; HEX_C 2      FrequencyTable list</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -410,31 +402,32 @@
 <p>Ideally, the normalization using <code>stenR</code> should be done only using raw, actual data. Unfortunately, it often can’t be accessed.</p>
 <p>Alternatively, the articles specifying measurement construction often share the descriptive statistics of their own results. Using them we can create <em>Simulated</em> tables:</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">sim_ft</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/SimFrequencyTable.html">SimFrequencyTable</a></span><span class="op">(</span>min <span class="op">=</span> <span class="fl">10</span>, max <span class="op">=</span> <span class="fl">50</span>, M <span class="op">=</span> <span class="fl">31.04</span>, 
-                            SD <span class="op">=</span> <span class="fl">6.7</span>, skew <span class="op">=</span> <span class="op">-</span><span class="fl">0.3</span>, kurt <span class="op">=</span> <span class="fl">2.89</span>, seed <span class="op">=</span> <span class="fl">2678</span><span class="op">)</span>
-<span class="co">#&gt; Constants: Distribution  1  </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Constants calculation time: 0.005 minutes </span>
-<span class="co">#&gt; Total Simulation time: 0.005 minutes</span>
-
-<span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">sim_ft</span><span class="op">)</span>
-<span class="co">#&gt; [1] "FrequencyTable" "Simulated"</span>
-
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">sim_ft</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">sim_ft</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/SimFrequencyTable.html">SimFrequencyTable</a></span><span class="op">(</span>min <span class="op">=</span> <span class="fl">10</span>, max <span class="op">=</span> <span class="fl">50</span>, M <span class="op">=</span> <span class="fl">31.04</span>, </span>
+<span>                            SD <span class="op">=</span> <span class="fl">6.7</span>, skew <span class="op">=</span> <span class="op">-</span><span class="fl">0.3</span>, kurt <span class="op">=</span> <span class="fl">2.89</span>, seed <span class="op">=</span> <span class="fl">2678</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Constants: Distribution  1  </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Constants calculation time: 0.004 minutes </span></span>
+<span><span class="co">#&gt; Total Simulation time: 0.004 minutes</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">sim_ft</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "FrequencyTable" "Simulated"</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">sim_ft</span><span class="op">)</span></span></code></pre></div>
 <p><img src="stenR_workflows_files/figure-html/SimTables-1.png" width="576" style="display: block; margin: auto;"></p>
 <p>The <em>Simulated</em> class will be inherited by <em>ScoreTable</em> object created on its basis.</p>
 <p>Simulated tables can be used in every way that regular ones can be with one exception: if used to create <em>CompScoreTable</em> object, the raw scores cannot be appended to this kind of table in <code>standardize()</code> method.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">SimCST</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/CompScoreTable.html">CompScoreTable</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span>
-  tables <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"simmed"</span> <span class="op">=</span> <span class="va">sim_ft</span><span class="op">)</span>,
-  scales <span class="op">=</span> <span class="va">STEN</span>
-<span class="op">)</span>
-
-<span class="va">SimCST</span><span class="op">$</span><span class="fu">standardize</span><span class="op">(</span>
-  data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>simmed <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">10</span>, <span class="fl">50</span><span class="op">)</span>, <span class="fl">0</span><span class="op">)</span><span class="op">)</span>,
-  what <span class="op">=</span> <span class="st">"sten"</span>,
-  calc <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-<span class="co">#&gt; Error: You can't add new raw values to Simulated FrequencyTable</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">SimCST</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/CompScoreTable.html">CompScoreTable</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span>
+<span>  tables <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"simmed"</span> <span class="op">=</span> <span class="va">sim_ft</span><span class="op">)</span>,</span>
+<span>  scales <span class="op">=</span> <span class="va">STEN</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">SimCST</span><span class="op">$</span><span class="fu">standardize</span><span class="op">(</span></span>
+<span>  data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>simmed <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">10</span>, <span class="fl">50</span><span class="op">)</span>, <span class="fl">0</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  what <span class="op">=</span> <span class="st">"sten"</span>,</span>
+<span>  calc <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;"> in `private$merge_ft()`:</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> You can't add new raw values to <span style="font-weight: bold;">Simulated</span> <span style="color: #0000BB;">&lt;FrequencyTable&gt;</span>.</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>
@@ -442,14 +435,15 @@
 
 
 
-    <footer><div class="pkgdown-footer-left">
+    <footer><div class="copyright">
   <p></p>
 <p>Developed by Michal Kosinski.</p>
 </div>
 
-<div class="pkgdown-footer-right">
+<div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
+  <p class="preferably">Using <a href="https://preferably.amirmasoudabdol.name/?source=footer" class="external-link">preferably</a> template.</p>
 </div>
 
     </footer>

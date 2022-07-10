@@ -9,7 +9,20 @@
              scores. It provides support for few standard scales often
              used in psychological questionnaires, though also allows using
              custom scales not provided out of the box.">
-<title>R6-based Standardization of Raw Discrete Scores  • stenR</title>
+<!-- Inform modern browsers that this page supports both dark and light color schemes,
+  and the page author prefers light. --><meta name="color-scheme" content="dark light">
+<script>
+  // If `prefers-color-scheme` is not supported, fall back to light mode.
+  // i.e. In this case, inject the `light` CSS before the others, with
+  // no media filter so that it will be downloaded with highest priority.
+  if (window.matchMedia("(prefers-color-scheme: dark)").media === "not all") {
+    document.documentElement.style.display = "none";
+    document.head.insertAdjacentHTML(
+      "beforeend",
+      "<link id=\"css\" rel=\"stylesheet\" href=\"https://bootswatch.com/5/flatly/bootstrap.css\" onload=\"document.documentElement.style.display = ''\">"
+    );
+  }
+</script><title>R6-based Standardization of Raw Discrete Scores  • stenR</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
 <link rel="apple-touch-icon" type="image/png" sizes="180x180" href="apple-touch-icon.png">
@@ -30,24 +43,29 @@
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-<![endif]-->
+<![endif]--><!-- Flatly Theme - Light  --><link id="css-light" rel="stylesheet" href="https://bootswatch.com/5/flatly/bootstrap.css" media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)">
+<!-- Darkly Theme - Dark --><link id="css-dark" rel="stylesheet" href="https://bootswatch.com/5/darkly/bootstrap.css" media="(prefers-color-scheme: dark)">
+<!-- preferably CSS --><link rel="stylesheet" href="preferably.css">
+<link id="css-code-light" rel="stylesheet" href="code-color-scheme-light.css" media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)">
+<link id="css-code-dark" rel="stylesheet" href="code-color-scheme-dark.css" media="(prefers-color-scheme: dark)">
+<script src="darkswitch.js"></script>
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
     
 
-    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light"><div class="container">
+    <nav class="navbar fixed-top navbar-dark navbar-expand-lg bg-primary"><div class="container">
     
     <a class="navbar-brand me-2" href="index.html">stenR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.4</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
 
-    <div id="navbar" class="collapse navbar-collapse ms-3">
+    <div id="navbar" class="collapse navbar-collapse ms-2">
       <ul class="navbar-nav me-auto">
 <li class="nav-item">
   <a class="nav-link" href="reference/index.html">Reference</a>
@@ -64,7 +82,16 @@
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="search.json" id="search-input" placeholder="Search for" autocomplete="off">
 </form>
 
-      <ul class="navbar-nav"></ul>
+      <ul class="navbar-nav">
+<li>
+          <a class="external-link nav-link" id="css-toggle-btn" aria-label="github">
+            <span class="fas fa fas fa-adjust fa-lg"></span>
+          </a>
+        </li>
+        
+        
+        
+      </ul>
 </div>
 
     
@@ -90,106 +117,106 @@
 </h2>
 <p>You can install the current version from <a href="https://github.com/" class="external-link">GitHub</a> with:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># install.packages("devtools")</span>
-<span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"StatisMike/stenR"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># install.packages("devtools")</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"StatisMike/stenR"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
 </h2>
 <p>There are numerous functions and <code>S3</code> classes constructors to help normalize and standardize discrete data.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://statismike.github.io/stenR/">stenR</a></span><span class="op">)</span>
-<span class="co">#&gt; Loading required package: R6</span>
-
-<span class="co"># build-in dataset with questionnaire data</span>
-<span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">HEXACO_60</span><span class="op">$</span><span class="va">HEX_C</span><span class="op">)</span>
-<span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span>
-<span class="co">#&gt;   17.00   30.00   35.00   35.42   40.00   50.00</span>
-
-<span class="co"># create STEN score table for variable</span>
-<span class="va">HEX_C_st</span> <span class="op">&lt;-</span> <span class="va">HEXACO_60</span><span class="op">$</span><span class="va">HEX_C</span> |&gt;
-  <span class="fu"><a href="reference/FrequencyTable.html">FrequencyTable</a></span><span class="op">(</span><span class="op">)</span> |&gt;
-  <span class="fu"><a href="reference/ScoreTable.html">ScoreTable</a></span><span class="op">(</span><span class="va">STEN</span><span class="op">)</span>
-
-<span class="co"># use the STEN table to normalize and standardize data</span>
-<span class="va">HEX_C_sten</span> <span class="op">&lt;-</span> <span class="va">HEXACO_60</span><span class="op">$</span><span class="va">HEX_C</span> |&gt;
-  <span class="fu"><a href="reference/normalize_score.html">normalize_score</a></span><span class="op">(</span><span class="va">HEX_C_st</span>, <span class="st">"sten"</span><span class="op">)</span>
-
-<span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">HEX_C_sten</span><span class="op">)</span>
-<span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span>
-<span class="co">#&gt;   1.000   4.000   5.000   5.495   7.000  10.000</span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://statismike.github.io/stenR/">stenR</a></span><span class="op">)</span></span>
+<span><span class="co">#&gt; Loading required package: R6</span></span>
+<span></span>
+<span><span class="co"># build-in dataset with questionnaire data</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">HEXACO_60</span><span class="op">$</span><span class="va">HEX_C</span><span class="op">)</span></span>
+<span><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
+<span><span class="co">#&gt;   17.00   30.00   35.00   35.42   40.00   50.00</span></span>
+<span></span>
+<span><span class="co"># create STEN score table for variable</span></span>
+<span><span class="va">HEX_C_st</span> <span class="op">&lt;-</span> <span class="va">HEXACO_60</span><span class="op">$</span><span class="va">HEX_C</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="reference/FrequencyTable.html">FrequencyTable</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="reference/ScoreTable.html">ScoreTable</a></span><span class="op">(</span><span class="va">STEN</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># use the STEN table to normalize and standardize data</span></span>
+<span><span class="va">HEX_C_sten</span> <span class="op">&lt;-</span> <span class="va">HEXACO_60</span><span class="op">$</span><span class="va">HEX_C</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="reference/normalize_score.html">normalize_score</a></span><span class="op">(</span><span class="va">HEX_C_st</span>, <span class="st">"sten"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">HEX_C_sten</span><span class="op">)</span></span>
+<span><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
+<span><span class="co">#&gt;   1.000   4.000   5.000   5.495   7.000  10.000</span></span></code></pre></div>
 <p>There is also a special <code>R6</code> class making the whole process more organized with potential inter-session continuity.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># inspect the whole dataset for comparison</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">HEXACO_60</span><span class="op">)</span>
-<span class="co">#&gt;                   user_id sex age HEX_H HEX_E HEX_X HEX_A HEX_C HEX_O</span>
-<span class="co">#&gt; 1 neutral_peregrinefalcon   F  26    42    33    34    36    36    31</span>
-<span class="co">#&gt; 2   trapeziform_zebradove   F  24    38    31    36    44    36    28</span>
-<span class="co">#&gt; 3    polyhedral_solenodon   F  26    18    17    16    42    35    37</span>
-<span class="co">#&gt; 4      decrepit_norwayrat   F  25    21    24    29    22    43    47</span>
-<span class="co">#&gt; 5          unawake_wisent   F  31    32    35    24    31    34    28</span>
-<span class="co">#&gt; 6   turophilic_spreadwing   M  25    34    30    34    34    28    39</span>
-
-<span class="co"># initialize the object with some scale attached</span>
-<span class="va">HEX_ST</span> <span class="op">&lt;-</span> <span class="va"><a href="reference/CompScoreTable.html">CompScoreTable</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span>
-  scales <span class="op">=</span> <span class="va">STEN</span>
-<span class="op">)</span>
-
-<span class="co"># you can use the `standardize` method to automatically calculate the tables</span>
-<span class="co"># during data calculation</span>
-<span class="va">HEXACO_sten</span> <span class="op">&lt;-</span> <span class="va">HEX_ST</span><span class="op">$</span><span class="fu">standardize</span><span class="op">(</span>
-  <span class="va">HEXACO_60</span>,
-  <span class="co"># specify the variables to calculate if there are any other in the data.frame</span>
-  vars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"HEX_H"</span>, <span class="st">"HEX_E"</span>, <span class="st">"HEX_X"</span>, <span class="st">"HEX_A"</span>, <span class="st">"HEX_C"</span>, <span class="st">"HEX_O"</span><span class="op">)</span>,
-  what <span class="op">=</span> <span class="st">"sten"</span>,
-  calc <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-
-<span class="co"># inspect the recalculated dataset</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">HEXACO_sten</span><span class="op">)</span>
-<span class="co">#&gt;                   user_id sex age HEX_H HEX_E HEX_X HEX_A HEX_C HEX_O</span>
-<span class="co">#&gt; 1 neutral_peregrinefalcon   F  26     8     5     7     8     6     3</span>
-<span class="co">#&gt; 2   trapeziform_zebradove   F  24     7     5     7    10     6     2</span>
-<span class="co">#&gt; 3    polyhedral_solenodon   F  26     2     2     2    10     5     5</span>
-<span class="co">#&gt; 4      decrepit_norwayrat   F  25     2     3     6     3     8     9</span>
-<span class="co">#&gt; 5          unawake_wisent   F  31     5     6     4     6     5     2</span>
-<span class="co">#&gt; 6   turophilic_spreadwing   M  25     5     5     7     7     3     6</span>
-
-<span class="co"># CompScoreTable object have the table already populated for next data input</span>
-<span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">HEX_ST</span><span class="op">)</span>
-<span class="co">#&gt; &lt;CompScoreTable&gt; object</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Attached &lt;ScoreTables&gt;:</span>
-<span class="co">#&gt;  variable   n      range</span>
-<span class="co">#&gt;     HEX_H 204 incomplete</span>
-<span class="co">#&gt;     HEX_E 204 incomplete</span>
-<span class="co">#&gt;     HEX_X 204 incomplete</span>
-<span class="co">#&gt;     HEX_A 204 incomplete</span>
-<span class="co">#&gt;     HEX_C 204   complete</span>
-<span class="co">#&gt;     HEX_O 204 incomplete</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Attached &lt;StandardScales&gt;:</span>
-<span class="co">#&gt;  name   M SD min max</span>
-<span class="co">#&gt;  sten 5.5  2   1  10</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># inspect the whole dataset for comparison</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">HEXACO_60</span><span class="op">)</span></span>
+<span><span class="co">#&gt;                   user_id sex age HEX_H HEX_E HEX_X HEX_A HEX_C HEX_O</span></span>
+<span><span class="co">#&gt; 1 neutral_peregrinefalcon   F  26    42    33    34    36    36    31</span></span>
+<span><span class="co">#&gt; 2   trapeziform_zebradove   F  24    38    31    36    44    36    28</span></span>
+<span><span class="co">#&gt; 3    polyhedral_solenodon   F  26    18    17    16    42    35    37</span></span>
+<span><span class="co">#&gt; 4      decrepit_norwayrat   F  25    21    24    29    22    43    47</span></span>
+<span><span class="co">#&gt; 5          unawake_wisent   F  31    32    35    24    31    34    28</span></span>
+<span><span class="co">#&gt; 6   turophilic_spreadwing   M  25    34    30    34    34    28    39</span></span>
+<span></span>
+<span><span class="co"># initialize the object with some scale attached</span></span>
+<span><span class="va">HEX_ST</span> <span class="op">&lt;-</span> <span class="va"><a href="reference/CompScoreTable.html">CompScoreTable</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span>
+<span>  scales <span class="op">=</span> <span class="va">STEN</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># you can use the `standardize` method to automatically calculate the tables</span></span>
+<span><span class="co"># during data calculation</span></span>
+<span><span class="va">HEXACO_sten</span> <span class="op">&lt;-</span> <span class="va">HEX_ST</span><span class="op">$</span><span class="fu">standardize</span><span class="op">(</span></span>
+<span>  <span class="va">HEXACO_60</span>,</span>
+<span>  <span class="co"># specify the variables to calculate if there are any other in the data.frame</span></span>
+<span>  vars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"HEX_H"</span>, <span class="st">"HEX_E"</span>, <span class="st">"HEX_X"</span>, <span class="st">"HEX_A"</span>, <span class="st">"HEX_C"</span>, <span class="st">"HEX_O"</span><span class="op">)</span>,</span>
+<span>  what <span class="op">=</span> <span class="st">"sten"</span>,</span>
+<span>  calc <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># inspect the recalculated dataset</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">HEXACO_sten</span><span class="op">)</span></span>
+<span><span class="co">#&gt;                   user_id sex age HEX_H HEX_E HEX_X HEX_A HEX_C HEX_O</span></span>
+<span><span class="co">#&gt; 1 neutral_peregrinefalcon   F  26     8     5     7     8     6     3</span></span>
+<span><span class="co">#&gt; 2   trapeziform_zebradove   F  24     7     5     7    10     6     2</span></span>
+<span><span class="co">#&gt; 3    polyhedral_solenodon   F  26     2     2     2    10     5     5</span></span>
+<span><span class="co">#&gt; 4      decrepit_norwayrat   F  25     2     3     6     3     8     9</span></span>
+<span><span class="co">#&gt; 5          unawake_wisent   F  31     5     6     4     6     5     2</span></span>
+<span><span class="co">#&gt; 6   turophilic_spreadwing   M  25     5     5     7     7     3     6</span></span>
+<span></span>
+<span><span class="co"># CompScoreTable object have the table already populated for next data input</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">HEX_ST</span><span class="op">)</span></span>
+<span><span class="co">#&gt; &lt;CompScoreTable&gt; object</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Attached &lt;ScoreTables&gt;:</span></span>
+<span><span class="co">#&gt;  variable   n      range</span></span>
+<span><span class="co">#&gt;     HEX_H 204 incomplete</span></span>
+<span><span class="co">#&gt;     HEX_E 204 incomplete</span></span>
+<span><span class="co">#&gt;     HEX_X 204 incomplete</span></span>
+<span><span class="co">#&gt;     HEX_A 204 incomplete</span></span>
+<span><span class="co">#&gt;     HEX_C 204   complete</span></span>
+<span><span class="co">#&gt;     HEX_O 204 incomplete</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Attached &lt;StandardScales&gt;:</span></span>
+<span><span class="co">#&gt;  name   M SD min max</span></span>
+<span><span class="co">#&gt;  sten 5.5  2   1  10</span></span></code></pre></div>
 <p>Above methods were focusing on using raw data available to us. Unfortunately, when using another author’s questionnaire we often don’t have their raw data available for calculating the <em>FrequencyTable</em> in regular way.</p>
 <p>Authors usually provide descriptive statistics about their data, though. We can use it to estimate the frequencies and use it to normalize raw scores gathered in our study.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">simulated_ft</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/SimFrequencyTable.html">SimFrequencyTable</a></span><span class="op">(</span>
-  min <span class="op">=</span> <span class="fl">10</span>, max <span class="op">=</span> <span class="fl">50</span>, M <span class="op">=</span> <span class="fl">31.04</span>, SD <span class="op">=</span> <span class="fl">6.7</span>, 
-  skew <span class="op">=</span> <span class="op">-</span><span class="fl">0.3</span>, kurt <span class="op">=</span> <span class="fl">2.89</span>, seed <span class="op">=</span> <span class="fl">2678</span><span class="op">)</span>
-<span class="co">#&gt; Constants: Distribution  1  </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Constants calculation time: 0.007 minutes </span>
-<span class="co">#&gt; Total Simulation time: 0.008 minutes</span>
-
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">simulated_ft</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">simulated_ft</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/SimFrequencyTable.html">SimFrequencyTable</a></span><span class="op">(</span></span>
+<span>  min <span class="op">=</span> <span class="fl">10</span>, max <span class="op">=</span> <span class="fl">50</span>, M <span class="op">=</span> <span class="fl">31.04</span>, SD <span class="op">=</span> <span class="fl">6.7</span>, </span>
+<span>  skew <span class="op">=</span> <span class="op">-</span><span class="fl">0.3</span>, kurt <span class="op">=</span> <span class="fl">2.89</span>, seed <span class="op">=</span> <span class="fl">2678</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Constants: Distribution  1  </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Constants calculation time: 0.007 minutes </span></span>
+<span><span class="co">#&gt; Total Simulation time: 0.008 minutes</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">simulated_ft</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-simulated_use-1.png"><!-- --></p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="reference/normalize_score.html">normalize_score</a></span><span class="op">(</span><span class="va">HEXACO_60</span><span class="op">$</span><span class="va">HEX_A</span>,
-                table <span class="op">=</span> <span class="fu"><a href="reference/ScoreTable.html">ScoreTable</a></span><span class="op">(</span><span class="va">simulated_ft</span>, <span class="va">STEN</span><span class="op">)</span>,
-                <span class="st">"sten"</span><span class="op">)</span> |&gt;
-  <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span>
-<span class="co">#&gt;   1.000   3.000   5.000   4.892   6.000  10.000</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="reference/normalize_score.html">normalize_score</a></span><span class="op">(</span><span class="va">HEXACO_60</span><span class="op">$</span><span class="va">HEX_A</span>,</span>
+<span>                table <span class="op">=</span> <span class="fu"><a href="reference/ScoreTable.html">ScoreTable</a></span><span class="op">(</span><span class="va">simulated_ft</span>, <span class="va">STEN</span><span class="op">)</span>,</span>
+<span>                <span class="st">"sten"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
+<span><span class="co">#&gt;   1.000   3.000   5.000   4.892   6.000  10.000</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="data-preprocessing">Data preprocessing<a class="anchor" aria-label="anchor" href="#data-preprocessing"></a>
@@ -198,64 +225,64 @@
 <p>When working with actual data, it is most commonly presented as answers to individual items. It is then needed to summarize them into distinct scales or factors. Author may also chose to handle <code>NA</code>s in some way, and commonly there are items in need of reversing before summarizing into scale score.</p>
 <p>All of these steps can be achieved using <code>ScaleSpec</code> objects with <code>sum_items_to_scale</code> function.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># Answers per item: Self-liking self-competence scale</span>
-<span class="co"># (dataset included within package)</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">SLCS</span><span class="op">)</span>
-<span class="co">#&gt;                                   user_id sex age SLCS_1 SLCS_2 SLCS_3 SLCS_4</span>
-<span class="co">#&gt; 1                            damaged_kiwi   M  30      4      2      1      2</span>
-<span class="co">#&gt; 2               unilateralised_anglerfish   K  31      5      2      2      1</span>
-<span class="co">#&gt; 3                   technical_anemonecrab   K  22      4      4      4      4</span>
-<span class="co">#&gt; 4                  temperate_americancurl   K  26      5      3      2      2</span>
-<span class="co">#&gt; 5 uncontradictious_irishredandwhitesetter   K  22      5      2      3      4</span>
-<span class="co">#&gt; 6              simaroubaceous_acornweevil   K  17      5      3      1      2</span>
-<span class="co">#&gt;   SLCS_5 SLCS_6 SLCS_7 SLCS_8 SLCS_9 SLCS_10 SLCS_11 SLCS_12 SLCS_13 SLCS_14</span>
-<span class="co">#&gt; 1      2      4      4      4      2       4       1       4       4       2</span>
-<span class="co">#&gt; 2      2      4      4      5      3       4       1       2       5       1</span>
-<span class="co">#&gt; 3      4      5      4      4      2       3       2       4       5       3</span>
-<span class="co">#&gt; 4      1      5      5      5      1       4       1       3       4       2</span>
-<span class="co">#&gt; 5      2      5      3      4      3       4       1       3       3       4</span>
-<span class="co">#&gt; 6      2      5      5      5      1       4       2       2       4       1</span>
-<span class="co">#&gt;   SLCS_15 SLCS_16</span>
-<span class="co">#&gt; 1       5       4</span>
-<span class="co">#&gt; 2       4       5</span>
-<span class="co">#&gt; 3       4       5</span>
-<span class="co">#&gt; 4       4       4</span>
-<span class="co">#&gt; 5       4       5</span>
-<span class="co">#&gt; 6       3       4</span>
-
-<span class="co"># Scale specification for each of subscales and general score:</span>
-<span class="co">## Self-Liking specification</span>
-<span class="va">SL_spec</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/ScaleSpec.html">ScaleSpec</a></span><span class="op">(</span>
-  name <span class="op">=</span> <span class="st">"SL"</span>,
-  item_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"SLCS"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span>, <span class="fl">5</span>, <span class="fl">6</span>, <span class="fl">7</span>, <span class="fl">9</span>, <span class="fl">11</span>, <span class="fl">15</span><span class="op">)</span>, sep <span class="op">=</span> <span class="st">"_"</span><span class="op">)</span>,
-  reverse <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"SLCS"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">6</span>, <span class="fl">7</span>, <span class="fl">15</span><span class="op">)</span>, sep <span class="op">=</span> <span class="st">"_"</span><span class="op">)</span>,
-  min <span class="op">=</span> <span class="fl">1</span>,
-  max <span class="op">=</span> <span class="fl">5</span><span class="op">)</span>
-
-<span class="co">## Self-Competence specification</span>
-<span class="va">SC_spec</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/ScaleSpec.html">ScaleSpec</a></span><span class="op">(</span>
-  name <span class="op">=</span> <span class="st">"SC"</span>,
-  item_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"SLCS"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">4</span>, <span class="fl">8</span>, <span class="fl">10</span>, <span class="fl">12</span>, <span class="fl">13</span>, <span class="fl">14</span>, <span class="fl">16</span><span class="op">)</span>, sep <span class="op">=</span> <span class="st">"_"</span><span class="op">)</span>,
-  reverse <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"SLCS"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">8</span>, <span class="fl">10</span>, <span class="fl">13</span><span class="op">)</span>, sep <span class="op">=</span> <span class="st">"_"</span><span class="op">)</span>,
-  min <span class="op">=</span> <span class="fl">1</span>,
-  max <span class="op">=</span> <span class="fl">5</span><span class="op">)</span>
-
-<span class="co">## General Score specification</span>
-<span class="va">GS_spec</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/CombScaleSpec.html">CombScaleSpec</a></span><span class="op">(</span>
-  name <span class="op">=</span> <span class="st">"GS"</span>,
-  <span class="va">SL_spec</span>,
-  <span class="va">SC_spec</span><span class="op">)</span>
-
-<span class="co"># Sum the data</span>
-<span class="va">SLCS_summed</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/sum_items_to_scale.html">sum_items_to_scale</a></span><span class="op">(</span><span class="va">SLCS</span>, <span class="va">SL_spec</span>, <span class="va">SC_spec</span>, <span class="va">GS_spec</span>, retain <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"user_id"</span>, <span class="st">"sex"</span>, <span class="st">"age"</span><span class="op">)</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">SLCS_summed</span><span class="op">)</span>
-<span class="co">#&gt;                                   user_id sex age SL SC GS</span>
-<span class="co">#&gt; 1                            damaged_kiwi   M  30 13 20 33</span>
-<span class="co">#&gt; 2               unilateralised_anglerfish   K  31 15 15 30</span>
-<span class="co">#&gt; 3                   technical_anemonecrab   K  22 19 26 45</span>
-<span class="co">#&gt; 4                  temperate_americancurl   K  26 10 19 29</span>
-<span class="co">#&gt; 5 uncontradictious_irishredandwhitesetter   K  22 16 25 41</span>
-<span class="co">#&gt; 6              simaroubaceous_acornweevil   K  17 12 17 29</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># Answers per item: Self-liking self-competence scale</span></span>
+<span><span class="co"># (dataset included within package)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">SLCS</span><span class="op">)</span></span>
+<span><span class="co">#&gt;                                   user_id sex age SLCS_1 SLCS_2 SLCS_3 SLCS_4</span></span>
+<span><span class="co">#&gt; 1                            damaged_kiwi   M  30      4      2      1      2</span></span>
+<span><span class="co">#&gt; 2               unilateralised_anglerfish   K  31      5      2      2      1</span></span>
+<span><span class="co">#&gt; 3                   technical_anemonecrab   K  22      4      4      4      4</span></span>
+<span><span class="co">#&gt; 4                  temperate_americancurl   K  26      5      3      2      2</span></span>
+<span><span class="co">#&gt; 5 uncontradictious_irishredandwhitesetter   K  22      5      2      3      4</span></span>
+<span><span class="co">#&gt; 6              simaroubaceous_acornweevil   K  17      5      3      1      2</span></span>
+<span><span class="co">#&gt;   SLCS_5 SLCS_6 SLCS_7 SLCS_8 SLCS_9 SLCS_10 SLCS_11 SLCS_12 SLCS_13 SLCS_14</span></span>
+<span><span class="co">#&gt; 1      2      4      4      4      2       4       1       4       4       2</span></span>
+<span><span class="co">#&gt; 2      2      4      4      5      3       4       1       2       5       1</span></span>
+<span><span class="co">#&gt; 3      4      5      4      4      2       3       2       4       5       3</span></span>
+<span><span class="co">#&gt; 4      1      5      5      5      1       4       1       3       4       2</span></span>
+<span><span class="co">#&gt; 5      2      5      3      4      3       4       1       3       3       4</span></span>
+<span><span class="co">#&gt; 6      2      5      5      5      1       4       2       2       4       1</span></span>
+<span><span class="co">#&gt;   SLCS_15 SLCS_16</span></span>
+<span><span class="co">#&gt; 1       5       4</span></span>
+<span><span class="co">#&gt; 2       4       5</span></span>
+<span><span class="co">#&gt; 3       4       5</span></span>
+<span><span class="co">#&gt; 4       4       4</span></span>
+<span><span class="co">#&gt; 5       4       5</span></span>
+<span><span class="co">#&gt; 6       3       4</span></span>
+<span></span>
+<span><span class="co"># Scale specification for each of subscales and general score:</span></span>
+<span><span class="co">## Self-Liking specification</span></span>
+<span><span class="va">SL_spec</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/ScaleSpec.html">ScaleSpec</a></span><span class="op">(</span></span>
+<span>  name <span class="op">=</span> <span class="st">"SL"</span>,</span>
+<span>  item_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"SLCS"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span>, <span class="fl">5</span>, <span class="fl">6</span>, <span class="fl">7</span>, <span class="fl">9</span>, <span class="fl">11</span>, <span class="fl">15</span><span class="op">)</span>, sep <span class="op">=</span> <span class="st">"_"</span><span class="op">)</span>,</span>
+<span>  reverse <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"SLCS"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">6</span>, <span class="fl">7</span>, <span class="fl">15</span><span class="op">)</span>, sep <span class="op">=</span> <span class="st">"_"</span><span class="op">)</span>,</span>
+<span>  min <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  max <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## Self-Competence specification</span></span>
+<span><span class="va">SC_spec</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/ScaleSpec.html">ScaleSpec</a></span><span class="op">(</span></span>
+<span>  name <span class="op">=</span> <span class="st">"SC"</span>,</span>
+<span>  item_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"SLCS"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">4</span>, <span class="fl">8</span>, <span class="fl">10</span>, <span class="fl">12</span>, <span class="fl">13</span>, <span class="fl">14</span>, <span class="fl">16</span><span class="op">)</span>, sep <span class="op">=</span> <span class="st">"_"</span><span class="op">)</span>,</span>
+<span>  reverse <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"SLCS"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">8</span>, <span class="fl">10</span>, <span class="fl">13</span><span class="op">)</span>, sep <span class="op">=</span> <span class="st">"_"</span><span class="op">)</span>,</span>
+<span>  min <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  max <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## General Score specification</span></span>
+<span><span class="va">GS_spec</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/CombScaleSpec.html">CombScaleSpec</a></span><span class="op">(</span></span>
+<span>  name <span class="op">=</span> <span class="st">"GS"</span>,</span>
+<span>  <span class="va">SL_spec</span>,</span>
+<span>  <span class="va">SC_spec</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Sum the data</span></span>
+<span><span class="va">SLCS_summed</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/sum_items_to_scale.html">sum_items_to_scale</a></span><span class="op">(</span><span class="va">SLCS</span>, <span class="va">SL_spec</span>, <span class="va">SC_spec</span>, <span class="va">GS_spec</span>, retain <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"user_id"</span>, <span class="st">"sex"</span>, <span class="st">"age"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">SLCS_summed</span><span class="op">)</span></span>
+<span><span class="co">#&gt;                                   user_id sex age SL SC GS</span></span>
+<span><span class="co">#&gt; 1                            damaged_kiwi   M  30 13 20 33</span></span>
+<span><span class="co">#&gt; 2               unilateralised_anglerfish   K  31 15 15 30</span></span>
+<span><span class="co">#&gt; 3                   technical_anemonecrab   K  22 19 26 45</span></span>
+<span><span class="co">#&gt; 4                  temperate_americancurl   K  26 10 19 29</span></span>
+<span><span class="co">#&gt; 5 uncontradictious_irishredandwhitesetter   K  22 16 25 41</span></span>
+<span><span class="co">#&gt; 6              simaroubaceous_acornweevil   K  17 12 17 29</span></span></code></pre></div>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="license">
@@ -293,14 +320,15 @@
 </div>
 
 
-    <footer><div class="pkgdown-footer-left">
+    <footer><div class="copyright">
   <p></p>
 <p>Developed by Michal Kosinski.</p>
 </div>
 
-<div class="pkgdown-footer-right">
+<div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
+  <p class="preferably">Using <a href="https://preferably.amirmasoudabdol.name/?source=footer" class="external-link">preferably</a> template.</p>
 </div>
 
     </footer>

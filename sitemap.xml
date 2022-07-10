@@ -34,7 +34,22 @@
     <loc>https://statismike.github.io/stenR/reference/FrequencyTable.html</loc>
   </url>
   <url>
+    <loc>https://statismike.github.io/stenR/reference/GroupAssignment.html</loc>
+  </url>
+  <url>
+    <loc>https://statismike.github.io/stenR/reference/GroupConditions.html</loc>
+  </url>
+  <url>
+    <loc>https://statismike.github.io/stenR/reference/GroupedFrequencyTable.html</loc>
+  </url>
+  <url>
+    <loc>https://statismike.github.io/stenR/reference/GroupedScoreTable.html</loc>
+  </url>
+  <url>
     <loc>https://statismike.github.io/stenR/reference/HEXACO_60.html</loc>
+  </url>
+  <url>
+    <loc>https://statismike.github.io/stenR/reference/IPIP_NEO_300.html</loc>
   </url>
   <url>
     <loc>https://statismike.github.io/stenR/reference/SLCS.html</loc>
@@ -46,6 +61,9 @@
     <loc>https://statismike.github.io/stenR/reference/ScoreTable.html</loc>
   </url>
   <url>
+    <loc>https://statismike.github.io/stenR/reference/ScoringTable.html</loc>
+  </url>
+  <url>
     <loc>https://statismike.github.io/stenR/reference/SimFrequencyTable.html</loc>
   </url>
   <url>
@@ -55,10 +73,34 @@
     <loc>https://statismike.github.io/stenR/reference/attach_scales.html</loc>
   </url>
   <url>
+    <loc>https://statismike.github.io/stenR/reference/check_score_between.html</loc>
+  </url>
+  <url>
     <loc>https://statismike.github.io/stenR/reference/default_scales.html</loc>
   </url>
   <url>
+    <loc>https://statismike.github.io/stenR/reference/export_ScoringTable.html</loc>
+  </url>
+  <url>
+    <loc>https://statismike.github.io/stenR/reference/extract_observations.html</loc>
+  </url>
+  <url>
+    <loc>https://statismike.github.io/stenR/reference/handle_retain.html</loc>
+  </url>
+  <url>
+    <loc>https://statismike.github.io/stenR/reference/import_ScoringTable.html</loc>
+  </url>
+  <url>
     <loc>https://statismike.github.io/stenR/reference/index.html</loc>
+  </url>
+  <url>
+    <loc>https://statismike.github.io/stenR/reference/intersect_GroupAssignment.html</loc>
+  </url>
+  <url>
+    <loc>https://statismike.github.io/stenR/reference/is_stenR_classes.html</loc>
+  </url>
+  <url>
+    <loc>https://statismike.github.io/stenR/reference/mockNAtable.html</loc>
   </url>
   <url>
     <loc>https://statismike.github.io/stenR/reference/normalize_score.html</loc>
@@ -67,9 +109,27 @@
     <loc>https://statismike.github.io/stenR/reference/normalize_scores_df.html</loc>
   </url>
   <url>
+    <loc>https://statismike.github.io/stenR/reference/normalize_scores_grouped.html</loc>
+  </url>
+  <url>
+    <loc>https://statismike.github.io/stenR/reference/normalize_scores_scoring.html</loc>
+  </url>
+  <url>
+    <loc>https://statismike.github.io/stenR/reference/plot.GroupedFrequencyTable.html</loc>
+  </url>
+  <url>
+    <loc>https://statismike.github.io/stenR/reference/plot.GroupedScoreTable.html</loc>
+  </url>
+  <url>
+    <loc>https://statismike.github.io/stenR/reference/qualify_to_groups.html</loc>
+  </url>
+  <url>
     <loc>https://statismike.github.io/stenR/reference/strip_ScoreTable.html</loc>
   </url>
   <url>
     <loc>https://statismike.github.io/stenR/reference/sum_items_to_scale.html</loc>
+  </url>
+  <url>
+    <loc>https://statismike.github.io/stenR/reference/verify_GC_for_ST.html</loc>
   </url>
 </urlset>
