@@ -3,7 +3,7 @@
 \docType{data}
 \name{HEXACO_60}
 \alias{HEXACO_60}
-\title{Sample data of HEXACO-60 questionnaire results (summed scales)}
+\title{Sample data of HEXACO-60 questionnaire results}
 \format{
 A data frame with 204 rows and 9 variables
 \describe{
