@@ -38,6 +38,8 @@ raw score
 \item status: list containing the total number of simulated observations (\code{n})
 and information about raw scores range completion (\code{range}): complete or incomplete
 }
+
+\code{data.frame} of descriptive statistcs
 }
 \description{
 Normalizes the distribution of raw scores. It can be used to construct

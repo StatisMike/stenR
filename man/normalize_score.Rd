@@ -15,7 +15,7 @@ normalize_score(x, table, what)
 \itemize{
 \item \code{quan} - the quantile of x in the raw score distribution
 \item \code{Z} - normalized Z score for the x raw score
-\item name of the scale calculated in \emph{ScoreTable} provided to \code{table} argument
+\item name of the scale calculated in \code{ScoreTable} provided to \code{table} argument
 }}
 }
 \value{

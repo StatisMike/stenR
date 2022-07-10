@@ -78,7 +78,7 @@ retained_1g <- normalize_scores_scoring(
   data = IPIP_NEO_300,
   vars = "N",
   NEO_N_1gST,
-  retain = T,
+  retain = c("sex", "age"),
   group_col = "group"
 )
 

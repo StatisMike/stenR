@@ -111,8 +111,8 @@ FrequencyTable <- function(data) {
 #' @export
 print.FrequencyTable <- function(x, max = NULL, print_table = FALSE, ...) {
   
-  cli_inform("{.cls FrequencyTable} computed on {.val {x$status$n}} observations")
-  cli_inform("range: {.emph {x$status$range}}")
+  cli_text("{.cls FrequencyTable} computed on {.val {x$status$n}} observations")
+  cli_text("range: {.emph {x$status$range}}")
   
   if (isTRUE(print_table))
     print(x$table, max = max, row.names = F)
@@ -151,25 +151,24 @@ plot.FrequencyTable <- function(x, ...) {
 #' @rdname FrequencyTable
 #' @param object A `FrequencyTable` object
 #' @param ... further arguments passed to or from other methods.
+#' @return `data.frame` of descriptive statistcs
 #' @export
 summary.FrequencyTable <- function(object, ...) {
   
   whole_vec <- rep(object$table$score, object$table$n)
   
-  summaries <- list(n = length(whole_vec),
-                    min = min(whole_vec),
-                    max = max(whole_vec),
-                    mean = mean(whole_vec),
-                    median = stats::median(whole_vec),
-                    sd = stats::sd(whole_vec),
-                    skewness = moments::skewness(whole_vec),
-                    kurtosis = moments::kurtosis(whole_vec))
+  summaries <- data.frame(
+    n = length(whole_vec),
+    min = min(whole_vec),
+    max = max(whole_vec),
+    mean = mean(whole_vec),
+    median = stats::median(whole_vec),
+    sd = stats::sd(whole_vec),
+    skewness = moments::skewness(whole_vec),
+    kurtosis = moments::kurtosis(whole_vec),
+    incomplete = length(object$status$incompletes))
   
-  cli_inform("{.cls FrequencyTable}")
-  class(summaries) <- c("summaryDefault", "table")
-  print(summaries)
-  
-  return(invisible(summaries))
+  return(summaries)
   
 }
 
@@ -473,29 +472,35 @@ plot.GroupedFrequencyTable <- function(
 #' @param x A `GroupedFrequencyTable` object
 #' @param ... further arguments passed to or from other methods.
 #' @rdname GroupedFrequencyTable
-#' @importFrom cli cli cli_inform
+#' @importFrom cli cli_text cli_ol cli_ul cli_li cli_end
 #' @export
 
 print.GroupedFrequencyTable <- function(x, ...) {
   
-  cli({
-    cli_inform("{.cls GroupedFrequencyTable}")
-    cli_inform("Contains {.cls FrequencyTable}s for {length(x)} groups.")
-  })
+
+    cli_text("{.cls GroupedFrequencyTable}")
+    cli_text("{.field No. groups}: {.val {length(x)}}")
+    cli_text("{.field GroupConditions}: {.val {length(attr(x, 'conditions'))}}")
+    ol <- cli_ol()
+    for (cond in attr(x, "conditions")) {
+      cli_li("{.strong Category}: {attr(cond, 'cond_category')}")
+      ul <- cli_ul()
+      cli_li("{.field Tested vars}: {.val {attr(cond, 'formula_vars')}}")
+      cli_li("{.field No. groups:}: {.val {length(attr(cond, 'groups'))}}")
+      cli_end(ul)
+    }
+    cli_end(ol)
+    cli_text("{.field .all groups:} {.val {attr(x, 'all')}}")  
 
   
-  for (i in seq_along(x)) {
-    
-    cat(names(x)[i], "")
-    print(x[[i]], print_table = FALSE)
-    
-  }
+  
 }
 
 #' @rdname GroupedFrequencyTable
 #' @param object A `GroupedFrequencyTable` object
 #' @param ... further arguments passed to or from other methods.
 #' @importFrom cli cli_inform
+#' @return `data.frame` of descriptive statistcs
 #' @export
 summary.GroupedFrequencyTable <- function(object, ...) {
   
@@ -515,11 +520,8 @@ summary.GroupedFrequencyTable <- function(object, ...) {
   })
   
   names(summary_all) <- names(object)
-  summary_all <- dplyr::bind_rows(summary_all, .id = "group")
+  summary_all <- as.data.frame(dplyr::bind_rows(summary_all, .id = "group"))
   
-  cli_inform("{.cls GroupedFrequencyTable}")
-  print(summary_all)
-  
-  return(invisible(summary_all))
+  return(summary_all)
   
 }

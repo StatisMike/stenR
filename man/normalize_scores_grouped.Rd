@@ -15,38 +15,38 @@ normalize_scores_grouped(
 )
 }
 \arguments{
-\item{data}{\emph{data.frame} object containing raw scores}
+\item{data}{data.frame object containing raw scores}
 
-\item{vars}{\emph{character vector} with names of columns to normalize. Length of vars
+\item{vars}{names of columns to normalize. Length of vars
 need to be the same as number of tables provided to either \code{...} or \code{.dots}}
 
-\item{...}{\emph{GroupedFrequencyTable} or \emph{GroupedScoreTable} objects to be used
+\item{...}{\code{GroupedFrequencyTable} or \code{GroupedScoreTable} objects to be used
 for normalization. They should be provided in the same order as \code{vars}}
 
 \item{what}{the values to get. One of either:
 \itemize{
 \item \code{quan} - the quantile of x in the raw score distribution
 \item \code{Z} - normalized Z score for the x raw score
-\item name of the scale calculated in \emph{GroupedScoreTables} provided to \code{...} or
+\item name of the scale calculated in \code{GroupedScoreTables} provided to \code{...} or
 \code{.dots} argument
 }}
 
-\item{retain}{either \emph{boolean}: \code{TRUE} if all columns in the \code{data} are to be
-retained, \code{FALSE} if none, or \emph{character vector} with names of columns to be retained}
+\item{retain}{either boolean: \code{TRUE} if all columns in the \code{data} are to be
+retained, \code{FALSE} if none; or character vector with names of columns to be retained}
 
-\item{group_col}{\emph{character} name of the column for name of the group each
+\item{group_col}{name of the column for name of the group each
 observation was qualified into. If left as default \code{NULL}, they won't be returned.}
 
-\item{.dots}{\emph{GroupedFrequencyTable} or \emph{GroupedScoreTable} objects provided
+\item{.dots}{\code{GroupedFrequencyTable} or \code{GroupedScoreTable} objects provided
 as a list, instead of individually in \code{...}.}
 }
 \value{
-\emph{data.frame} with normalized scores
+data.frame with normalized scores
 }
 \description{
-Normalize scores using either \emph{GroupedFrequencyTable} or
-\emph{GroupedScoreTable} for one or more variables. Given \emph{data.frame} should also
-contain columns used in \emph{GroupingConditions} attached to the table
+Normalize scores using either \code{GroupedFrequencyTable} or
+\code{GroupedScoreTable} for one or more variables. Given data.frame should also
+contain columns used in \code{GroupingConditions} attached to the table
 }
 \examples{
 #### create GroupConditions for calculating tables ####

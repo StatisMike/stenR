@@ -12,6 +12,7 @@ cli_class <- list(
     NoTable = "NoTableError",
     NoValidWhat = "NoValidWhatError",
     NoValidVars = "NoValidVarsError",
+    NoValidRetain = "NoValidRetainError",
     NoConditionsVars = "NoConditionsVarsError",
     NoCompatibleAssignements = "NoCompatibleAssignementsError",
     WrongLength = "WrongLengthError",
@@ -23,7 +24,8 @@ cli_class <- list(
     WrongGroup = "WrongGroupError",
     WrongFormula = "WrongFormulaError",
     WrongIdVal = "WrongIdValError",
-    WrongMinMax = "WrongMinMax"
+    WrongMinMax = "WrongMinMax",
+    BadName = "BadNameError"
   ),
   warning = list(
     Type = "TypeWarning",

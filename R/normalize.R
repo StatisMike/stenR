@@ -11,9 +11,10 @@
 #' 
 #' - `quan` - the quantile of x in the raw score distribution
 #' - `Z` - normalized Z score for the x raw score
-#' - name of the scale calculated in *ScoreTable* provided to `table` argument 
+#' - name of the scale calculated in `ScoreTable` provided to `table` argument 
 #' 
 #' @example man/examples/normalize_score.R
+#' @importFrom cli cli_abort
 #' @return Numeric vector with values specified in `what` argument
 #' @family score-normalization functions
 #' 
@@ -28,13 +29,18 @@ normalize_score <- function(
     class(table)[1],
     "FrequencyTable" = {
       if (!what %in% c("quan", "Z")) 
-        stop("Provide either 'quan' or 'Z' to the 'what' argument.")},
+        cli_abort("Provide either {.val quan} or {.val Z} to the {.var what} argument.",
+                  class = cli_class$error$NoValidWhat)
+    },
     
     "ScoreTable" = {
       if (!what %in% c("quan", "Z", names(table$scale)))
-        stop("Provide either 'quan', 'Z' or name of the computed scale to the 'what' argument.")},
+        cli_abort("Provide either {.val quan}, {.val Z} or name of the computed scale ({.val {names(table$scale)}}) to the {.var what} argument.",
+                  class = cli_class$error$NoValidWhat)
+    },
     
-    stop("Object of class 'FrequencyTable' or 'ScoreTable' needs to be provided to the 'table' argument.") )
+    cli_abort("{.cls FrequencyTable} or {.cls ScoreTable} object needs to be provided to the {.var table} argument.",
+              clss = cli_class$error$Class))
   
   sapply(as.integer(x), \(x) {
     
@@ -55,25 +61,26 @@ normalize_score <- function(
 #' Normalize raw scores for multiple variables
 #' @description Wrapper for [normalize_score] that works on data frame
 #' and multiple variables
-#' @param data *data.frame* object containing raw scores
-#' @param vars *character vector* with names of columns to normalize. Length of vars
+#' @param data `data.frame` containing raw scores
+#' @param vars names of columns to normalize. Length of `vars`
 #' need to be the same as number of tables provided to either `...` or `.dots`
-#' @param ... *ScoreTable* or *FrequencyTable* objects to be used for normalization
+#' @param ... `ScoreTable` or `FrequencyTable` objects to be used for normalization
 #' @param what the values to get. One of either:
 #' 
 #' - `quan` - the quantile of x in the raw score distribution
 #' - `Z` - normalized Z score for the x raw score
-#' - name of the scale calculated in *ScoreTables* provided to `...` or
+#' - name of the scale calculated in `ScoreTables` provided to `...` or
 #' `.dots` argument
 #' 
-#' @param retain either *boolean*: `TRUE` if all columns in the `data` are to be
-#' retained, `FALSE` if none, or *character vector* with names of columns to be retained
-#' @param .dots *ScoreTable* or *FrequencyTable* objects provided as a list, 
+#' @param retain either boolean: `TRUE` if all columns in the `data` are to be
+#' retained, `FALSE` if none; or character vector with names of columns to be retained
+#' @param .dots `ScoreTable` or `FrequencyTable` objects provided as a list, 
 #' instead of individually in `...`. 
 #' @example man/examples/normalize_scores_df.R
+#' @importFrom cli cli_abort
 #' @export
 #' @family score-normalization functions
-#' @return *data.frame* with normalized scores
+#' @return `data.frame` with normalized scores
 #' 
 
 normalize_scores_df <- function(
@@ -85,29 +92,37 @@ normalize_scores_df <- function(
     .dots = list()) {
   
   if (!is.data.frame(data))
-    stop("'data.frame' need to be provided to 'data' argument.")
+    cli_abort("{.cls data.frame} need to be provided to {.var data}.",
+              class = cli_class$error$Class)
   if (!is.character(vars))
-    stop("Character vector need to be provided to 'vars' argument.")
+    cli_abort("{.emph character vector} needs to be provided to {.var vars} argument",
+              class = cli_class$error$Type)
   if (any(!vars %in% names(data)))
-    stop("All 'vars' need to be available in the 'data'.")
+    cli_abort("All {.var vars} need to be available in the {.var data}.",
+              class = cli_class$error$NoValidVars)
   if (!is.logical(retain) && !(is.character(retain) && all(retain %in% names(data))))
-    stop("Bool value or character vector containing column names available in 'data' need to be provided to 'retain' argument.")
-  
+    cli_abort("{.emph Boolean value} or {.emph character vector} containing column names available in {.var data} need to be provided in {.var retain} argument.",
+              class = cli_class$error$NoValidRetain)
+
   tables <- list(...)
   if (length(tables) == 0 && length(.dots) > 0)
     tables <- .dots
   
-  if (!all(sapply(tables, \(x) class(x) %in% c("FrequencyTable", "ScoreTable"))))
-    stop("All objects provided to '...' or '.dots' need to be of class 'FrequencyTable' or 'ScoreTable'")
+  if (any(sapply(tables, \(x) !is.FrequencyTable(x) && !is.ScoreTable(x))))
+    cli_abort("All object provided to {.var ...} or {.var .dots} need to be a {.cls FrequencyTable} or {.cls ScoreTable}.",
+              class = cli_class$error$Class)
   
   if (length(vars) != length(tables))
-    stop("Number of provided tables and 'vars' to normalize need to be the same.")
+    cli_abort("Number of provided tables ({.val {length(tables}}) and {.var vars} to normalize ({.val {length(vars}}) need to be equal.",
+              class = cli_class$error$WrongLength)
   
-  if (all(sapply(tables, \(x) class(x) == "ScoreTable")) && !what %in% c("quan", "Z")) {
+  if (all(sapply(tables, is.ScoreTable)) && !what %in% c("quan", "Z")) {
     if (!all(sapply(tables, \(x) what %in% names(x$scale))))
-      stop("Scale of the name provided in 'what' need to be available in all provided 'ScoreTable' objects.")
+      cli_abort("Scale of the name provided in {.var what} need to be available in all provided {.cls ScoreTable} objects.",
+                class = cli_class$error$NoValidWhat)
   } else if (!what %in% c("quan", "Z"))
-    stop("'what' argument can be one of: 'quan', 'Z' or name of the scale in provided 'ScoreTable' objects.")
+    cli_abort("{.var what} argument can be one of {.val quan} or {.val Z}, or name of the scale if {.cls ScoreTable} objects are provided.",
+              class = cli_class$error$NoValidWhat)
   
   normalized <- lapply(1:length(vars), \(i) {
     
@@ -129,31 +144,32 @@ normalize_scores_df <- function(
 }
 
 #' @title Normalize scores using GroupedFrequencyTables or GroupedScoreTables
-#' @description Normalize scores using either *GroupedFrequencyTable* or
-#' *GroupedScoreTable* for one or more variables. Given *data.frame* should also
-#' contain columns used in *GroupingConditions* attached to the table
-#' @param data *data.frame* object containing raw scores
-#' @param vars *character vector* with names of columns to normalize. Length of vars
+#' @description Normalize scores using either `GroupedFrequencyTable` or
+#' `GroupedScoreTable` for one or more variables. Given data.frame should also
+#' contain columns used in `GroupingConditions` attached to the table
+#' @param data data.frame object containing raw scores
+#' @param vars names of columns to normalize. Length of vars
 #' need to be the same as number of tables provided to either `...` or `.dots`
-#' @param ... *GroupedFrequencyTable* or *GroupedScoreTable* objects to be used 
+#' @param ... `GroupedFrequencyTable` or `GroupedScoreTable` objects to be used 
 #' for normalization. They should be provided in the same order as `vars`
 #' @param what the values to get. One of either:
 #' 
 #' - `quan` - the quantile of x in the raw score distribution
 #' - `Z` - normalized Z score for the x raw score
-#' - name of the scale calculated in *GroupedScoreTables* provided to `...` or
+#' - name of the scale calculated in `GroupedScoreTables` provided to `...` or
 #' `.dots` argument
 #' 
-#' @param retain either *boolean*: `TRUE` if all columns in the `data` are to be
-#' retained, `FALSE` if none, or *character vector* with names of columns to be retained
-#' @param group_col *character* name of the column for name of the group each
+#' @param retain either boolean: `TRUE` if all columns in the `data` are to be
+#' retained, `FALSE` if none; or character vector with names of columns to be retained
+#' @param group_col name of the column for name of the group each
 #' observation was qualified into. If left as default `NULL`, they won't be returned.
-#' @param .dots *GroupedFrequencyTable* or *GroupedScoreTable* objects provided 
+#' @param .dots `GroupedFrequencyTable` or `GroupedScoreTable` objects provided 
 #' as a list, instead of individually in `...`. 
 #' @export
+#' @importFrom cli cli_abort
 #' @example man/examples/normalize_scores_grouped.R
 #' @family score-normalization functions
-#' @return *data.frame* with normalized scores
+#' @return data.frame with normalized scores
 
 normalize_scores_grouped <- function(
     data,
@@ -165,40 +181,51 @@ normalize_scores_grouped <- function(
     .dots = list()) {
   
   if (!is.data.frame(data))
-    stop("'data.frame' need to be provided to 'data' argument.")
+    cli_abort("{.cls data.frame} need to be provided to {.var data}.",
+              class = cli_class$error$Class)
   if (!is.character(vars))
-    stop("Character vector need to be provided to 'vars' argument.")
+    cli_abort("{.emph character vector} needs to be provided to {.var vars} argument",
+              class = cli_class$error$Type)
   if (any(!vars %in% names(data)))
-    stop("All 'vars' need to be available in the 'data'.")
+    cli_abort("All {.var vars} need to be available in the {.var data}.",
+              class = cli_class$error$NoValidVars)
   if (!is.logical(retain) && !(is.character(retain) && all(retain %in% names(data))))
-    stop("Bool value or character vector containing column names available in 'data' need to be provided to 'retain' argument.")
+    cli_abort("{.emph Boolean value} or {.emph character vector} containing column names available in {.var data} need to be provided in {.var retain} argument.",
+              class = cli_class$error$NoValidRetain)
   if (!is.null(group_col) && (!is.character(group_col) || length(group_col) != 1))
-    stop("One character value need to be passed to 'group_col'")
+    cli_abort("One {.emph character value} can be passed to {.var group_col}",
+              class = cli_class$error$Type)
   
   tables <- list(...)
   if (length(tables) == 0 && length(.dots) > 0)
     tables <- .dots
   
-  if (!all(sapply(tables, \(x) class(x) %in% c("GroupedFrequencyTable", "GroupedScoreTable"))))
-    stop("All objects provided to '...' or '.dots' need to be of class 'GroupedFrequencyTable' or 'GroupedScoreTable'")
+  if (any(sapply(tables, \(x) !is.GroupedFrequencyTable(x) && !is.GroupedScoreTable(x))))
+    cli_abort("All object provided to {.var ...} or {.var .dots} need to be a {.cls FrequencyTable} or {.cls ScoreTable}.",
+              class = cli_class$error$Class)
   
   if (length(vars) != length(tables))
-    stop("Number of provided tables and 'vars' to normalize need to be the same.")
+    cli_abort("Number of provided tables ({.val {length(tables}}) and {.var vars} to normalize ({.val {length(vars}}) need to be equal.",
+              class = cli_class$error$WrongLength)
   
-  if (all(sapply(tables, \(x) class(x) == "GroupedScoreTable")) && !what %in% c("quan", "Z")) {
+  if (all(sapply(tables, is.GroupedScoreTable)) && !what %in% c("quan", "Z")) {
     if (!all(sapply(tables, \(x) what %in% names(attr(x, "scales")))))
-      stop("Scale of the name provided in 'what' need to be available in all provided 'GroupedScoreTable' objects.")
+      cli_abort("Scale of the name provided in {.var what} need to be available in all provided {.cls GroupedScoreTable} objects.",
+                class = cli_class$error$NoValidWhat)
   } else if (!what %in% c("quan", "Z"))
-    stop("'what' argument can be one of: 'quan', 'Z' or name of the scale in provided 'GroupedScoreTable' objects.")
+    cli_abort("{.var what} argument can be one of {.val quan} or {.val Z}, or name of the scale if {.cls GroupedScoreTable} objects are provided.",
+              class = cli_class$error$NoValidWhat)
   
   if (".temp_GroupAssignment_index" %in% names(data))
-    stop("Column name '.temp_GroupAssignment_index' is reserved for internal operations.")
+    cli_abort("Column name: {.val .temp_GroupAssignment_index} is reserved for internal operations.",
+              class = cli_class$error$BadName)
   
   # check if all conditions are the same
   conditions <- lapply(tables, attr, which = "conditions")
   equal_comb <- all(sapply(conditions[-1], \(cond) identical(conditions[[1]], cond)))
   if (!isTRUE(equal_comb))
-    stop("All ", class(tables[[1]]), " objects need to be created on the basis of the same 'GroupConditions'.")
+    cli_abort("All grouped tables need to be created on the basis of the same {.cls GroupConditions}",
+              class = cli_class$error$NoCompatibleAssignements)
   # keep only one conditions
   conditions <- conditions[[1]]
   
@@ -243,38 +270,35 @@ normalize_scores_grouped <- function(
                                                  use.names = T,
                                                  idcol = group_col[1])
   
-  normalized_all_groups <- normalized_all_groups[
+  out <- normalized_all_groups[
     order(normalized_all_groups[[".temp_GroupAssignment_index"]]), 
     -which(names(normalized_all_groups) == ".temp_GroupAssignment_index"),
     drop = FALSE
   ]
-  
-  out <- handle_retain(data = data,
-                       output = normalized_all_groups,
-                       retain = retain)
   
   return(out)
   
 }
 
 #' @title Normalize scores using ScoringTables
-#' @description Normalize scores using either *ScoringTable* objects for one or 
-#' more variables. Given *data.frame* should also contain columns used in 
-#' *GroupingConditions* attached to the table (if any)
-#' @param data *data.frame* object containing raw scores
-#' @param vars *character vector* with names of columns to normalize. Length of vars
+#' @description Normalize scores using either `ScoringTable` objects for one or 
+#' more variables. Given data.frame should also contain columns used in 
+#' `GroupingConditions` attached to the table (if any)
+#' @param data data.frame containing raw scores
+#' @param vars names of columns to normalize. Length of vars
 #' need to be the same as number of tables provided to either `...` or `.dots`
-#' @param ... *ScoringTable* objects to be used for normalization. They should 
+#' @param ... `ScoringTable` objects to be used for normalization. They should 
 #' be provided in the same order as `vars`
-#' @param retain either *boolean*: `TRUE` if all columns in the `data` are to be
-#' retained, `FALSE` if none, or *character vector* with names of columns to be retained
-#' @param group_col *character* name of the column for name of the group each
+#' @param retain either boolean: `TRUE` if all columns in the `data` are to be
+#' retained, `FALSE` if none; or names of columns to be retained
+#' @param group_col name of the column for name of the group each
 #' observation was qualified into. If left as default `NULL`, they won't be returned.
 #' Ignored if no conditions are available
-#' @param .dots *ScoringTable* objects provided as a list, instead of individually in `...`. 
+#' @param .dots `ScoringTable` objects provided as a list, instead of individually in `...`. 
 #' @export
+#' @importFrom cli cli_abort
 #' @family score-normalization functions
-#' @return *data.frame* with normalized scores
+#' @return data.frame with normalized scores
 
 normalize_scores_scoring <- function(
     data,
@@ -285,28 +309,36 @@ normalize_scores_scoring <- function(
     .dots = list()) {
   
   if (!is.data.frame(data))
-    stop("'data.frame' need to be provided to 'data' argument.")
+    cli_abort("{.cls data.frame} need to be provided to {.var data}.",
+              class = cli_class$error$Class)
   if (!is.character(vars))
-    stop("Character vector need to be provided to 'vars' argument.")
+    cli_abort("{.emph character vector} needs to be provided to {.var vars} argument",
+              class = cli_class$error$Type)
   if (any(!vars %in% names(data)))
-    stop("All 'vars' need to be available in the 'data'.")
+    cli_abort("All {.var vars} need to be available in the {.var data}.",
+              class = cli_class$error$NoValidVars)
   if (!is.logical(retain) && !(is.character(retain) && all(retain %in% names(data))))
-    stop("Bool value or character vector containing column names available in 'data' need to be provided to 'retain' argument.")
+    cli_abort("{.emph Boolean value} or {.emph character vector} containing column names available in {.var data} need to be provided in {.var retain} argument.",
+              class = cli_class$error$NoValidRetain)
   if (!is.null(group_col) && (!is.character(group_col) || length(group_col) != 1))
-    stop("One character value need to be passed to 'group_col'")
+    cli_abort("One {.emph character value} can be passed to {.var group_col}",
+              class = cli_class$error$Type)
   
   tables <- list(...)
   if (length(.dots) > 0)
     tables <- .dots
   
   if (!all(sapply(tables, is.ScoringTable)))
-    stop("All objects provided to '...' or '.dots' need to be of class 'ScoringTable'")
+    cli_abort("All object provided to {.var ...} or {.var .dots} need to be a {.cls ScoringTable}.",
+              class = cli_class$error$Class)
   
   if (length(vars) != length(tables))
-    stop("Number of provided tables and 'vars' to normalize need to be the same.")
+    cli_abort("Number of provided tables ({.val {length(tables}}) and {.var vars} to normalize ({.val {length(vars}}) need to be equal.",
+              class = cli_class$error$WrongLength)
   
   if (".temp_GroupAssignment_index" %in% names(data))
-    stop("Column name '.temp_GroupAssignment_index' is reserved for internal operations.")
+    cli_abort("Column name: {.val .temp_GroupAssignment_index} is reserved for internal operations.",
+              class = cli_class$error$BadName)
   
   # check if all conditions are the same
   conditions <- lapply(tables, attr, which = "conditions")
@@ -314,7 +346,8 @@ normalize_scores_scoring <- function(
   if (!all(sapply(lapply(tables, attr, which = "conditions"), \(x) is.null(x)))) {
     equal_comb <- all(sapply(conditions[-1], \(cond) identical(conditions[[1]], cond)))
     if (!isTRUE(equal_comb))
-      stop("All ", class(tables[[1]]), " objects need to be created on the basis of the same 'GroupConditions'.")
+      cli_abort("All {.cls ScoringTable} objects need to be created on the basis of the same {.cls GroupConditions}",
+                class = cli_class$error$NoCompatibleAssignements)
     # keep only one conditions
     conditions <- conditions[[1]]
   } else {
@@ -463,13 +496,15 @@ qualify_to_groups <- function(data,
 #' @param x raw score
 #' @param col_raw Column of raw scores from ScoringTable
 #' @param col_score COlumn of StandardScale score from ScoringTable
+#' @importFrom cli cli_abort
 #' @keywords internal
 
 check_score_between <- function(x, col_raw, col_score) {
   
   if (length(x) != 1)
-    stop("'x' argument need to be one raw score value.")
-  
+    cli_abort("{.var x} need to be {.strong one raw score value}",
+              class = cli_class$error$Type)
+
   if (is.na(x))
     return(as.numeric(NA))
   

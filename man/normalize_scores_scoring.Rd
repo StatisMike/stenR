@@ -14,30 +14,30 @@ normalize_scores_scoring(
 )
 }
 \arguments{
-\item{data}{\emph{data.frame} object containing raw scores}
+\item{data}{data.frame containing raw scores}
 
-\item{vars}{\emph{character vector} with names of columns to normalize. Length of vars
+\item{vars}{names of columns to normalize. Length of vars
 need to be the same as number of tables provided to either \code{...} or \code{.dots}}
 
-\item{...}{\emph{ScoringTable} objects to be used for normalization. They should
+\item{...}{\code{ScoringTable} objects to be used for normalization. They should
 be provided in the same order as \code{vars}}
 
-\item{retain}{either \emph{boolean}: \code{TRUE} if all columns in the \code{data} are to be
-retained, \code{FALSE} if none, or \emph{character vector} with names of columns to be retained}
+\item{retain}{either boolean: \code{TRUE} if all columns in the \code{data} are to be
+retained, \code{FALSE} if none; or names of columns to be retained}
 
-\item{group_col}{\emph{character} name of the column for name of the group each
+\item{group_col}{name of the column for name of the group each
 observation was qualified into. If left as default \code{NULL}, they won't be returned.
 Ignored if no conditions are available}
 
-\item{.dots}{\emph{ScoringTable} objects provided as a list, instead of individually in \code{...}.}
+\item{.dots}{\code{ScoringTable} objects provided as a list, instead of individually in \code{...}.}
 }
 \value{
-\emph{data.frame} with normalized scores
+data.frame with normalized scores
 }
 \description{
-Normalize scores using either \emph{ScoringTable} objects for one or
-more variables. Given \emph{data.frame} should also contain columns used in
-\emph{GroupingConditions} attached to the table (if any)
+Normalize scores using either \code{ScoringTable} objects for one or
+more variables. Given data.frame should also contain columns used in
+\code{GroupingConditions} attached to the table (if any)
 }
 \seealso{
 Other score-normalization functions: 

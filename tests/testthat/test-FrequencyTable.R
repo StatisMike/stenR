@@ -42,11 +42,11 @@ test_that("FrequencyTable generates summary", {
   
   expect_equal(
     names(summary(ft)),
-    c("n", "min", "max", "mean", "median", "sd", "skewness", "kurtosis")
+    c("n", "min", "max", "mean", "median", "sd", "skewness", "kurtosis", "incomplete")
   )
   
   expect_equal(
     names(summary(ft_sim)),
-    c("n", "min", "max", "mean", "median", "sd", "skewness", "kurtosis")
+    c("n", "min", "max", "mean", "median", "sd", "skewness", "kurtosis", "incomplete")
   )
 })

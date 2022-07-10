@@ -44,6 +44,9 @@ Defaults to \code{TRUE}}
 
 \item{object}{A \code{GroupedFrequencyTable} object}
 }
+\value{
+\code{data.frame} of descriptive statistcs
+}
 \description{
 Using \code{\link[=GroupConditions]{GroupConditions()}} object and source \code{data.frame} compute
 a set of \code{\link[=FrequencyTable]{FrequencyTable()}}s for single variable
