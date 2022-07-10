@@ -103,6 +103,8 @@ create_st <- function(short_st,
 #' @param table `ScoreTable` or `GroupedScoreTable` object
 #' @param ... additional arguments 
 #' @return `ScoringTable` object
+#' @rdname ScoringTable
+#' @aliases to_ScoringTable
 #' @export
 
 to_ScoringTable <- function(table, ...) {
@@ -111,21 +113,19 @@ to_ScoringTable <- function(table, ...) {
   
 }
 
-#' @rdname to_ScoringTable
+#' @rdname ScoringTable
 #' @param scale name of the scale attached in `table`. If only one
 #' scale is attached, it can be left as default `NULL`
-#' @param min_raw absolute minimum score that can be received. If left
-#' as default `NULL`, the minimum available in the data will be used.
-#' @param max_raw absolute maximum score that can be received. If left
-#' as default `NULL`, the maximum available in the data will be used.
+#' @param min_raw,max_raw absolute minimum/maximum score that can be received. 
+#' If left as default `NULL`, the minimum/maximum available in the data will be 
+#' used.
 #' @param score_colname Name of the column containing the raw scores
 #' @importFrom cli cli_abort
+#' @aliases to_ScoringTable
 #' @export
 
 to_ScoringTable.ScoreTable <- function(
     table, scale = NULL, min_raw = NULL, max_raw = NULL, score_colname = "Score", ...) {
-  
-  
   
   if (is.null(scale) && length(table$scales) != 1)
     cli_abort("{.cls ScoreTable} have multiple scales attached: {.val {names(table$scales)}}. Provide one of these names to {.var scale}.",
@@ -161,11 +161,22 @@ to_ScoringTable.ScoreTable <- function(
   
 }
 
-#' @rdname to_ScoringTable
+#' @rdname ScoringTable
+#' @aliases to_ScoringTable
 #' @export
 
 to_ScoringTable.GroupedScoreTable <- function(
     table, scale = NULL, min_raw = NULL, max_raw = NULL, ...) {
+  
+  if (is.null(scale) && length(table$scales) != 1)
+    cli_abort("{.cls ScoreTable} have multiple scales attached: {.val {names(table$scales)}}. Provide one of these names to {.var scale}.",
+              class = "ScaleNonunequivocalError")
+  else if (length(table$scales == 1)) {
+    if (!scale %in% names(table$scales))
+      cli_abort("{.var scale}: {.val {scale}} is not attached. Choose one of {.val {names(table$scales)}}",
+                class = "WrongScaleError")
+    scale <- names(table$scales)
+  }
   
   tables <- mapply(to_ScoringTable, 
                    table = table, 
@@ -179,8 +190,9 @@ to_ScoringTable.GroupedScoreTable <- function(
   out <- out[order(out[[1]]), ]
   
   attr(out, "grouped") <- TRUE
-  class(out) <- c("ScoringTable", "data.frame")
   attr(out, "conditions") <- attr(table, "conditions")
+  attr(out, "all") <- isTRUE(attr(table, "all"))
+  class(out) <- c("ScoringTable", if (is.intersected(table)) "Intersect", "data.frame")
   return(out)
   
 }
@@ -202,9 +214,10 @@ to_ScoringTable.GroupedScoreTable <- function(
 #' @param method Method for export, either `"csv"`, `"json"` or `"object"`
 #' @param conditions_file Output file for `GroupConditions`. Used only
 #' if `method = csv` and `table` created with `GroupedScoreTable`.
-#' @importFrom cli cli_abort cli_alert_warning
-#' @return list containing `ScoringTable` `tibble` and `GroupConditions` if
-#' `method = "object"`. `NULL` for other methods
+#' @seealso import_ScoringTable
+#' @importFrom cli cli_abort cli_warn
+#' @return list containing `ScoringTable` as a `tibble` and `GroupConditions` 
+#' if `method = "object"`. `NULL` for other methods
 #' @export
 
 export_ScoringTable <- function(table,
@@ -230,8 +243,8 @@ export_ScoringTable <- function(table,
              cond_df <- dplyr::bind_rows(cond_ls)
              utils::write.csv(cond_df, conditions_file, row.names = F)
            } else if (!is.null(attr(table, "conditions"))) 
-             cli_alert_warning("{.cls GroupConditions} haven't been exported. To export them with {.emph csv method}, please provide the {.var conditions_file} argument",
-                               class = "NonExportedConditionsWarning")
+             cli_warn("{.cls GroupConditions} haven't been exported. To export them with {.emph csv method}, please provide the {.var conditions_file} argument",
+                      class = "NonExportedConditionsWarning")
          },
          json = {
            out <- list(ScoringTable = table)
@@ -263,8 +276,8 @@ export_ScoringTable <- function(table,
 }
 
 #' @title Import ScoringTable
-#' @description `ScoringTable` can be imported from `csv` or `json` file
-#' into R object. Source file can be either an output of [export_ScoringTable()]
+#' @description `ScoringTable` can be imported from `csv`, `json` file or
+#' `tibble`. Source file or object can be either an output of [export_ScoringTable()]
 #' function, or created by hand - though it needs to be created following the
 #' correct format.
 #' @param source Path to the file to import the `ScoringTable` from (for *csv* and *json* methods)
@@ -275,6 +288,7 @@ export_ScoringTable <- function(table,
 #' for *object* method and *csv* method if no `cond_file` is provided. If provided
 #' while using *json* method, original `GroupConditions` will be ignored.  
 #' @importFrom cli cli_abort
+#' @seealso export_ScoringTable
 #' @return `ScoringTable` object
 #' @export
 
@@ -373,7 +387,13 @@ import_ScoringTable <- function(
   } else
     attr(st_out, "grouped") <- FALSE
   
-  class(st_out) <- c("ScoringTable", class(st_out))
+  if (attr(st_out, "grouped")) {
+    attr(st_out, "all") <- isTRUE(any(grepl(names(st_out), pattern = "^.all")))
+  }
+    
+  class(st_out) <- c("ScoringTable", 
+                     if (isTRUE(all(grepl(names(st_out)[-1], pattern = ":")))) "Intersect", 
+                     "data.frame")
   return(st_out)
   
 }
@@ -464,4 +484,38 @@ verify_GC_for_ST <- function(st_df, gc_df) {
   
   return(out)
   
+}
+
+#' @rdname ScoringTable
+#' @param object `ScoringTable` object
+#' @param ... further arguments passed to or from other methods.
+#' @importFrom cli cli_text cli_ul cli_li cli_end 
+#' @export
+
+summary.ScoringTable <- function(object, ...) {
+  
+  cli_text("{.cls ScoringTable}")
+  if (ncol(object) == 2)
+    cli_text("{.field No. groups}: ungrouped")
+  else
+    cli_text("{.field No. groups}: {.val {ncol(object)}}")
+  cli_text("{.strong Scale}: {.val {names(object)[1]}}; {.var min}: {.val {min(object[[1]])}}; {.var max}: {.val {max(object[[1]])}}")
+  
+  if (!is.null(attr(object, "conditions"))) {
+    
+    conds <- attr(object, "conditions")
+    
+    cli_text("{.field GroupConditions}: {.val {length(conds)}}")
+    ol <- cli_ol()
+    for (cond in conds) {
+      cli_li("{.strong Category}: {attr(cond, 'cond_category')}")
+      ul <- cli_ul()
+      cli_li("{.field Tested vars}: {.val {attr(cond, 'formula_vars')}}")
+      cli_li("{.field No. groups:}: {.val {length(attr(cond, 'groups'))}}")
+      cli_end(ul)
+    }
+    cli_end(ol)
+    cli_text("{.field {.bold .all} groups} included: {.val {isTRUE(attr(object, 'all'))}}")
+    
+  }
 }

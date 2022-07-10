@@ -4,6 +4,7 @@
 \alias{to_ScoringTable}
 \alias{to_ScoringTable.ScoreTable}
 \alias{to_ScoringTable.GroupedScoreTable}
+\alias{summary.ScoringTable}
 \title{Create ScoringTable}
 \usage{
 to_ScoringTable(table, ...)
@@ -18,11 +19,13 @@ to_ScoringTable(table, ...)
 )
 
 \method{to_ScoringTable}{GroupedScoreTable}(table, scale = NULL, min_raw = NULL, max_raw = NULL, ...)
+
+\method{summary}{ScoringTable}(object, ...)
 }
 \arguments{
 \item{table}{\code{ScoreTable} or \code{GroupedScoreTable} object}
 
-\item{...}{additional arguments}
+\item{...}{further arguments passed to or from other methods.}
 
 \item{scale}{name of the scale attached in \code{table}. If only one
 scale is attached, it can be left as default \code{NULL}}
@@ -34,6 +37,8 @@ as default \code{NULL}, the minimum available in the data will be used.}
 as default \code{NULL}, the maximum available in the data will be used.}
 
 \item{score_colname}{Name of the column containing the raw scores}
+
+\item{object}{\code{ScoringTable} object}
 }
 \value{
 \code{ScoringTable} object

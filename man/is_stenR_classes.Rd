@@ -4,7 +4,7 @@
 \alias{is_stenR_classes}
 \alias{is.GroupConditions}
 \alias{is.GroupAssignment}
-\alias{is.intersected_GroupAssignment}
+\alias{is.intersected}
 \alias{is.ScaleSpec}
 \alias{is.CombScaleSpec}
 \alias{is.FrequencyTable}
@@ -13,7 +13,6 @@
 \alias{is.GroupedScoreTable}
 \alias{is.ScoringTable}
 \alias{is.StandardScale}
-\alias{is.intersected}
 \alias{is.Simulated}
 \title{Checkers for stenR S3 and R6 classes}
 \usage{
@@ -45,5 +44,13 @@ is.StandardScale(x)
 \item{x}{any \R object}
 }
 \description{
-Various functions to check if given \R object is of given class
+Various functions to check if given \R object is of given class. Additionally:
+\itemize{
+\item \code{is.intersected()} checks if the \code{GroupAssignment} object have been created
+with \code{\link[=intersect_GroupAssignment]{intersect_GroupAssignment()}} and \code{GroupedFrequencyTable},
+\code{GroupedScoreTable} or \code{ScoringTable} have been created with two \code{GroupConditions}
+objects.
+\item \code{is.Simulated()} checks if the \code{FrequencyTable} or \code{ScoreTable} have been
+created on basis of simulated distribution (based on \code{\link[=SimFrequencyTable]{SimFrequencyTable()}})
+}
 }

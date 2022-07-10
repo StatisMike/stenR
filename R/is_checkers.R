@@ -3,8 +3,14 @@
 #' @rdname is_stenR_classes
 #' @param x any \R object
 #' @description 
-#' Various functions to check if given \R object is of given class
-#' @aliases is.GroupConditions is.GroupAssignment is.intersected_GroupAssignment 
+#' Various functions to check if given \R object is of given class. Additionally:
+#' - `is.intersected()` checks if the `GroupAssignment` object have been created
+#' with [intersect_GroupAssignment()] and `GroupedFrequencyTable`,
+#' `GroupedScoreTable` or `ScoringTable` have been created with two `GroupConditions`
+#' objects.
+#' - `is.Simulated()` checks if the `FrequencyTable` or `ScoreTable` have been
+#' created on basis of simulated distribution (based on [SimFrequencyTable()])
+#' @aliases is.GroupConditions is.GroupAssignment is.intersected 
 #' is.ScaleSpec is.CombScaleSpec is.FrequencyTable is.GroupedFrequencyTable 
 #' is.ScoreTable is.GroupedScoreTable is.ScoringTable is.StandardScale
 NULL

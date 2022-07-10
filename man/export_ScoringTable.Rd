@@ -39,3 +39,6 @@ be exported to another \emph{csv} file, creating two different files.
 \code{ScoringTable} itself and \code{GroupConditions} in the same \emph{json} file.
 }
 }
+\seealso{
+import_ScoringTable
+}

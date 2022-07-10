@@ -504,8 +504,8 @@ print.GroupedFrequencyTable <- function(x, ...) {
       cli_end(ul)
     }
     cli_end(ol)
-    cli_text("{.field .all groups:} {.val {attr(x, 'all')}}")  
-
+    cli_text("{.field {.bold .all} groups} included: {.val {isTRUE(attr(x, 'all'))}}")
+    
 }
 
 #' @rdname GroupedFrequencyTable

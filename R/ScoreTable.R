@@ -68,6 +68,7 @@ ScoreTable <- function(ft,
 }
 
 #' @param x A `ScoreTable` object
+#' @param ... further arguments passed to or from other methods.
 #' @rdname ScoreTable
 #' @importFrom cli cli_text cli_ul cli_li cli_end
 #' @export

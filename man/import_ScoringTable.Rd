@@ -27,8 +27,11 @@ while using \emph{json} method, original \code{GroupConditions} will be ignored.
 \code{ScoringTable} object
 }
 \description{
-\code{ScoringTable} can be imported from \code{csv} or \code{json} file
-into R object. Source file can be either an output of \code{\link[=export_ScoringTable]{export_ScoringTable()}}
+\code{ScoringTable} can be imported from \code{csv}, \code{json} file or
+\code{tibble}. Source file or object can be either an output of \code{\link[=export_ScoringTable]{export_ScoringTable()}}
 function, or created by hand - though it needs to be created following the
 correct format.
+}
+\seealso{
+export_ScoringTable
 }
