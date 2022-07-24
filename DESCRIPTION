@@ -1,6 +1,6 @@
 Package: stenR
 Title: R6-based Standardization of Raw Discrete Scores 
-Version: 0.6.4
+Version: 0.6.5
 Authors@R: 
     person(given = "Michal",
            family = "Kosinski",
