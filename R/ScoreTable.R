@@ -391,10 +391,16 @@ plot.GroupedScoreTable <- function(
   
   plot_data <- data.table::rbindlist(plot_data)
   
-  if ("group2" %in% names(plot_data) && isTRUE(plot_grid)) {
+  if (is.intersected(x)) {
     
-    plot_data$group1 <- factor(plot_data$group1, levels = c(".all1", attr(attr(x, "conditions")[[1]], "groups")))
-    plot_data$group2 <- factor(plot_data$group2, levels = c(".all2", attr(attr(x, "conditions")[[2]], "groups")))
+    plot_data$group1 <- factor(plot_data$group1, 
+                               levels = c(if (attr(x, "all")) ".all1", attr(attr(x, "conditions")[[1]], "groups")))
+    plot_data$group2 <- factor(plot_data$group2, 
+                               levels = c(if (attr(x, "all")) ".all2", attr(attr(x, "conditions")[[2]], "groups")))
+    
+  }
+  
+  if (isTRUE(plot_grid) && is.intersected(x)) {
     
     grp1_row <- length(unique(plot_data$group2)) < length(unique(plot_data$group1))
     
@@ -423,22 +429,6 @@ plot.GroupedScoreTable <- function(
     
   } else {
     
-    if (is.intersected(x)) {
-      
-      plot_data$group1 <- factor(plot_data$group1, 
-                                 levels = c(if (attr(x, "all")) ".all1", attr(attr(x, "conditions")[[1]], "groups")))
-      plot_data$group2 <- factor(plot_data$group2, 
-                                 levels = c(if (attr(x, "all")) ".all2", attr(attr(x, "conditions")[[2]], "groups")))
-      plot_data$group1 <- paste(plot_data$group1, plot_data$group2, sep = ":")
-      
-    } else {
-      
-      plot_data$group1 <- factor(plot_data$group1, 
-                                 levels = c(if (attr(x, "all")) ".all", attr(attr(x, "conditions")[[1]], "groups")))
-    }
-    
-    plot_data$group1 <- factor(plot_data$group1, levels = c(".all", attr(attr(x, "conditions")[[1]], "groups")))
-    
     plot <- ggplot2::ggplot(plot_data, ggplot2::aes(x = x, y = prop)) + 
       ggplot2::geom_col(ggplot2::aes(fill = SD), alpha = 0.3, color = "black") + 
       ggplot2::scale_fill_manual(name = "Distance from\nthe mean", values = c("green", "blue", "red")) +
@@ -448,9 +438,14 @@ plot.GroupedScoreTable <- function(
         breaks = c(scale_data$min, scale_data$SD2[1], scale_data$SD1[1], 
                    scale_data$M, scale_data$SD1[2], scale_data$SD2[2], scale_data$max))
     
-    plot_args <- list(
-      facets = ggplot2::vars(group1)
-    )
+    if (is.intersected(x))
+      plot_args <- list(
+        facets = ggplot2::vars(group1, group2)
+      )  
+    else
+      plot_args <- list(
+        facets = ggplot2::vars(group1)
+      )
     
     add_args <- list(...)
     

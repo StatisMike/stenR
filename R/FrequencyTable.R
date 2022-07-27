@@ -333,7 +333,7 @@ GroupedFrequencyTable <- function(data,
   attr(FTs, "all") <- isTRUE(.all)
   attr(FTs, "conditions") <- conditions
   
-  class(FTs) <- c("GroupedFrequencyTable", if (length(conditions) == 2) "Intersected")
+  class(FTs) <- c("GroupedFrequencyTable", if (length(conditions) == 2) "Intersect")
   
   return(FTs)
   
