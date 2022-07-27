@@ -303,7 +303,6 @@ listinize_spec.CombScaleSpec <- function(spec, ...) {
   
 }
 
-#' Objectifize ScaleSpec lists
 objectifize_spec <- function(x) {
   
   out <- switch(
