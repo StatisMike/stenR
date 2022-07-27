@@ -88,4 +88,10 @@ all.equal(Consc_ST, imported_from_json)
 }
 \seealso{
 export_ScoringTable
+
+Other import/export functions: 
+\code{\link{export_ScaleSpec}()},
+\code{\link{export_ScoringTable}()},
+\code{\link{import_ScaleSpec}()}
 }
+\concept{import/export functions}

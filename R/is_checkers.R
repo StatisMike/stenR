@@ -33,7 +33,7 @@ is.GroupAssignment <- function(x) {
 #' @rdname is_stenR_classes
 #' @export
 is.intersected <- function(x) {
-  inherits(x, "Intersect")
+  inherits(x, "Intersected")
 }
 
 #### handle_raw_scores.R ####

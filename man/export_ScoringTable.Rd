@@ -95,4 +95,10 @@ all.equal(Consc_ST, imported_from_json)
 }
 \seealso{
 import_ScoringTable
+
+Other import/export functions: 
+\code{\link{export_ScaleSpec}()},
+\code{\link{import_ScaleSpec}()},
+\code{\link{import_ScoringTable}()}
 }
+\concept{import/export functions}

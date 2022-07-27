@@ -228,6 +228,7 @@ to_ScoringTable.GroupedScoreTable <- function(
 #' @example man/examples/import_export_ScoringTable.R
 #' @return list containing `ScoringTable` as a `tibble` and `GroupConditions` 
 #' if `method = "object"`. `NULL` for other methods
+#' @family import/export functions
 #' @export
 
 export_ScoringTable <- function(table,
@@ -301,6 +302,7 @@ export_ScoringTable <- function(table,
 #' @seealso export_ScoringTable
 #' @example man/examples/import_export_ScoringTable.R
 #' @return `ScoringTable` object
+#' @family import/export functions
 #' @export
 
 import_ScoringTable <- function(
