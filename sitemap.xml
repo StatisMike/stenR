@@ -79,6 +79,9 @@
     <loc>https://statismike.github.io/stenR/reference/default_scales.html</loc>
   </url>
   <url>
+    <loc>https://statismike.github.io/stenR/reference/export_ScaleSpec.html</loc>
+  </url>
+  <url>
     <loc>https://statismike.github.io/stenR/reference/export_ScoringTable.html</loc>
   </url>
   <url>
@@ -86,6 +89,9 @@
   </url>
   <url>
     <loc>https://statismike.github.io/stenR/reference/handle_retain.html</loc>
+  </url>
+  <url>
+    <loc>https://statismike.github.io/stenR/reference/import_ScaleSpec.html</loc>
   </url>
   <url>
     <loc>https://statismike.github.io/stenR/reference/import_ScoringTable.html</loc>
