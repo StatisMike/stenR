@@ -413,18 +413,22 @@ plot.GroupedFrequencyTable <- function(
   
   plot_data <- data.table::rbindlist(plot_data)
   
-  if ("group2" %in% names(plot_data) && isTRUE(plot_grid)) {
+  if (is.intersected(x)) {
     
     plot_data$group1 <- factor(plot_data$group1, 
                                levels = c(if (attr(x, "all")) ".all1", attr(attr(x, "conditions")[[1]], "groups")))
     plot_data$group2 <- factor(plot_data$group2, 
                                levels = c(if (attr(x, "all")) ".all2", attr(attr(x, "conditions")[[2]], "groups")))
     
+  }
+  
+  if (isTRUE(plot_grid) && is.intersected(x)) {
+    
     grp1_row <- length(unique(plot_data$group2)) < length(unique(plot_data$group1))
     
     plot <- 
       ggplot2::ggplot(data = plot_data, ggplot2::aes(x = score, y = n)) + 
-      ggplot2::geom_col(ggplot2::aes(fill = sds), color = "black", alpha = 0.3) +
+      ggplot2::geom_col(ggplot2::aes(fill = sds), alpha = 0.3) +
       ggplot2::scale_fill_manual("Normalized\ndistribution",
                                  values = c("green", "blue", "red")) +
       ggplot2::theme_bw() +
@@ -445,33 +449,23 @@ plot.GroupedFrequencyTable <- function(
     return(plot)
     
   } else {
-    
-    if (is.intersected(x)) {
-      
-      plot_data$group1 <- factor(plot_data$group1, 
-                                 levels = c(if (attr(x, "all")) ".all1", attr(attr(x, "conditions")[[1]], "groups")))
-      plot_data$group2 <- factor(plot_data$group2, 
-                                 levels = c(if (attr(x, "all")) ".all2", attr(attr(x, "conditions")[[2]], "groups")))
-      plot_data$group1 <- paste(plot_data$group1, plot_data$group2, sep = ":")
-      
-    } else {
-      
-      plot_data$group1 <- factor(plot_data$group1, 
-                                 levels = c(if (attr(x, "all")) ".all", attr(attr(x, "conditions")[[1]], "groups")))
-    }
 
-    
     plot <- 
       ggplot2::ggplot(data = plot_data, ggplot2::aes(x = score, y = n)) + 
-      ggplot2::geom_col(ggplot2::aes(fill = sds), color = "black", alpha = 0.3) +
+      ggplot2::geom_col(ggplot2::aes(fill = sds), alpha = 0.3) +
       ggplot2::scale_fill_manual("Normalized\ndistribution",
                                  values = c("green", "blue", "red")) +
       ggplot2::theme_bw() +
       ggplot2::scale_y_continuous(name = "Number of observations")
     
-    plot_args <- list(
-      facets = ggplot2::vars(group1)
-    )
+    if (is.intersected(x))
+      plot_args <- list(
+        facets = ggplot2::vars(group1, group2)
+      )  
+    else
+      plot_args <- list(
+        facets = ggplot2::vars(group1)
+      )  
     
     add_args <- list(...)
     
@@ -526,7 +520,8 @@ summary.GroupedFrequencyTable <- function(object, ...) {
                       median = stats::median(whole_vec),
                       sd = stats::sd(whole_vec),
                       skewness = moments::skewness(whole_vec),
-                      kurtosis = moments::kurtosis(whole_vec))
+                      kurtosis = moments::kurtosis(whole_vec),
+                      incomplete = length(ft$status$incompletes))
     
     return(summaries)
   })
