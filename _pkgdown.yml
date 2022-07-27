@@ -61,6 +61,8 @@ reference:
   - ScaleSpec
   - CombScaleSpec
   - sum_items_to_scale
+  - export_ScaleSpec
+  - import_ScaleSpec
 - title: Object Oriented workflow
   desc: >
    Complex R6 object mirroring the ungrouped procedural workflow, allowing
