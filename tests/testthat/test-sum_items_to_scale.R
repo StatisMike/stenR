@@ -105,6 +105,25 @@ summed <- sum_items_to_scale(
   rec_rev
 )
 
+test_that("ScaleSpec prints and summaries", {
+  
+  expect_message(print(scale_reg), regexp = "ScaleSpec")
+  expect_message(summary(scale_reg), regexp = "ScaleSpec")
+  
+})
+
+test_that("CombScaleSpec prints and summaries", {
+  
+  expect_message(print(comb_asis), regexp = "CombScaleSpec")
+  expect_message(test_sum <- summary(comb_asis), regexp = "CombScaleSpec")
+  
+  expect_s3_class(test_sum, "data.frame")
+  expect_equal(nrow(test_sum), length(comb_asis$item_names))
+  expect_equal(length(unique(test_sum$scale)), length(comb_asis$ScaleSpecs))
+  
+  
+})
+
 test_that("NAs without NA handling are retained", {
   expect_equal(sum(is.na(summed$reg)), 2)
 })
