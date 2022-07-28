@@ -250,8 +250,6 @@ summary.CombScaleSpec <- function(object, ...) {
     items_ls <- lapply(object$ScaleSpec, summary)
   )
   
-  items_ls <- list()
-  
   cli_text("{.cls CombScaleSpec}: {.strong {object$name}}")
   cli_text("{.strong Underlying objects}:")
   
