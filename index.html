@@ -136,7 +136,7 @@
 <span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">SLCS</span><span class="op">)</span></span>
 <span><span class="co">#&gt; 'data.frame':    103 obs. of  19 variables:</span></span>
 <span><span class="co">#&gt;  $ user_id: chr  "damaged_kiwi" "unilateralised_anglerfish" "technical_anemonecrab" "temperate_americancurl" ...</span></span>
-<span><span class="co">#&gt;  $ sex    : chr  "M" "K" "K" "K" ...</span></span>
+<span><span class="co">#&gt;  $ sex    : chr  "M" "F" "F" "F" ...</span></span>
 <span><span class="co">#&gt;  $ age    : int  30 31 22 26 22 17 27 24 20 19 ...</span></span>
 <span><span class="co">#&gt;  $ SLCS_1 : int  4 5 4 5 5 5 5 4 4 5 ...</span></span>
 <span><span class="co">#&gt;  $ SLCS_2 : int  2 2 4 3 2 3 1 5 2 1 ...</span></span>
@@ -192,7 +192,7 @@
 <span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">summed_data</span><span class="op">)</span></span>
 <span><span class="co">#&gt; 'data.frame':    103 obs. of  5 variables:</span></span>
 <span><span class="co">#&gt;  $ user_id        : chr  "damaged_kiwi" "unilateralised_anglerfish" "technical_anemonecrab" "temperate_americancurl" ...</span></span>
-<span><span class="co">#&gt;  $ sex            : chr  "M" "K" "K" "K" ...</span></span>
+<span><span class="co">#&gt;  $ sex            : chr  "M" "F" "F" "F" ...</span></span>
 <span><span class="co">#&gt;  $ Self-Liking    : int  13 15 19 10 16 12 18 28 10 14 ...</span></span>
 <span><span class="co">#&gt;  $ Self-Competence: int  20 15 26 19 25 17 14 28 19 13 ...</span></span>
 <span><span class="co">#&gt;  $ General Score  : int  33 30 45 29 41 29 32 56 29 27 ...</span></span></code></pre></div>
@@ -200,6 +200,7 @@
 <div class="section level3">
 <h3 id="create-frequencytable-scoretable-for-normalization">Create <em>FrequencyTable</em>, <em>ScoreTable</em> for normalization<a class="anchor" aria-label="anchor" href="#create-frequencytable-scoretable-for-normalization"></a>
 </h3>
+<p>Generate norms from raw data to normalize and standardize results</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">GS_ft</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/FrequencyTable.html">FrequencyTable</a></span><span class="op">(</span><span class="va">summed_data</span><span class="op">$</span><span class="va">`General Score`</span><span class="op">)</span></span>
 <span><span class="co">#&gt; ℹ There are missing raw score values between minimum and maximum raw scores.</span></span>
@@ -231,18 +232,19 @@
 <span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">normalized_data</span><span class="op">)</span></span>
 <span><span class="co">#&gt; 'data.frame':    103 obs. of  3 variables:</span></span>
 <span><span class="co">#&gt;  $ user_id      : chr  "damaged_kiwi" "unilateralised_anglerfish" "technical_anemonecrab" "temperate_americancurl" ...</span></span>
-<span><span class="co">#&gt;  $ sex          : chr  "M" "K" "K" "K" ...</span></span>
+<span><span class="co">#&gt;  $ sex          : chr  "M" "F" "F" "F" ...</span></span>
 <span><span class="co">#&gt;  $ General Score: num  4 3 6 3 5 3 4 8 3 2 ...</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="create-groupedfrequencytable-and-groupedscoretable">Create <em>GroupedFrequencyTable</em> and <em>GroupedScoreTable</em>
 <a class="anchor" aria-label="anchor" href="#create-groupedfrequencytable-and-groupedscoretable"></a>
 </h3>
+<p>Generate norms for different groups on basis of up to two <em>GroupConditions</em> objects</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sex_grouping</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/GroupConditions.html">GroupConditions</a></span><span class="op">(</span></span>
 <span>  conditions_category <span class="op">=</span> <span class="st">"Sex"</span>,</span>
 <span>  <span class="st">"M"</span> <span class="op">~</span> <span class="va">sex</span> <span class="op">==</span> <span class="st">"M"</span>,</span>
-<span>  <span class="st">"F"</span> <span class="op">~</span> <span class="va">sex</span> <span class="op">==</span> <span class="st">"K"</span>,</span>
+<span>  <span class="st">"F"</span> <span class="op">~</span> <span class="va">sex</span> <span class="op">==</span> <span class="st">"F"</span>,</span>
 <span>  <span class="st">"O"</span> <span class="op">~</span> <span class="va">sex</span> <span class="op">==</span> <span class="st">"O"</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -277,13 +279,14 @@
 <span><span class="co">#&gt; Classes 'data.table' and 'data.frame':   103 obs. of  4 variables:</span></span>
 <span><span class="co">#&gt;  $ Group        : chr  "M" "F" "F" "F" ...</span></span>
 <span><span class="co">#&gt;  $ user_id      : chr  "damaged_kiwi" "unilateralised_anglerfish" "technical_anemonecrab" "temperate_americancurl" ...</span></span>
-<span><span class="co">#&gt;  $ sex          : chr  "M" "K" "K" "K" ...</span></span>
+<span><span class="co">#&gt;  $ sex          : chr  "M" "F" "F" "F" ...</span></span>
 <span><span class="co">#&gt;  $ General Score: num  3 4 6 3 5 3 4 9 3 3 ...</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="create-and-export-scoringtable">Create and export <em>ScoringTable</em>
 <a class="anchor" aria-label="anchor" href="#create-and-export-scoringtable"></a>
 </h3>
+<p>Export generated norms in universal format</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ST_csv</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".csv"</span><span class="op">)</span></span>
 <span><span class="va">GS_scoring</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/ScoringTable.html">to_ScoringTable</a></span><span class="op">(</span></span>
@@ -301,8 +304,9 @@
 <span><span class="co">#&gt; provide the `cond_file` argument</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="create-scoringtable-from-csv-file">Create <em>ScoringTable</em> from <strong>csv</strong> file<a class="anchor" aria-label="anchor" href="#create-scoringtable-from-csv-file"></a>
+<h3 id="create-scoringtable-from-csv-or-json-file">Create <em>ScoringTable</em> from <strong>csv</strong> or <strong>json</strong> file<a class="anchor" aria-label="anchor" href="#create-scoringtable-from-csv-or-json-file"></a>
 </h3>
+<p>Import <em>ScoringTable</em> from universally readable formats (eg. create <strong>csv</strong> on basis of published norms)</p>
 <pre class="csv"><code>"sten","M","F","O"
 1,NA,"16-22",NA
 2,"16-32","23-26",NA
@@ -332,7 +336,7 @@
 <span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">scoring_normalized</span><span class="op">)</span></span>
 <span><span class="co">#&gt; 'data.frame':    103 obs. of  4 variables:</span></span>
 <span><span class="co">#&gt;  $ user_id      : chr  "damaged_kiwi" "unilateralised_anglerfish" "technical_anemonecrab" "temperate_americancurl" ...</span></span>
-<span><span class="co">#&gt;  $ sex          : chr  "M" "K" "K" "K" ...</span></span>
+<span><span class="co">#&gt;  $ sex          : chr  "M" "F" "F" "F" ...</span></span>
 <span><span class="co">#&gt;  $ Group        : chr  "M" "F" "F" "F" ...</span></span>
 <span><span class="co">#&gt;  $ General Score: num  3 4 6 3 5 3 4 9 3 3 ...</span></span></code></pre></div>
 </div>
