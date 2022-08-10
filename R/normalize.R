@@ -512,7 +512,9 @@ check_score_between <- function(x, col_raw, col_score) {
   
   splitscore <- strsplit(col_raw, split = "-")
   splitscore <- lapply(splitscore, as.numeric)
-  score_n <- which(sapply(splitscore, \(score) x %in% score[1]:score[2]))
+  score_n <- which(sapply(splitscore, \(score) {
+                          if (is.na(score[1]) || is.na(score[2])) FALSE 
+                          else x %in% score[1]:score[2]}))
   
   if (length(score_n) < 1) {
     if (x < min(unlist(splitscore)))

@@ -5,6 +5,7 @@
 \alias{CompScoreTable}
 \title{R6 class for producing easily re-computable ScoreTable}
 \description{
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
 Computable ScoreTable class. It can compute and store \code{\link{ScoreTable}s}
 for multiple variables containing raw score results.
 

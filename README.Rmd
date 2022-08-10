@@ -13,6 +13,7 @@ knitr::opts_chunk$set(
   fig.height = 4
 )
 Sys.setenv(LANGUAGE='en')
+library(stenR)
 ```
 
 # stenR <img src='man/figures/logo.png' align="right" width="200" style="float:right; width:200px !important;"/>
@@ -55,3 +56,158 @@ devtools::install_github("StatisMike/stenR")
 
 ## Usage
 
+### Data processing
+
+Process data from item raw scores to factor/scales scores
+
+```{r data_process}
+# Exemplary data provided within package
+str(SLCS)
+
+# create scale specifications
+SL_spec <- ScaleSpec(
+  name = "Self-Liking",
+  item_names = c("SLCS_1", "SLCS_3", "SLCS_5", "SLCS_6", "SLCS_7", 
+                 "SLCS_9", "SLCS_11", "SLCS_15"),
+  min = 1,
+  max = 5,
+  reverse = c("SLCS_1", "SLCS_6", "SLCS_7", "SLCS_15")
+)
+
+SC_spec <- ScaleSpec(
+  name = "Self-Competence",
+  item_names = c("SLCS_2", "SLCS_4", "SLCS_8", "SLCS_10", "SLCS_12",
+                 "SLCS_13", "SLCS_14", "SLCS_16"),
+  min = 1,
+  max = 5,
+  reverse = c("SLCS_8", "SLCS_10", "SLCS_13")
+)
+
+GS_spec <- CombScaleSpec(
+  name = "General Score",
+  SL_spec,
+  SC_spec
+)
+
+# summarize data into factors/scales
+summed_data <- sum_items_to_scale(
+  data = SLCS,
+  SL_spec,
+  SC_spec,
+  GS_spec,
+  retain = c("user_id", "sex")
+)
+
+str(summed_data)
+```
+
+### Create *FrequencyTable*, *ScoreTable* for normalization
+
+```{r ungrouped_FT}
+GS_ft <- FrequencyTable(summed_data$`General Score`)
+plot(GS_ft)
+
+GS_st <- ScoreTable(GS_ft, scale = STEN)
+plot(GS_st)
+
+normalized_GS <- normalize_score(
+  summed_data$`General Score`,
+  table = GS_st,
+  what = "sten"
+)
+
+normalized_data <- normalize_scores_df(
+  data = summed_data,
+  vars = "General Score",
+  GS_st,
+  what = "sten",
+  retain = c("user_id", "sex")
+)
+
+str(normalized_GS)
+str(normalized_data)
+```
+
+### Create *GroupedFrequencyTable* and *GroupedScoreTable*
+
+```{r grouped_tables}
+sex_grouping <- GroupConditions(
+  conditions_category = "Sex",
+  "M" ~ sex == "M",
+  "F" ~ sex == "K",
+  "O" ~ sex == "O"
+)
+
+GS_gft <- GroupedFrequencyTable(
+  data = summed_data,
+  conditions = sex_grouping,
+  var = "General Score",
+  .all = FALSE
+)
+plot(GS_gft)
+
+GS_gst <- GroupedScoreTable(GS_gft, scale = STEN)
+plot(GS_gst)
+
+grouping_normalized <- normalize_scores_grouped(
+  data = summed_data,
+  vars = "General Score",
+  GS_gst,
+  retain = c("user_id", "sex"),
+  what = "sten",
+  group_col = "Group"
+)
+
+str(grouping_normalized)
+```
+
+### Create and export *ScoringTable*
+
+```{r scoring_table}
+ST_csv <- tempfile(fileext = ".csv")
+GS_scoring <- to_ScoringTable(
+  table = GS_gst,
+  min_raw = 16,
+  max_raw = 80
+)
+
+export_ScoringTable(
+  table = GS_scoring,
+  out_file = ST_csv,
+  method = "csv"
+)
+```
+
+### Create *ScoringTable* from **csv** file
+
+```csv
+"sten","M","F","O"
+1,NA,"16-22",NA
+2,"16-32","23-26",NA
+3,"33-36","27-29","16-35"
+4,"37-40","30-37",NA
+5,"41-47","38-41","36-63"
+6,"48-51","42-47","64-68"
+7,"52-58","48-49",NA
+8,"59-71","50-55","69-80"
+9,"72-80","56-59",NA
+10,NA,"60-80",NA
+```
+
+```{r import_scoring_table}
+imported <- import_ScoringTable(
+  source = ST_csv,
+  method = "csv",
+  conditions = sex_grouping
+)
+
+scoring_normalized <- normalize_scores_scoring(
+  data = summed_data,
+  vars = "General Score",
+  imported,
+  retain = c("user_id", "sex"),
+  group_col = "Group"
+)
+
+str(scoring_normalized)
+```

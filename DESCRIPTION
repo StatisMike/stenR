@@ -1,6 +1,6 @@
 Package: stenR
 Title: Standardization of raw discrete questionnaire scores
-Version: 0.6.8
+Version: 0.6.9
 Authors@R: 
     person(given = "Michal",
            family = "Kosinski",
