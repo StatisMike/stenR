@@ -1,8 +1,9 @@
 ---
-title: "Complete tour from data to results"
+title: "Tour from data to results"
 output: rmarkdown::html_vignette
+
 vignette: >
-  %\VignetteIndexEntry{Complete tour from data to results}
+  %\VignetteIndexEntry{Tour from data to results}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -20,7 +21,7 @@ knitr::opts_chunk$set(
 questionnaire or survey on basis of Classical Test Theorem.
 
 Particularly in psychology and other social studies it is very common to not 
-interpretate the raw results of measurement in individual context. In actuality, 
+interpret the raw results of measurement in individual context. In actuality, 
 it would be usually a mistake to do so. Instead, there is a need to evaluate 
 the score of single questionee on the basis of larger sample. It can be done
 by finding the place of every individual raw score in the distribution of

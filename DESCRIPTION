@@ -1,16 +1,16 @@
 Package: stenR
-Title: R6-based Standardization of Raw Discrete Scores 
-Version: 0.6.7
+Title: Standardization of raw discrete questionnaire scores
+Version: 0.6.8
 Authors@R: 
     person(given = "Michal",
            family = "Kosinski",
            role = c("aut", "cre"),
            email = "kosinski.mich@gmail.com",
            comment = c(ORCID = "https://orcid.org/0000-0002-8426-3654"))
-Description: stenR creates an user-friendly framework to standardize raw discrete
-             scores. It provides support for few standard scales often
-             used in psychological questionnaires, though also allows using
-             custom scales not provided out of the box.
+Description: stenR creates an user-friendly framework to preprocess raw item
+             scores of questionnaires into factors or scores and standardize
+             them. Standardization can be made either by their normalization
+             in big sample, or by import of premade scoring table.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
