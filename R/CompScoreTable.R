@@ -2,6 +2,7 @@
 #' @title R6 class for producing easily re-computable ScoreTable
 #'
 #' @description
+#' `r lifecycle::badge("experimental")`
 #' Computable ScoreTable class. It can compute and store \code{\link{ScoreTable}s} 
 #' for multiple variables containing raw score results.
 #' 

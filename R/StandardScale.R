@@ -105,6 +105,8 @@ WECHSLER_IQ <- StandardScale(name = "wechslerIQ", M = 100, SD = 15, min = 40, ma
 #' @export
 plot.StandardScale <- function(x, n = 1000, ...) {
   
+  SS <- x
+  
   rlang::check_installed("ggplot2")
   
   data_points = data.frame(score = seq(from = x$min, to = x$max, by = 1))
@@ -113,29 +115,29 @@ plot.StandardScale <- function(x, n = 1000, ...) {
   SD2 <- c(x$M-2*x$SD, x$M+2*x$SD)
   
   func1SD <- function(x) {
-    y <- stats::dnorm(x, x$M, x$SD)
+    y <- stats::dnorm(x, SS$M, SS$SD)
     y[x < SD1[1] | x > SD1[2]] <- NA
     return(y)
   }
   func2SD <- function(x) {
-    y <- stats::dnorm(x, x$M, x$SD)
+    y <- stats::dnorm(x, SS$M, SS$SD)
     y[(x > SD1[1] & x < SD1[2]) | x < SD2[1] | x > SD2[2]] <- NA
     return(y)
   }
   func3SD <- function(x) {
-    y <- stats::dnorm(x, x$M, x$SD)
+    y <- stats::dnorm(x, SS$M, SS$SD)
     y[x > SD2[1] & x < SD2[2]] <- NA
     return(y)
   }
   
   ggplot2::ggplot(data_points, 
                   ggplot2::aes(x = score)) + 
-    ggplot2::stat_function(fun = stats::dnorm, args = c(x$M, x$SD), n = n) +
+    ggplot2::stat_function(fun = stats::dnorm, args = c(SS$M, SS$SD), n = n) +
     ggplot2::stat_function(fun = func1SD, geom = "area", ggplot2::aes(fill = factor("<1SD", levels = c("<1SD", "1SD-2SD", ">2SD"))), alpha = 0.3, n = n) +
     ggplot2::stat_function(fun = func2SD, geom = "area", ggplot2::aes(fill = factor("1SD-2SD", levels = c("<1SD", "1SD-2SD", ">2SD"))), alpha = 0.3, n = n) +
     ggplot2::stat_function(fun = func3SD, geom = "area", ggplot2::aes(fill = factor(">2SD", levels = c("<1SD", "1SD-2SD", ">2SD"))), alpha = 0.3, n = n) +
-    ggplot2::scale_x_continuous(breaks = c(x$min, SD2[1], SD1[1], x$M, SD1[2], SD2[2], x$max)) +
-    ggplot2::geom_vline(xintercept = x$M) +
+    ggplot2::scale_x_continuous(breaks = c(SS$min, SD2[1], SD1[1], SS$M, SD1[2], SD2[2], SS$max)) +
+    ggplot2::geom_vline(xintercept = SS$M) +
     ggplot2::geom_vline(xintercept = SD1, color = "green") +
     ggplot2::geom_vline(xintercept = SD2, color = "blue") +
     ggplot2::theme_bw() +
