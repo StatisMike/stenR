@@ -103,6 +103,8 @@ str(summed_data)
 
 ### Create *FrequencyTable*, *ScoreTable* for normalization
 
+Generate norms from raw data to normalize and standardize results
+
 ```{r ungrouped_FT}
 GS_ft <- FrequencyTable(summed_data$`General Score`)
 plot(GS_ft)
@@ -130,11 +132,14 @@ str(normalized_data)
 
 ### Create *GroupedFrequencyTable* and *GroupedScoreTable*
 
+Generate norms for different groups on basis of up to two *GroupConditions*
+objects
+
 ```{r grouped_tables}
 sex_grouping <- GroupConditions(
   conditions_category = "Sex",
   "M" ~ sex == "M",
-  "F" ~ sex == "K",
+  "F" ~ sex == "F",
   "O" ~ sex == "O"
 )
 
@@ -163,6 +168,8 @@ str(grouping_normalized)
 
 ### Create and export *ScoringTable*
 
+Export generated norms in universal format
+
 ```{r scoring_table}
 ST_csv <- tempfile(fileext = ".csv")
 GS_scoring <- to_ScoringTable(
@@ -178,7 +185,10 @@ export_ScoringTable(
 )
 ```
 
-### Create *ScoringTable* from **csv** file
+### Create *ScoringTable* from **csv** or **json** file
+
+Import *ScoringTable* from universally readable formats (eg. create **csv**
+on basis of published norms)
 
 ```csv
 "sten","M","F","O"
