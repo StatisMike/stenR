@@ -1,3 +1,5 @@
+#' @importFrom utils packageVersion
+
 .onAttach <- function(libname, pkgname) {
   packageStartupMessage("This is version ", packageVersion("stenR"), 
                         " of stenR package.\n",
