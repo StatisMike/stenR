@@ -144,12 +144,8 @@ as a list, instead of individually in <code>...</code>.</p></dd>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co">#### create GroupConditions for calculating tables ####</span></span></span>
 <span class="r-in"><span><span class="va">age_grouping</span> <span class="op">&lt;-</span> <span class="fu"><a href="GroupConditions.html">GroupConditions</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>  conditions_category <span class="op">=</span> <span class="st">"Age"</span>,</span></span>
-<span class="r-in"><span>  <span class="st">"below 18"</span> <span class="op">~</span> <span class="va">age</span> <span class="op">&lt;</span> <span class="fl">18</span>,</span></span>
-<span class="r-in"><span>  <span class="st">"18-22"</span> <span class="op">~</span> <span class="va">age</span> <span class="op">&gt;=</span> <span class="fl">18</span> <span class="op">&amp;</span> <span class="va">age</span> <span class="op">&lt;=</span> <span class="fl">22</span>,</span></span>
-<span class="r-in"><span>  <span class="st">"23-26"</span> <span class="op">~</span> <span class="va">age</span> <span class="op">&gt;=</span> <span class="fl">23</span> <span class="op">&amp;</span> <span class="va">age</span> <span class="op">&lt;=</span> <span class="fl">26</span>,</span></span>
-<span class="r-in"><span>  <span class="st">"27-32"</span> <span class="op">~</span> <span class="va">age</span> <span class="op">&gt;=</span> <span class="fl">27</span> <span class="op">&amp;</span> <span class="va">age</span> <span class="op">&lt;=</span> <span class="fl">32</span>,</span></span>
-<span class="r-in"><span>  <span class="st">"33-40"</span> <span class="op">~</span> <span class="va">age</span> <span class="op">&gt;=</span> <span class="fl">33</span> <span class="op">&amp;</span> <span class="va">age</span> <span class="op">&lt;=</span> <span class="fl">40</span>,</span></span>
-<span class="r-in"><span>  <span class="st">"40-60"</span> <span class="op">~</span> <span class="va">age</span> <span class="op">&gt;=</span> <span class="fl">40</span> <span class="op">&amp;</span> <span class="va">age</span> <span class="op">&lt;=</span> <span class="fl">60</span>,</span></span>
+<span class="r-in"><span>  <span class="st">"below 22"</span> <span class="op">~</span> <span class="va">age</span> <span class="op">&lt;</span> <span class="fl">22</span>,</span></span>
+<span class="r-in"><span>  <span class="st">"23-60"</span> <span class="op">~</span> <span class="va">age</span> <span class="op">&gt;=</span> <span class="fl">23</span> <span class="op">&amp;</span> <span class="va">age</span> <span class="op">&lt;=</span> <span class="fl">60</span>,</span></span>
 <span class="r-in"><span>  <span class="st">"above 60"</span> <span class="op">~</span> <span class="va">age</span> <span class="op">&gt;</span> <span class="fl">60</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">sex_grouping</span> <span class="op">&lt;-</span> <span class="fu"><a href="GroupConditions.html">GroupConditions</a></span><span class="op">(</span></span></span>
@@ -166,24 +162,12 @@ as a list, instead of individually in <code>...</code>.</p></dd>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> There are missing raw score values between minimum and maximum raw scores for</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   some groups. They have been filled automatically.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> <span style="color: #00BB00;">below 18:Male</span> No. missing: 34/202; 16.83%</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> <span style="color: #00BB00;">below 18:Female</span> No. missing: 39/195; 20%</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> <span style="color: #00BB00;">below 18:.all2</span> No. missing: 30/214; 14.02%</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> <span style="color: #00BB00;">18-22:Male</span> No. missing: 37/213; 17.37%</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> <span style="color: #00BB00;">18-22:Female</span> No. missing: 40/202; 19.8%</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> <span style="color: #00BB00;">18-22:.all2</span> No. missing: 37/230; 16.09%</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> <span style="color: #00BB00;">23-26:Male</span> No. missing: 38/211; 18.01%</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> <span style="color: #00BB00;">23-26:Female</span> No. missing: 52/218; 23.85%</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> <span style="color: #00BB00;">23-26:.all2</span> No. missing: 32/225; 14.22%</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> <span style="color: #00BB00;">27-32:Male</span> No. missing: 47/220; 21.36%</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> <span style="color: #00BB00;">27-32:Female</span> No. missing: 42/208; 20.19%</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> <span style="color: #00BB00;">27-32:.all2</span> No. missing: 26/220; 11.82%</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> <span style="color: #00BB00;">33-40:Male</span> No. missing: 26/206; 12.62%</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> <span style="color: #00BB00;">33-40:Female</span> No. missing: 41/208; 19.71%</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> <span style="color: #00BB00;">33-40:.all2</span> No. missing: 25/221; 11.31%</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> <span style="color: #00BB00;">40-60:Male</span> No. missing: 24/203; 11.82%</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> <span style="color: #00BB00;">40-60:Female</span> No. missing: 19/194; 9.79%</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> <span style="color: #00BB00;">40-60:.all2</span> No. missing: 12/205; 5.85%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> <span style="color: #00BB00;">below 22:Male</span> No. missing: 24/213; 11.27%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> <span style="color: #00BB00;">below 22:Female</span> No. missing: 29/202; 14.36%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> <span style="color: #00BB00;">below 22:.all2</span> No. missing: 29/230; 12.61%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> <span style="color: #00BB00;">23-60:Male</span> No. missing: 11/220; 5%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> <span style="color: #00BB00;">23-60:Female</span> No. missing: 16/218; 7.34%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> <span style="color: #00BB00;">23-60:.all2</span> No. missing: 9/227; 3.96%</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> <span style="color: #00BB00;">above 60:Male</span> No. missing: 60/208; 28.85%</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> <span style="color: #00BB00;">above 60:Female</span> No. missing: 55/199; 27.64%</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> <span style="color: #00BB00;">above 60:.all2</span> No. missing: 39/209; 18.66%</span>
@@ -210,12 +194,12 @@ as a list, instead of individually in <code>...</code>.</p></dd>
 <span class="r-in"><span><span class="co"># only 'sex' and 'age' are retained</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">normalized_to_quan</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    sex age        N</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1:   F  25 57.72613</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2:   F  18 79.69349</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3:   F  16 75.96996</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4:   M  23 59.94994</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5:   F  25 33.29146</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6:   M  26 80.60075</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1:   F  25 62.53234</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2:   F  18 77.32835</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3:   F  16 77.32835</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4:   M  23 58.89060</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5:   F  25 38.13066</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6:   M  26 80.09245</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># to StandardScale attached to GroupedScoreTable</span></span></span>
 <span class="r-in"><span><span class="va">normalized_to_STEN</span> <span class="op">&lt;-</span> <span class="fu">normalize_scores_grouped</span><span class="op">(</span></span></span>
@@ -227,15 +211,15 @@ as a list, instead of individually in <code>...</code>.</p></dd>
 <span class="r-in"><span>  group_col <span class="op">=</span> <span class="st">"sex_age_group"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># none is retained, 'sex_age_goup' is created</span></span></span>
+<span class="r-in"><span><span class="co"># none is retained, 'sex_age_group' is created</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">normalized_to_STEN</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      sex_age_group N</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1:    23-26:Female 5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2:    18-22:Female 7</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3: below 18:Female 6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4:      23-26:Male 6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5:    23-26:Female 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6:      23-26:Male 7</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1:    23-60:Female 6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2: below 22:Female 6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3: below 22:Female 6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4:      23-60:Male 5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5:    23-60:Female 4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6:      23-60:Male 7</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
