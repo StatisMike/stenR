@@ -465,13 +465,13 @@ str(IPIP_NEO_300)
     ```
 
 
-## Additional functions
+## Varia
 
 Above information should be enough for basic usage of `stenR`. It is developed
 having in mind multiple use-cases and general customizability. Below are some
 additional possibilities described.
 
-### `StandardScale()`
+### *StandardScale*
 
 In the examples above we used `STEN` *StandardScale* object, which is provided
 in the package. You can check all available scales with `?default_scales` doc.
@@ -598,7 +598,7 @@ ft_list <- HexCST$export_ScoreTable(strip = T)
 summary(ft_list)
 ```
 
-### SimFrequencyTable() using only distribution data
+### Simulate *FrequencyTable* using raw score distribution data
 
 Above examples described two most possible scenarios: either having raw scores
 to calculate norms yourself, or importing scoring table from measure documentation.
@@ -640,7 +640,7 @@ SimCST$standardize(
 There are also `GroupAssignment()` and `intersect_GroupAssignment()` functions
 to assign observations on basis of one or two *GroupConditions* objects, described
 in **Groups** section. They are used internally by `GroupedFrequencyTable()`, 
-`normalize_scores_grouping()` and `normalize_scores_scoring()`, but are also 
+`normalize_scores_grouped()` and `normalize_scores_scoring()`, but are also 
 exported if you wish to `extract_observations()` manually. Check the examples
 in documentation for more information.
 

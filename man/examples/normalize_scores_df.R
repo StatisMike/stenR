@@ -1,7 +1,9 @@
 # normalize multiple variables with FrequencyTable
-ft_H <- FrequencyTable(HEXACO_60$HEX_H)
-ft_E <- FrequencyTable(HEXACO_60$HEX_E)
-ft_X <- FrequencyTable(HEXACO_60$HEX_X)
+suppressMessages({
+  ft_H <- FrequencyTable(HEXACO_60$HEX_H)
+  ft_E <- FrequencyTable(HEXACO_60$HEX_E)
+  ft_X <- FrequencyTable(HEXACO_60$HEX_X)
+})
 
 normalize_scores_df(data = head(HEXACO_60), 
                     vars = c("HEX_H", "HEX_E", "HEX_X"),

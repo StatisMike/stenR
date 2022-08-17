@@ -1,5 +1,7 @@
 # normalize with FrequencyTable
-ft <- FrequencyTable(HEXACO_60$HEX_H)
+suppressMessages(
+  ft <- FrequencyTable(HEXACO_60$HEX_H)
+)
 
 normalize_score(HEXACO_60$HEX_H[1:5], ft, what = "Z")
 

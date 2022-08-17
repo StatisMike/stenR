@@ -1,9 +1,7 @@
 url: https://statismike.github.io/stenR/
 template:
-  package: preferably
-  params:
-    toggle: manual
   bootstrap: 5
+  bootswatch: flatly
 reference:
 - title: Basic normalization
   desc: >

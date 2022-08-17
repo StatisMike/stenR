@@ -41,13 +41,15 @@ more variables. Given data.frame should also contain columns used in
 }
 \examples{
 # Scoring table to export / import #
-Consc_ST <- 
-  GroupedFrequencyTable(
-    data = IPIP_NEO_300,
-    conditions = GroupConditions("Sex", "M" ~ sex == "M", "F" ~ sex == "F"), 
-    var = "C") |>
-  GroupedScoreTable(scale = STEN) |>
-  to_ScoringTable(min_raw = 60, max_raw = 300)
+suppressMessages(
+  Consc_ST <- 
+    GroupedFrequencyTable(
+      data = IPIP_NEO_300,
+      conditions = GroupConditions("Sex", "M" ~ sex == "M", "F" ~ sex == "F"), 
+      var = "C") |>
+    GroupedScoreTable(scale = STEN) |>
+    to_ScoringTable(min_raw = 60, max_raw = 300)
+)
 
 # normalize scores
 Consc_norm <- 

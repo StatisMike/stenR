@@ -49,31 +49,29 @@ Normalize scores using either \code{GroupedFrequencyTable} or
 contain columns used in \code{GroupingConditions} attached to the table
 }
 \examples{
-#### create GroupConditions for calculating tables ####
-age_grouping <- GroupConditions(
-  conditions_category = "Age",
-  "below 22" ~ age < 22,
-  "23-60" ~ age >= 23 & age <= 60,
-  "above 60" ~ age > 60
-)
-sex_grouping <- GroupConditions(
-  conditions_category = "Sex",
-  "Male" ~ sex == "M",
-  "Female" ~ sex == "F"
-)
-
-#### create GroupedFrequencyTable ####
-NEU_gft <- GroupedFrequencyTable(
-  data = IPIP_NEO_300,
-  conditions = list(age_grouping, sex_grouping),
-  var = "N"
-)
-
-#### create GroupedScoreTable ####
-NEU_gst <- GroupedScoreTable(
-  NEU_gft,
-  scale = list(STEN, STANINE)
-)
+# setup - create necessary objects #
+suppressMessages({
+  age_grouping <- GroupConditions(
+    conditions_category = "Age",
+    "below 22" ~ age < 22,
+    "23-60" ~ age >= 23 & age <= 60,
+    "above 60" ~ age > 60
+  )
+  sex_grouping <- GroupConditions(
+    conditions_category = "Sex",
+    "Male" ~ sex == "M",
+    "Female" ~ sex == "F"
+  )
+  NEU_gft <- GroupedFrequencyTable(
+    data = IPIP_NEO_300,
+    conditions = list(age_grouping, sex_grouping),
+    var = "N"
+  )
+  NEU_gst <- GroupedScoreTable(
+    NEU_gft,
+    scale = list(STEN, STANINE)
+  )
+})
 
 #### normalize scores ####
 # to Z score or quantile using GroupedFrequencyTable
