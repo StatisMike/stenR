@@ -296,6 +296,7 @@ normalize_scores_grouped <- function(
 #' Ignored if no conditions are available
 #' @param .dots `ScoringTable` objects provided as a list, instead of individually in `...`. 
 #' @export
+#' @example man/examples/normalize_scores_scoring.R
 #' @importFrom cli cli_abort
 #' @family score-normalization functions
 #' @return data.frame with normalized scores
